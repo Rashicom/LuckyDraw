@@ -3,6 +3,7 @@ from django.views import View
 from .forms import LoginForm
 from django.contrib.auth import authenticate, login, logout
 
+
 # Login
 class UserLogin(View):
 
@@ -66,6 +67,7 @@ class UserLogin(View):
         """
         return render(request, self.login_templet)
         
+
 
 
 class UserLogout(View):
