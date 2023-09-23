@@ -31,7 +31,11 @@ class CoupenValidator:
         """
         this methods returns True if the coupen is a valied box coupen else return False
         """
-        
+
+        # if number contain extra char than a b c
+        if self.is_contain_extra_char():
+            return False
+
         # seperate integer to one string, alphabet to another string for checking
         number = ""
         char = ""
@@ -39,14 +43,17 @@ class CoupenValidator:
             if i.isnumeric():
                 number = number+i
             else:
-                char = char+i
-
+                char = char + i.capitalize()
         
-        if len(number) == 2 and len(char) == 3:
+        # check any duplicate char are there
+        if len(char) != len(set(char)):
+            return False
+        
+        if (len(number) == 2 and len(char) == 3) or (len(number) > len(char)):
             return False
 
         # bothe number and char leng must be below 3 and not be zero
-        if 0 < len(number) <= 3 or 0 < len(char) <= 3:
+        if 0 < len(number) <= 3 and 0 < len(char) <= 3:
             return True
 
         else:
@@ -71,9 +78,22 @@ class CoupenValidator:
         if contains returns true 
         """
 
+        # special charecter check
         regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
 
         if regex.search(self.coupen_number) is not None:
             return True
         else:
             return False
+    
+    
+    def is_contain_extra_char(self):
+        """
+        this method checking the coupen nuber consist any char other than A B or C
+        """
+        regex = re.match(r'^[ABCabc]+\d*$', self.coupen_number)
+        if regex:
+            return False
+        else:
+            return True
+        

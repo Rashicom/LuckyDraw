@@ -3,20 +3,23 @@ from django.views import View
 from .forms import AddParticipantForm
 from .models import LuckyDraw, LuckyDrawContext
 from datetime import datetime, timedelta
+from .coupens import CoupenValidator
+from django.http import JsonResponse
 
 # Add new participant
 class AddParticipant(View):
 
     form_class = AddParticipantForm
-    templet = "addparticipant.html"
+    coupenvalidator_class = CoupenValidator
 
     def post(self, request):
         """
-        this metthod is creating a new participant
+        this metthod is creating a new participant ajax call
 
         accept: participant_name   optional
                 coupen_number      char
                 coupen_type        choice field
+                coupen_count       integer
                 luckydrawtype_id   id
 
         program flow:
@@ -31,8 +34,7 @@ class AddParticipant(View):
         # CHECK 1 : fetching data and validatiog form
         form = self.form_class(request.POST)
         if not form.is_valid():
-            return render(request,self.templet,{"error":"Please enter all fields"})
-
+            return JsonResponse({"error":"Please enter a valid data"})
 
         # CHECK 2 : data entry time contrain check
 
@@ -56,4 +58,19 @@ class AddParticipant(View):
             context_instance = LuckyDrawContext.objects.get_or_create(luckydrawtype_id = luckydraw_instance.luckydrawtype_id,context_date=datetime.date + timedelta(1))
 
         # CHECK 3 : validate coupen
+        coupen_number = form.cleaned_data.get("coupen_number")
+        coupen_type = form.cleaned_data.get("coupen_type")
         
+        # creating instace for validater class and pass credencials
+        coupen = self.coupenvalidator_class(coupen_number=coupen_number, coupen_type=coupen_type)
+        
+        # if coupen is valied update data base
+        if coupen.is_valied():
+            return JsonResponse({"status":201,"message":"success"})
+
+
+        else:
+            return JsonResponse({"status":"400","error":"invalied coupen"})
+
+
+

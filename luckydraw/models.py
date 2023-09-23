@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.contrib.postgres.fields import ArrayField
 
 # lucky dray type
 class LuckyDraw(models.Model):
@@ -37,7 +37,7 @@ class LuckyDrawContext(models.Model):
     all the given lucky number saved here for future mannual cross matching to varify the result
     """
     # array field which save all the lucky nubers for a perticular context
-    context_luckynumber_list = models.ArrayField(models.CharField(max_length=5), null=True, blank=True)
+    context_luckynumber_list = ArrayField(models.CharField(max_length=6), null=True, blank=True)
 
 
 # particants with lucky number
@@ -59,6 +59,7 @@ class Participants(models.Model):
     participant_name = models.CharField(max_length=50, null= True, blank= True)
     coupen_number = models.CharField(max_length=10)
     coupen_type = models.CharField(choices=CoupenType.choices, max_length=50)
+    coupen_count = models.IntegerField()
     is_winner = models.BooleanField(default=False)
 
 
