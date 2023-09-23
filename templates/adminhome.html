@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h3>ADMIN PANEL</h3>
+    <h2>luckydraw</h2>
+
+    {% comment %} list out lucky drow {% endcomment %}
+
+    <form action="" method="POST">
+        {% csrf_token %}
+        <label for="">luckydraw name</label>
+        <input type="text" name="luckydraw_name">
+
+        <label for="">description</label>
+        <input type="text" name="description">
+
+        <label for="">draw_time</label>
+        <input type="text" name="draw_time">
+
+        <button type="submit">create new luckydraw</button>
+
+    </form>
+    {% if error %}
+    {{error}}
+    {% endif %}
+    
+</body>
+</html>
