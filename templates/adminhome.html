@@ -12,6 +12,21 @@
 
     {% comment %} list out lucky drow {% endcomment %}
 
+    <ul>
+        {% for luckydrow in luckydrow_list %}
+            <li>
+                <p>{{luckydrow.luckydrawtype_id}}</p>
+                <p>{{luckydrow.luckydraw_name}}</p>
+                <p>{{luckydrow.description}}</p>
+                <p>{{luckydrow.draw_time}}</p>
+
+            </li>
+            <a href="{% url "get_contest" luckydrow.luckydrawtype_id %}">click here</a>
+        {% endfor %}
+
+    </ul>
+    
+
     <form action="" method="POST">
         {% csrf_token %}
         <label for="">luckydraw name</label>

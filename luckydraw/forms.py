@@ -8,6 +8,15 @@ class AddParticipantForm(forms.Form):
     coupen_type = forms.CharField(required=True)
     coupen_count = forms.IntegerField(required=True)
 
+    def clean(self):
+        cleaned_data = super().clean()
+        coupen_count = cleaned_data.get('coupen_count')
+
+        if coupen_count is not None and coupen_count <= 0:
+            self.add_error(None,"invalied coupen count")
+
+        return cleaned_data
+
 
 class GetorSetLuckyDrawForm(forms.ModelForm):
     class Meta:

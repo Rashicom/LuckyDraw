@@ -5,21 +5,110 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
 </head>
 <body>
 
     <h3>add participant</h3>
-    <form action="">
-        <input type="text" name="luckydrawtype_id">
-        <input type="text" name="participant_name">
-        <input type="text" name="coupen_number">
-        <select name="coupen_type">
+    <p>{{luckydraw.luckydrawtype_id}}</p>
+    <p>{{luckydraw.luckydraw_name}}</p>
+    <p>{{luckydraw.description}}</p>
+    <h3>time:{{luckydraw.draw_time}}</h3>
+
+    <form>
+        {% csrf_token %}
+        <input type="text" hidden id="luckydrawtype_id" value={{luckydraw.luckydrawtype_id}}>
+
+        <label for="">name</label>
+        <input type="text" id="participant_name">
+
+        <label for="">coupen number</label>
+        <input type="text" id="coupen_number">
+        
+        <label for="">cupen type</label>
+        <select id="coupen_type">
             <option value="BLOCK">BLOCK</option>
             <option value="BOX">BOX</option>
             <option value="SUPER">SUPER</option>
         </select>
 
+        <label for="">count</label>
+        <input type="number" id="coupen_count" value="1">
+
+        <button type="button" id="add_participant">Save</button>
+        <p id="error"></p>
+        
+
     </form>
+
+
+    <script>
+
+        //participant save button
+        $("#add_participant").on("click", function(e) {
+            /*
+            this method fetch all the data from the form and validate,
+            then trigger ajax call to update
+            */
+
+            e.preventDefault()
+            console.log("button clicked")
+            
+            //fetcing data
+            let luckydrawtype_id = $("#luckydrawtype_id").val()
+            let participant_name = $("#participant_name").val()
+            let coupen_number = $("#coupen_number").val()
+            let coupen_type = $("#coupen_type").val()
+            let coupen_count = $("#coupen_count").val()
+            
+            //validation
+            if (coupen_number=="" || coupen_type=="") {
+                $("#error").text("Field incomplete")
+                return 
+            }
+            else{$("#error").text("")}
+            if (coupen_count < 0) {
+                $("#error").text("Invalid count")
+                return
+            }
+            else{$("#error").text("")}
+            console.log(coupen_count)
+            // coupen_number and coupen_type validation needed for better perfomance
+            // otherwise we make ajax call using invalied data
+            // backend does have a validation, but frond end validation needed for better perfomance
+            
+            console.log("procede for ajax call")
+            //calling ajax
+            let data = {
+                "luckydrawtype_id":luckydrawtype_id,
+                "participant_name": participant_name,
+                "coupen_number": coupen_number,
+                "coupen_type": coupen_type,
+                "coupen_count": coupen_count,
+                "csrfmiddlewaretoken":"{{ csrf_token }}",
+            }
+            console.log("calling ajax")
+            $.ajax({
+                url: "{% url "add_participant" %}",
+                method: "POST",
+                data: data,
+
+                success: function(data) {
+                    // handle response
+                    console.log(data)
+                    console.log(data.error)
+                },
+
+            })
+            
+            
+
+        })
+        $(document).ready(function() {
+            console.log("hellot")
+
+        })
+    </script>
     
 </body>
 </html>

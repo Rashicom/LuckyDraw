@@ -29,7 +29,7 @@ class LuckyDrawContext(models.Model):
     luckydrawtype_id = models.ForeignKey(LuckyDraw, on_delete=models.CASCADE, related_name="luckydrawcontext_set")
 
     # date must be unique to prevent duplication, one day can have only cone context
-    context_date = models.DateField(auto_now=True, auto_now_add=False, unique=True) 
+    context_date = models.DateField(unique=True) 
     
     """
     list of lucky numbers announced by the organizers
