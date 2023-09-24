@@ -2,20 +2,22 @@ from django.shortcuts import render
 from django.views import View
 from .forms import AddParticipantForm, GetorSetLuckyDrawForm
 from .models import LuckyDraw, LuckyDrawContext, Participants
+from django.contrib.auth.decorators import login_required
 from datetime import timedelta, datetime, time
 from .coupens import CoupenValidator
 from django.http import JsonResponse
 import pytz
 
 
+
 class GetorSetLuckyDraw(View):
     """
-    ACCESS: ADMIN ONLY
     """
 
     form_class = GetorSetLuckyDrawForm
     templet = "adminhome.html"
 
+    
     def post(self, request):
         """
         creating new lucky draw
@@ -36,20 +38,14 @@ class GetorSetLuckyDraw(View):
         
         return render(request,self.templet,message)
     
-
-    def get(self, request):
-        """
-        return admin home page
-        """
-        luckydrow_list = LuckyDraw.objects.all()
-        return render(request,self.templet,{"luckydrow_list":luckydrow_list})
-
+   
 
 # Add new participant ajax call
 class AddParticipant(View):
 
     form_class = AddParticipantForm
     coupenvalidator_class = CoupenValidator
+
 
     def post(self, request):
         """
@@ -154,6 +150,7 @@ class GetContext(View):
 
     Addparticipant_templet = "addparticipant.html"
 
+   
     def get(self, request, luckydrawtype_id):
         """
         this method returns Add participant page

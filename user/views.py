@@ -2,14 +2,15 @@ from django.shortcuts import render, redirect
 from django.views import View
 from .forms import LoginForm
 from django.contrib.auth import authenticate, login, logout
-
+from django.contrib.auth.decorators import login_required
+from luckydraw.models import LuckyDraw
 
 # Login
 class UserLogin(View):
 
     form_class = LoginForm
     login_templet = "login.html"
-    home_templet = "home.html"
+    home_templet = "adminhome.html"
 
     def post(self, request, *args, **kwargs):
         """
@@ -44,9 +45,10 @@ class UserLogin(View):
             """
             login(request,user)
 
-            # provide home templet, message optional
+            # return
             templet = self.home_templet
-            message = {}
+            luckydrow_list = LuckyDraw.objects.all()
+            return render(request,templet,{"luckydrow_list":luckydrow_list})
         
         else:
             """
@@ -56,15 +58,21 @@ class UserLogin(View):
             # render the same page with error response
             templet = self.login_templet
             message = {"error":"invalied email or password"}
+            
+            # return
+            return render(request, templet, message)
 
-        # return
-        return render(request, templet, message)
         
-
+        
+    
     def get(self, request, *args, **kwargs):
         """
         returning login template
         """
+        if request.user.is_authenticated:
+            luckydrow_list = LuckyDraw.objects.all()
+            return render(request,self.home_templet,{"luckydrow_list":luckydrow_list})
+
         return render(request, self.login_templet)
         
 
