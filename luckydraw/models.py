@@ -54,6 +54,15 @@ class Participants(models.Model):
         BOX = "BOX"
         SUPER = "SUPER"
 
+    # choice for coupen type
+    class Prizes(models.TextChoices):
+        FIRST_PRIZE = "FIRST_PRIZE"
+        SECOND_PRIZE = "SECOND_PRIZE"
+        THIRD_PRIZE = "THIRD_PRIZE"
+        FOURTH_PRIZE = "FOURTH_PRIZE"
+        FIFTH_PRIZE = "FIFTH_PRIZE"
+
+
     participant_id = models.AutoField(primary_key=True)
     context_id = models.ForeignKey(LuckyDrawContext, on_delete=models.CASCADE, related_name="participants_set")
 
@@ -62,6 +71,8 @@ class Participants(models.Model):
     coupen_type = models.CharField(choices=CoupenType.choices, max_length=50)
     coupen_count = models.IntegerField()
     is_winner = models.BooleanField(default=False)
+    prize = models.CharField(choices=Prizes.choices, max_length=50, blank=True, null=True)
+    
 
 
     

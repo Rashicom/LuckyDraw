@@ -13,7 +13,7 @@ class CoupenValidator:
         self.coupen_number = coupen_number
         self.coupen_type = coupen_type
 
-
+    
     def is_valied(self):
         """
         calling different validtin fuction accorting to the coupen type
@@ -22,14 +22,14 @@ class CoupenValidator:
         if self.is_contain_special_char():
             return False
 
-        if self.coupen_type == "BOX":
-            return self.is_box_coupen()
+        if self.coupen_type == "BLOCK":
+            return self.is_block_coupen()
         
-        elif self.coupen_type == "BLOCK" or self.coupen_type == "SUPER":
-            return self.is_block_or_super()
+        elif self.coupen_type == "BOX" or self.coupen_type == "SUPER":
+            return self.is_box_or_super()
 
 
-    def is_box_coupen(self):
+    def is_block_coupen(self):
         """
         this methods returns True if the coupen is a valied box coupen else return False
         """
@@ -62,7 +62,7 @@ class CoupenValidator:
             return False
             
 
-    def is_block_or_super(self):
+    def is_box_or_super(self):
         """
         for both block and supen we have a single chicking
         check: three digit number or not
