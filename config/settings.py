@@ -42,8 +42,8 @@ INSTALLED_APPS = [
     'luckydraw',
     'home',
 
-
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

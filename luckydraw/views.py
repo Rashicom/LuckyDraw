@@ -13,7 +13,6 @@ import pytz
 class GetorSetLuckyDraw(View):
     """
     """
-
     form_class = GetorSetLuckyDrawForm
     templet = "adminhome.html"
 
@@ -25,9 +24,10 @@ class GetorSetLuckyDraw(View):
                 description       optional
                 draw_time
         """
-
+        print("request hit")
         form = self.form_class(request.POST)
         if form.is_valid():
+            print("form validated")
             form.save()
             message = {}
 
@@ -113,7 +113,7 @@ class AddParticipant(View):
         # CHECK 3 : validate coupen
         coupen_number = form.cleaned_data.get("coupen_number")
         coupen_type = form.cleaned_data.get("coupen_type")
-        print("context instance:",context_instance)
+        
         # creating instace for validator class and pass credencials
         coupen = self.coupenvalidator_class(coupen_number=coupen_number, coupen_type=coupen_type)
         
@@ -164,3 +164,5 @@ class GetContext(View):
         luckydrow = LuckyDraw.objects.get(luckydrawtype_id = luckydrawtype_id)
 
         return render(request,templet,{"luckydraw":luckydrow})
+
+

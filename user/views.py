@@ -76,8 +76,7 @@ class UserLogin(View):
         return render(request, self.login_templet)
         
 
-
-
+# logout user
 class UserLogout(View):
 
     def get(self, request, *args, **kwargs):

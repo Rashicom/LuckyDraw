@@ -29,7 +29,7 @@ class LuckyDrawContext(models.Model):
     luckydrawtype_id = models.ForeignKey(LuckyDraw, on_delete=models.CASCADE, related_name="luckydrawcontext_set")
 
     # date must be unique to prevent duplication, one day can have only cone context
-    context_date = models.DateField(unique=True) 
+    context_date = models.DateField()
     
     """
     list of lucky numbers announced by the organizers
@@ -38,6 +38,7 @@ class LuckyDrawContext(models.Model):
     """
     # array field which save all the lucky nubers for a perticular context
     context_luckynumber_list = ArrayField(models.CharField(max_length=6), null=True, blank=True)
+    is_winner_announced = models.BooleanField(default=False)
 
 
 # particants with lucky number
