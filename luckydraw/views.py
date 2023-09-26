@@ -26,17 +26,25 @@ class GetorSetLuckyDraw(View):
         """
         print("request hit")
         form = self.form_class(request.POST)
+
+        luckydrow_list = LuckyDraw.objects.all()
+
         if form.is_valid():
             print("form validated")
             form.save()
-            message = {}
+            data = {"luckydrow_list":luckydrow_list}
 
         else:
             
-            message = {"error":form.errors}
-            print(message)
+            data= {"error":form.errors, "luckydrow_list":luckydrow_list}
+            print(data)
         
-        return render(request,self.templet,message)
+        
+        return render(request,self.templet,data)
+        
+    def get(self,request):
+        luckydrow_list = LuckyDraw.objects.all()
+        return render(request,self.templet,{"luckydrow_list":luckydrow_list})
     
    
 

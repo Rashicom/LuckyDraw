@@ -1,6 +1,6 @@
 from .models import LuckyDraw
 import re
-from .models import Participants
+from .models import Participants,LuckyDraw,LuckyDrawContext
 
 
 # coupen validation check agains its type
@@ -102,7 +102,7 @@ class CoupenValidator:
 
 
 # winner announcement
-class LuckyNumber:
+class AnnounceWiners:
     """
     user given luckynumbers may be a list or in otherformat or anything.
     accept the string and convert to an array of 3 digit numbers then validate, if validated cross chck the matching to find winner
@@ -120,10 +120,14 @@ class LuckyNumber:
 
     """
 
-    def __init__(self,lucky_numbers = None):
+    def __init__(self,lucky_numbers = [],luckydrawtype_id=None,context_date=None):
         self.lucky_numbers = lucky_numbers
+        self.luckydrawtype_id = luckydrawtype_id
+        self.context_date = context_date
+        context_instance = LuckyDrawContext.objects.get(luckydrawtype_id=luckydrawtype_id,context_date=context_date)
         self.cleaned_data = []
         self.query_set = Participants.objects.filter()
+
 
 
     # clean input
@@ -140,6 +144,7 @@ class LuckyNumber:
 
     # validate
     def is_valid(self):
+
         """
         clean method is also enough for make a cleaned and varified data
         from the input.
@@ -153,24 +158,44 @@ class LuckyNumber:
             if len(number) != 3:
                 return False
         return True
-    
 
 
+    # announce
+    def announce(self):
+        """
+        this fuction iterarating through all todays coupen numbers
+        and varify the number is matching or not by calling one on the 
+        methods(super_winner,block_winner,box_winner)
+        """
+
+        # get all participant_query_dict list and iterate through it
+        # each iteration check the coupen type and call appropriate winner method
+        # those methods cross match it and if there is any match, it will alter the query fields(is_winner,prize)
+        all_participants = Participants.objects.filter(context_id=self.context_instance)
+        
+        for participant in all_participants:
+            if participant.coupen_type == "SUPER":
+                self.super_winner(participant)
 
     # super winners
-    def super_winners(self):
+    def super_winner(self,participant):
         """
-        fiter all the coupen numbers by todays date
+        go through all provided lucky_numbers and find the match
         """
+        for i in range(len(self.cleaned_data)):
+            if participant.coupen_number == self.cleaned_data[i]:
+                print("coupen matched update to database")
 
+        
+        
 
     # block winners
-    def block_winners(self):
+    def block_winner(self):
         pass
 
 
     # annownsing box winners
-    def box_winners(self):
+    def box_winner(self):
         pass
 
 
