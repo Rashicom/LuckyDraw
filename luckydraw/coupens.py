@@ -1,7 +1,7 @@
 from .models import LuckyDraw
 import re
 from .models import Participants,LuckyDraw,LuckyDrawContext
-
+from itertools import permutations
 
 # coupen validation check agains its type
 class CoupenValidator:
@@ -102,7 +102,7 @@ class CoupenValidator:
 
 
 # winner announcement
-class AnnounceWiners:
+class AnnounceWinners:
     """
     user given luckynumbers may be a list or in otherformat or anything.
     accept the string and convert to an array of 3 digit numbers then validate, if validated cross chck the matching to find winner
@@ -127,18 +127,24 @@ class AnnounceWiners:
         context_instance = LuckyDrawContext.objects.get(luckydrawtype_id=luckydrawtype_id,context_date=context_date)
         self.cleaned_data = []
         self.query_set = Participants.objects.filter()
+        
+        self.winning_prizes = []
+        self.complimentery_prizes = set()
+        print("constructor inetyialized")
 
+        self.prize = ""
 
 
     # clean input
     def clean(self):
-
+        print("clean method hit")
         # Use regular expression to find three-digit numbers
         cleaned_list = re.findall(r'\d{3}', self.lucky_numbers)
         
         # make sure the array is empty, then extend the cleaced data
-        self.cleaned_data = []
-        self.cleaned_data.exten(cleaned_list)
+        self.cleaned_data.extend(cleaned_list)
+
+        return self.cleaned_data
         
     
 
@@ -166,38 +172,124 @@ class AnnounceWiners:
         this fuction iterarating through all todays coupen numbers
         and varify the number is matching or not by calling one on the 
         methods(super_winner,block_winner,box_winner)
+        
+        Program Flow:
+            - populate winning_prizes list and complimentery_winning prizes set
+            - collect all participant filtered by specific luckydraw type and date
+            - iterate through the queryset and check the coupen type
+            - call the appropriate method to identify the participant is a winner or not
+            - these methods are responsible to update the data base of teh winnign statuses.
+            - after gong through all queryset set is_winner_announced to True
         """
+        print("announcing winner")
+        # populating winning prizes list and complimetery winning prizes set
+        self.winning_prizes.extend(self.cleaned_data[:5])
+        self.complimentery_prizes.update(self.cleaned_data[5:])
 
+        context_instance = LuckyDrawContext.objects.get(luckydrawtype_id = self.luckydrawtype_id, context_date=self.context_date)
+        
         # get all participant_query_dict list and iterate through it
         # each iteration check the coupen type and call appropriate winner method
         # those methods cross match it and if there is any match, it will alter the query fields(is_winner,prize)
-        all_participants = Participants.objects.filter(context_id=self.context_instance)
+        all_participants = Participants.objects.filter(context_id=context_instance)
         
         for participant in all_participants:
             if participant.coupen_type == "SUPER":
                 self.super_winner(participant)
+            if participant.coupen_type == "BOX":
+                self.box_winner(participant)
+
+
+        # after iteration set is_winner_announced to True and save the lucky numbers to the context_luckynumber_list
+
 
     # super winners
     def super_winner(self,participant):
         """
         go through all provided lucky_numbers and find the match
         """
-        for i in range(len(self.cleaned_data)):
-            if participant.coupen_number == self.cleaned_data[i]:
-                print("coupen matched update to database")
+        print("super winner")
+        # lookup for is the number is IN  TOP 5 WINNERES or not
+        for i in range(len(self.winning_prizes)):
+            if self.winning_prizes[i] == participant.coupen_number:
 
-        
-        
+                # seting winning prize level
+                if i == 0:
+                    self.prize = "FIRST_PRIZE"
+                elif i == 1:
+                    self.prize = "SECOND_PRIZE"
+                elif i == 2:
+                    self.prize = "THIRD_PRIZE"
+                elif i == 3:
+                    self.prize = "FOURTH_PRIZE"
+                elif i == 4:
+                    self.prize = "SIXTH_PRIZE"
+
+            # update data base
+            print("---------------------")
+            print(self.prize)
+            print(participant.coupen_number)
+            # if coupen is in winner we dont wnant to ckeck the number in complimentery
+            return
+
+        # lookup for complimentery winners
+        if participant.coupen_number in self.complimentery_prizes:
+            print("complimentery prize")
+            # updte data base
+
 
     # block winners
-    def block_winner(self):
+    def block_winner(self,participant):
+        
         pass
 
 
     # annownsing box winners
-    def box_winner(self):
-        pass
+    def box_winner(self,participant):
+        print("box winner")
+        # we have to create a permutaion(all possible permutaions) list of the coupen number
+        permutation_list = list(permutations(participant.coupen_number))
 
+        # Convert each permutation back to an integer and save them to a list
+        possible_combinations = [int("".join(permutation)) for permutation in permutation_list]
+        
+        # iterate through possibli compinations
+        for coupen in possible_combinations:
+            """
+            ckeck each value is in winning prizes list or in complimetery_prize list
+            """
+            # lookup for is the number is IN  TOP 5 WINNERES or not
+            for i in range(len(self.winning_prizes)):
+                if self.winning_prizes[i] == coupen:
+
+                    # seting winning prize level
+                    if i == 0:
+                        self.prize = "FIRST_PRIZE"
+                    elif i == 1:
+                        self.prize = "SECOND_PRIZE"
+                    elif i == 2:
+                        self.prize = "THIRD_PRIZE"
+                    elif i == 3:
+                        self.prize = "FOURTH_PRIZE"
+                    elif i == 4:
+                        self.prize = "SIXTH_PRIZE"
+
+                # update data base
+                print("-----------------")
+                print(self.prize)
+                print(coupen)
+                # if coupen is in winner we dont wnant to ckeck the number in complimentery
+                return
+
+            # lookup for complimentery winners
+            if participant.coupen_number in self.complimentery_prizes:
+                print("complimentery prize")
+                # updte data base
+                
+                # we dont want further iteration
+                return
+
+    
 
 
 
