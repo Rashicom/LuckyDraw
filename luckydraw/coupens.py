@@ -204,8 +204,9 @@ class AnnounceWinners:
 
 
         # after iteration set is_winner_announced to True and save the lucky numbers to the context_luckynumber_list
-
-
+        context_instance.is_winner_announced = True
+        context_instance.context_luckynumber_list = self.cleaned_data
+        context_instance.save()
     # super winners
     def super_winner(self,participant):
         """
@@ -226,9 +227,13 @@ class AnnounceWinners:
                 elif i == 3:
                     self.prize = "FOURTH_PRIZE"
                 elif i == 4:
-                    self.prize = "FIXTH_PRIZE"
+                    self.prize = "FIFTH_PRIZE"
 
                 # update data base
+                participant.is_winner = True
+                participant.prize = self.prize
+                participant.save()
+
                 print("---------winning prize------------")
                 print(self.prize)
                 print(participant.coupen_number)
@@ -241,6 +246,10 @@ class AnnounceWinners:
             print(participant.coupen_number)
 
             # updte data base
+            self.prize = "COMPLIMENTERY_PRIZE"
+            participant.is_winner = True
+            participant.prize = self.prize
+            participant.save()
 
 
     # block winners
@@ -308,6 +317,10 @@ class AnnounceWinners:
                         self.prize = "COMPLIMENTERY_PRIZE"
                     
                     # update database
+                    participant.is_winner = True
+                    participant.prize = self.prize
+                    participant.save()
+
                     # stop further checking
                     print("----BOX WINNER------")
                     print(self.prize)
@@ -358,6 +371,10 @@ class AnnounceWinners:
                         self.prize = "COMPLIMENTERY_PRIZE"
                     
                     # update database
+                    participant.is_winner = True
+                    participant.prize = self.prize
+                    participant.save()
+
                     # stop further checking
                     print("----BOX WINNER------")
                     print(self.prize)
@@ -397,6 +414,10 @@ class AnnounceWinners:
                         self.prize = "FIXTH_PRIZE"
 
                     # update data base
+                    participant.is_winner = True
+                    participant.prize = self.prize
+                    participant.save()
+
                     print("--------Winning prize---------")
                     print(self.prize)
                     print(coupen)
@@ -407,8 +428,13 @@ class AnnounceWinners:
             if coupen in self.complimentery_prizes:
                 print("--------Complimentry prize---------")
                 print(coupen)
+
                 # updte data base
-                
+                self.prize = "COMPLIMENTERY_PRIZE"
+                participant.is_winner = True
+                participant.prize = self.prize
+                participant.save()
+
                 # we dont want further iteration
                 return
 

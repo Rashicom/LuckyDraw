@@ -174,3 +174,13 @@ class GetContext(View):
         return render(request,templet,{"luckydraw":luckydrow})
 
 
+# Annouce winner
+class AnnounceWinner(View):
+    
+
+    def post(self, request):
+        """
+        this method is anouncing winners by crossmatching the given lucky number set
+        and return all winner informations
+        accept: 
+        """
