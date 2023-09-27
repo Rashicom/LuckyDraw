@@ -1,10 +1,10 @@
 from django.shortcuts import render
 from django.views import View
-from .forms import AddParticipantForm, GetorSetLuckyDrawForm
+from .forms import AddParticipantForm, GetorSetLuckyDrawForm, AnnounceWinnerForm
 from .models import LuckyDraw, LuckyDrawContext, Participants
 from django.contrib.auth.decorators import login_required
 from datetime import timedelta, datetime, time
-from .coupens import CoupenValidator
+from .coupens import CoupenValidator, AnnounceWinners
 from django.http import JsonResponse
 import pytz
 
@@ -177,10 +177,58 @@ class GetContext(View):
 # Annouce winner
 class AnnounceWinner(View):
     
+    form_class = AnnounceWinnerForm
+    templet = 0
 
     def post(self, request):
         """
         this method is anouncing winners by crossmatching the given lucky number set
         and return all winner informations
-        accept: 
+        accept: lucky_numbers, luckydrawtype_id, context_date
         """
+        
+        # serialize and validate data
+        form = self.form_class(request.POST)
+        if not form.is_valid():
+            return render(request,self.templet,{"error":form.errors})
+
+        # extract validate data
+        luckydrawtype_id = form.cleaned_data.get('luckydrawtype_id')
+        lucky_numbers = form.cleaned_data.get('lucky_numbers')
+        context_date = form.cleaned_data.get('context_date')
+
+        # CHECK 1 : context_date not grater than todays
+        time_zone = pytz.timezone('Asia/Kolkata')
+        today_date = datetime.now(time_zone).date()
+        context_date_obj = datetime.strptime(str(context_date), "%YYYY:%MM:%DD").date()
+        
+        if context_date_obj > today_date:
+            return render(request,self.templet,{"error":"Invalied date"})
+
+        # CHECK 2 : never allow to perform announce winneres if the present time is less than context time
+        present_time = datetime.now(time_zone).time()
+        luckydraw_obj = LuckyDraw.objects.get(luckydrawtype_id=luckydrawtype_id)
+        draw_time_obj = datetime.strptime(str(luckydraw_obj.draw_time), "%H:%M:%S").time()
+
+        if present_time < draw_time_obj:
+            return render(request,self.templet,{"error":"Drow Time not passed"})
+            
+
+        # CHECK 3 : never allow the announcement if already announced befor
+        context_obj = LuckyDrawContext.objects.get(luckydrawtype_id = luckydraw_obj.luckydrawtype_id, context_date=context_date)
+        
+        # if the winner is already announced
+        if context_obj.is_winner_announced == True:
+            return render(request,self.templet,{"error":"Already announced"})
+        
+        # ALL TEST IS PASSESD
+        context_winners = AnnounceWinners(luckydrawtype_id=luckydrawtype_id, context_date=context_date, lucky_numbers=lucky_numbers)
+        
+        # clean data
+        cleaned_data = context_winners.clean()
+
+        # announce winners
+        data = context_winners.announce()
+
+        return render(request,self.templet,data)
+

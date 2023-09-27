@@ -3,6 +3,7 @@ import re
 from .models import Participants,LuckyDraw,LuckyDrawContext
 from itertools import permutations
 
+
 # coupen validation check agains its type
 class CoupenValidator:
     """
@@ -207,6 +208,8 @@ class AnnounceWinners:
         context_instance.is_winner_announced = True
         context_instance.context_luckynumber_list = self.cleaned_data
         context_instance.save()
+
+
     # super winners
     def super_winner(self,participant):
         """
@@ -311,7 +314,7 @@ class AnnounceWinners:
                     elif i == 3:
                         self.prize = "FOURTH_PRIZE"
                     elif i == 4:
-                        self.prize = "FIXTH_PRIZE"
+                        self.prize = "FIFTH_PRIZE"
 
                     else:
                         self.prize = "COMPLIMENTERY_PRIZE"
@@ -365,7 +368,7 @@ class AnnounceWinners:
                     elif i == 3:
                         self.prize = "FOURTH_PRIZE"
                     elif i == 4:
-                        self.prize = "FIXTH_PRIZE"
+                        self.prize = "FIFTH_PRIZE"
 
                     else:
                         self.prize = "COMPLIMENTERY_PRIZE"
@@ -411,7 +414,7 @@ class AnnounceWinners:
                     elif i == 3:
                         self.prize = "FOURTH_PRIZE"
                     elif i == 4:
-                        self.prize = "FIXTH_PRIZE"
+                        self.prize = "FIFTH_PRIZE"
 
                     # update data base
                     participant.is_winner = True
@@ -438,13 +441,75 @@ class AnnounceWinners:
                 # we dont want further iteration
                 return
 
+
+
+
+class WinnersFilter:
+
+    def __init__(self, luckydrawtype_id=None, context_date=None):
+        self.luckydrawtype_id = luckydrawtype_id
+        self.context_date = context_date
+        self.data = {}
     
 
+    def getcontext_and_validate(self):
+        """
+        this checks the context is exest of not
+        if exist make sure that the context is already announced
+        """
+
+        context_instance = LuckyDrawContext.objects.filter(luckydrawtype_id=self.luckydrawtype_id, context_date=self.context_date)
+        
+        # does not exist if context doex not fount
+        if not context_instance.exists():
+            raise Exception("Context does not found")
+        else:
+            context_instance = context_instance[0]
+
+        # check the winners is announce or not
+        if context_instance.is_winner_announced == False:
+            raise Exception("Winners not announced yet")
+
+        # filter all participants under the context instance
+        winning_participants = Participants.objects.filter(context_id=context_instance.context_id, is_winner=True)
+        
+        # initilize
+        self.data = {
+            "FIRST_PRIZE": [],
+            "SECOND_PRIZE": [],
+            "THIRD_PRIZE": [],
+            "FOURTH_PRIZE": [],
+            "FIFTH_PRIZE": [],
+            "COMPLIMENTERY_PRIZE": [],
+        }
+
+        # iterate throuhg participants
+        for participant in winning_participants:
+            prize_category = participant.prize
+            participant_info = {
+                "coupen_number": participant.coupen_number,
+                "coupen_type": participant.coupen_type,
+                "coupen_count": participant.coupen_count,
+                "prize": participant.prize,
+            }
+
+            # appending to data lists
+            self.data[prize_category].append(participant_info)
+
+        return self.data  
 
 
+
+        
+        
+
+        
         
 
 
 
 
+
+
         
+

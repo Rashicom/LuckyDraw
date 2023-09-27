@@ -23,3 +23,9 @@ class GetorSetLuckyDrawForm(forms.ModelForm):
         model = LuckyDraw
         fields = ['luckydraw_name','description','draw_time']
 
+
+class AnnounceWinnerForm(forms.Form):
+    lucky_numbers = forms.CharField(required=True)
+    luckydrawtype_id = forms.IntegerField(required=True)
+    context_date = forms.DateField(required=True)
+    

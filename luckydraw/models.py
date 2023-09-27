@@ -63,7 +63,7 @@ class Participants(models.Model):
         FIFTH_PRIZE = "FIFTH_PRIZE"
         COMPLIMENTERY_PRIZE = "COMPLIMENTERY_PRIZE"
 
-
+    
     participant_id = models.AutoField(primary_key=True)
     context_id = models.ForeignKey(LuckyDrawContext, on_delete=models.CASCADE, related_name="participants_set")
 
