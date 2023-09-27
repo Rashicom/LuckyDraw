@@ -195,13 +195,12 @@ class AnnounceWinners:
         all_participants = Participants.objects.filter(context_id=context_instance)
         
         for participant in all_participants:
-            print("Iteration")
             # if participant.coupen_type == "SUPER":
             #     self.super_winner(participant)
             # if participant.coupen_type == "BOX":
             #     self.box_winner(participant)
-            if participant.coupen_type("BLOCK"):
-                self.block_winner()
+            if participant.coupen_type == "BLOCK":
+                self.block_winner(participant)
 
 
         # after iteration set is_winner_announced to True and save the lucky numbers to the context_luckynumber_list
@@ -250,36 +249,42 @@ class AnnounceWinners:
         programm flow:
             - seperate checking based on char and number
         """
+        print("ANNOUNCING BLOCK WINNERS")
         # Regular expression to separate characters and digits
         match = re.match(r'([A-Za-z]+)([0-9]+)', participant.coupen_number)
 
         if match:
             characters, digits = match.groups()
             characters = characters.upper()
+            digits = str(digits)
+
+        print(characters,digits)
 
         # 1'ST CASE: len(characters) == len(digits) eg: ab12
         if len(characters) == len(digits):
+            print("length of chat is == len digit")
         
-            for i in len(self.cleaned_data):
+            for i in range(len(self.cleaned_data)):
+                
                 # iterate through coupen charecter
                 # check any of the positional number matches
                 # winner flag assert all the positons are matching not only one. eg: ab23, bothe a and b position contain2 and 3 respectivelly to win, Not a or b
                 is_winner_flag = False
-                for idx in characters:
+                for idx,digit in zip(characters,digits):
                     if idx == "A":
-                        if digits[0] == self.cleaned_data[i][0]:
+                        if digit == str(self.cleaned_data[i])[0]:
                             is_winner_flag = True
                         else:
                             is_winner_flag = False
 
                     if idx == "B":
-                        if digits[1] == self.cleaned_data[i][1]:
+                        if digit == str(self.cleaned_data[i])[1]:
                             is_winner_flag = True
                         else:
                             is_winner_flag = False
                                 
                     if idx == "C":
-                        if digits[2] == self.cleaned_data[i][2]:
+                        if digit == str(self.cleaned_data[i])[2]:
                             is_winner_flag = True
                         else:
                             is_winner_flag = False
@@ -310,29 +315,28 @@ class AnnounceWinners:
                     return
             
         # 2'ST CASE: len(characters) > len(digits) ag: abc1
-        if len(characters) > len(digits):
+        elif len(characters) > len(digits):
             
-            for i in len(self.cleaned_data):
+            for i in range(len(self.cleaned_data)):
+                
                 # iterate through coupen charecter
                 is_winner_flag = False
                 for idx in characters:
+                    
                     if idx == "A":
-                        if digits[0] == self.cleaned_data[i][0]:
+                        if digits[0] == str(self.cleaned_data[i])[0]:
                             is_winner_flag = True
-                        else:
-                            is_winner_flag = False
+                            break
 
                     if idx == "B":
-                        if digits[0] == self.cleaned_data[i][1]:
+                        if digits[0] == str(self.cleaned_data[i][1]):
                             is_winner_flag = True
-                        else:
-                            is_winner_flag = False
+                            break
 
                     if idx == "C":
-                        if digits[0] == self.cleaned_data[i][2]:
+                        if digits[0] == str(self.cleaned_data[i][2]):
                             is_winner_flag = True
-                        else:
-                            is_winner_flag = False
+                            break
 
 
                 # if all the positions are perfectly marched 
