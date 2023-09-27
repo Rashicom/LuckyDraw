@@ -61,6 +61,7 @@ class Participants(models.Model):
         THIRD_PRIZE = "THIRD_PRIZE"
         FOURTH_PRIZE = "FOURTH_PRIZE"
         FIFTH_PRIZE = "FIFTH_PRIZE"
+        COMPLIMENTERY_PRIZE = "COMPLIMENTERY_PRIZE"
 
 
     participant_id = models.AutoField(primary_key=True)
