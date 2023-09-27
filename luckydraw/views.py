@@ -4,7 +4,7 @@ from .forms import AddParticipantForm, GetorSetLuckyDrawForm, AnnounceWinnerForm
 from .models import LuckyDraw, LuckyDrawContext, Participants
 from django.contrib.auth.decorators import login_required
 from datetime import timedelta, datetime, time
-from .coupens import CoupenValidator, AnnounceWinners
+from .coupens import CoupenValidator, AnnounceWinners, WinnersFilter
 from django.http import JsonResponse
 import pytz
 
@@ -179,6 +179,7 @@ class AnnounceWinner(View):
     
     form_class = AnnounceWinnerForm
     templet = 0
+    coupen_filter_class = WinnersFilter
 
     def post(self, request):
         """
@@ -228,7 +229,11 @@ class AnnounceWinner(View):
         cleaned_data = context_winners.clean()
 
         # announce winners
-        data = context_winners.announce()
+        context_winners.announce()
+
+        # get announced winners data
+        coupen_filter = self.coupen_filter_class(luckydrawtype_id= luckydrawtype_id, context_date=context_date)
+        data = coupen_filter.getcontext_and_validate()
 
         return render(request,self.templet,data)
 
