@@ -195,10 +195,10 @@ class AnnounceWinners:
         all_participants = Participants.objects.filter(context_id=context_instance)
         
         for participant in all_participants:
-            # if participant.coupen_type == "SUPER":
-            #     self.super_winner(participant)
-            # if participant.coupen_type == "BOX":
-            #     self.box_winner(participant)
+            if participant.coupen_type == "SUPER":
+                 self.super_winner(participant)
+            if participant.coupen_type == "BOX":
+                 self.box_winner(participant)
             if participant.coupen_type == "BLOCK":
                 self.block_winner(participant)
 
