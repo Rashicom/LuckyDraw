@@ -122,35 +122,36 @@
         <div class="container">
 
 
-          <form class="row row-cols-lg-auto g-3 align-items-center form-section">
+          <form method="POST" class="row row-cols-lg-auto g-3 align-items-center form-section">
 
             {% csrf_token %}
-            <input type="text" hidden id="luckydrawtype_id" value={{luckydraw.luckydrawtype_id}}>
+            <input type="text" hidden id="luckydrawtype_id" name="luckydrawtype_id" value={{luckydraw.luckydrawtype_id}}>
             
             <div class="col-12">
               <label class="visually-hidden" for="inlineFormInputGroupUsername">Username</label>
               <div class="input-group">
-                <input type="text" class="form-control" id="participant_name" placeholder="Name" />
+                <input type="text" class="form-control" id="participant_name" name="participant_name" placeholder="Name" />
               </div>
               <br>
               <div class="input-group">
-                <input type="text" class="form-control" id="coupen_number" placeholder="Number" />
+                <input type="text" class="form-control" id="coupen_number" name="coupen_number" placeholder="Number" />
               </div>
               <br>
               <div class="input-group">
-                <input type="number" class="form-control" id="coupen_count" placeholder="Count" />
+                <input type="number" class="form-control" id="coupen_count" name="coupen_count" placeholder="Count" />
                 <span>
                   <input type="number" class="form-control ms-1" id="inlineFormInputGroupUsername" placeholder="Count Limit" />
 
                 </span>
               </div>
               <p ></p>
-              <p class="text-muted" id="error"></p>
+              <p class="text-muted" id="error">{% if error %}{{error}}{% endif %}</p>
+
             </div>
           
             <div class="col-12">
               <label class="visually-hidden" for="inlineFormSelectPref">Preference</label>
-              <select class="select" id="coupen_type">
+              <select class="select" id="coupen_type" name="coupen_type">
                 <option value="BLOCK">BLOCK</option>
                 <option value="BOX">BOX</option>
                 <option value="SUPER">SUPER</option>
@@ -158,7 +159,9 @@
               
             </div>
             <div class="col-12">
-              <button type="button" id="add_participant" class="btn btn-primary">Add Coupen</button>
+              {% comment %} <button type="button" id="add_participant" class="btn btn-primary">Add Coupen</button> {% endcomment %}
+              <button type="submit" class="btn btn-primary">Add Coupen</button>
+
             </div>
             <p></p>
           </form>
@@ -174,9 +177,10 @@
           <table class="table align-middle mb-0 bg-white">
             <thead class="bg-light ">
               <tr>
-                <th>Name</th>
-                <th>Number</th>
+                <th>Coupan Number</th>
                 <th>Types</th>
+                <th>Count</th>
+                
                 <th>Actions</th>
               </tr>
             </thead>
@@ -184,21 +188,22 @@
 
               {% if all_paerticipants %}
               {% for participant in all_paerticipants %}
-              <tr>
+              <tr id="participant-{{ participant.participant_id }}">
                 <td>
                   <div class="d-flex align-items-center ">
                     
                     <div class="">
-                      <p class="text-muted mb-0 ">John Doe</p>
+                      <p class="text-muted mb-0 ">{{participant.coupen_number}}</p>
                     </div>
                   </div>
                 </td>
                 <td>
-                  <p class="text-muted mb-0">209</p>
+                  <p class="text-muted mb-0">{{participant.coupen_type}}</p>
                 </td>
-                <td class="text-muted mb-0">Block</td>
+                <td class="text-muted mb-0">{{participant.coupen_count}}</td>
+                
                 <td>
-                  <button type="button" class="btn btn-link btn-sm btn-rounded">
+                  <button type="button" data-participant-id="{{ participant.participant_id }}" class="delete_participant btn btn-link btn-sm btn-rounded">
                     <i class="bi bi-trash3-fill text-danger"></i>
                   </button>
                 </td>
@@ -312,11 +317,30 @@
         
 
     })
-    $(document).ready(function() {
-        console.log("hellot")
+    
+    $(".delete_participant").on('click', function(e) {
+      e.preventDefault()
+      console.log("button clicked")
+      var participant_id = $(this).data("participant-id");
+      var data = {participant_id:participant_id}
+      var rowId = "participant-" + participant_id;
+
+      $.ajax({
+        url: "{% url "delete_participant" %}",
+        method: "GET",
+        data: data,
+
+        success: function(data) {
+            // handle response
+            if(data.status == 200) {
+              $("#" + rowId).remove();
+            }   
+            
+        },
 
     })
-
+      
+    })
 
     </script>
 </body>

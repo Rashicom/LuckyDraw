@@ -154,11 +154,118 @@ class AddParticipant(View):
 
 
 # get context
-class GetContext(View):
+class Context(View):
 
     Addparticipant_templet = "lucky_add.html"
+    form_class = AddParticipantForm
+    coupenvalidator_class = CoupenValidator
+
+    def post(self, request, luckydrawtype_id):
+
+        # geting lucky drow instance to pass to show the details in the frond end
+        luckydrow = LuckyDraw.objects.get(luckydrawtype_id = luckydrawtype_id)
+
+        # get present context participant detains to list in the html
+        draw_time = datetime.strptime(str(luckydrow.draw_time), "%H:%M:%S").time()
+        time_zone = pytz.timezone('Asia/Kolkata')
+        time_now = datetime.now(time_zone).time()
+
+        if time_now < draw_time:
+            context_date = datetime.now(time_zone).date()
+        else:
+            context_date = datetime.now(time_zone).date() + timedelta(1)
+        
+        try:
+            contest = LuckyDrawContext.objects.get(luckydrawtype_id=luckydrow.luckydrawtype_id, context_date=context_date)
+        except Exception as e:
+            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow})
+        
+        # fiter participants in the contst object
+        all_paerticipants = Participants.objects.filter(context_id= contest.context_id)
+
+
+        # CHECK 1 : fetching data and validatiog form
+        form = self.form_class(request.POST)
+        if not form.is_valid():
+            print("form validation FAILED")
+            print(form.errors)
+
+            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"form not valied"})
+
+
+        # CHECK 2 : data entry time contrain check
+
+        # if the time is blow draw time get or create todays dates context instance
+        # if the time is high(todys context is finished and winner announced), get or create tomorrows date context instance
+        print(form.cleaned_data.get("coupen_count"))
+
+        try:
+            luckydraw_instance = LuckyDraw.objects.get(luckydrawtype_id=form.cleaned_data.get("luckydrawtype_id"))
+        except Exception as e:
+            print(e)
+            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"Not found"})
+
+            
+        draw_time = luckydraw_instance.draw_time
+        
+        # drow time is a string, so we have to convert it to time object
+        draw_time_obj = datetime.strptime(str(draw_time), "%H:%M:%S").time()
+        
+        # to know the current time we have to make a time zone object
+        time_zone = pytz.timezone('Asia/Kolkata')
+
+        # if we are entering data before drow time, data goes to todays context
+        if datetime.now(time_zone).time() < draw_time_obj:
+            print("context : today")
+            """
+            todays context not annouced, so we can get or create todays context instance
+            """
+            context_instance,_ = LuckyDrawContext.objects.get_or_create(context_date=datetime.now(time_zone).date(), luckydrawtype_id = luckydraw_instance)
+        
+        else:
+            # else todays context is finished and data can will be added to the tommorrows context
+            # get or create tommorrows context instance
+            print("context: tommorow")
+            tomorow_date = datetime.now(time_zone).date()+timedelta(1)
+            print(tomorow_date)
+            context_instance,_ = LuckyDrawContext.objects.get_or_create(luckydrawtype_id = luckydraw_instance,context_date=tomorow_date)
+
+        # CHECK 3 : validate coupen
+        coupen_number = form.cleaned_data.get("coupen_number")
+        coupen_type = form.cleaned_data.get("coupen_type")
+        
+        # creating instace for validator class and pass credencials
+        coupen = self.coupenvalidator_class(coupen_number=coupen_number, coupen_type=coupen_type)
+        
+        # if coupen is valied update data base
+        if coupen.is_valied():
+            print("coupen validated and READY TO SAVE DATA BASE")
+            # create participant with lucky number
+            try:
+                new_participant = Participants(
+                    context_id=context_instance,
+                    coupen_number = coupen_number,
+                    coupen_type = coupen_type,
+                    coupen_count = form.cleaned_data.get("coupen_count")
+                )
+                new_participant.save()
+            except Exception as e:
+                print(e)
+                return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"coupen not updated"})
+
+
+            all_paerticipants = Participants.objects.filter(context_id= contest.context_id)
+            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants})
+
+
+        else:
+            print("invalied coupen")
+            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"Invalied coupan"})
+
 
    
+
+
     def get(self, request, luckydrawtype_id):
         """
         this method returns Add participant page
@@ -190,6 +297,8 @@ class GetContext(View):
         all_paerticipants = Participants.objects.filter(context_id= contest.context_id)
 
         return render(request,templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants})
+
+
 
 
 # Annouce winner
@@ -260,3 +369,19 @@ class AnnounceWinner(View):
         retunr winner announcement page
         """
         return render(request,self.templet)
+
+
+
+class DeleteParticipant(View):
+    def get(self, request, *args, **kwargs):
+        participant_id = request.GET.get("participant_id")
+        
+        try:
+            participant = Participants.objects.get(participant_id=participant_id)
+            participant.delete()
+            
+        except Exception as e:
+            print(e)
+            return JsonResponse({"status":404})
+
+        return JsonResponse({"status":200})
