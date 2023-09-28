@@ -10,3 +10,21 @@ urlpatterns = [
 
     
 ]
+
+
+
+
+# server {
+#     listen 80;
+#     server_name 13.49.64.76;
+
+#     location = /favicon.ico { access_log off; log_not_found off; }
+#     location /static/ {
+#         alias /home/ubuntu/LuckyDraw/static-cdn/;
+#     }
+
+#     location / {
+#         include proxy_params;
+#         proxy_pass http://unix:/run/gunicorn.sock;
+#     }
+# }
