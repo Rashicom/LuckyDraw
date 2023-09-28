@@ -9,8 +9,8 @@ from luckydraw.models import LuckyDraw
 class UserLogin(View):
 
     form_class = LoginForm
-    login_templet = "login.html"
-    home_templet = "adminhome.html"
+    login_templet = "lucky_login.html"
+    home_templet = "lucky_index.html"
 
     def post(self, request, *args, **kwargs):
         """
@@ -26,7 +26,7 @@ class UserLogin(View):
         # validating form
         # if the form is not valied return error response
         if not login_form.is_valid():
-            print("emial not valied")
+            print("not valied")
             return render(request, self.login_templet, {'error': "Pleace provide a valied email and password"})
         print("valied")
         

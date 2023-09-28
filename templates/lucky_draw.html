@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+</head>
+<body>
+    <style>
+        .navbar{
+        background: linear-gradient(135deg, #364a60, #384c6c);
+        }  
+        .nav-item a{
+            color: #fff;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .under_line{
+          color: #fff !important;
+          border-bottom: 2px solid #bdcfe2 !important;
+        }
+        .navbar-brand {
+            font-weight: 500 ;
+            font-size: 13px
+        }
+        /* button style */
+        .fancy {
+                background-color: transparent;
+                border: 2px solid #b4b1b1;
+                border-radius: 0;
+                box-sizing: border-box;
+                color: #fff;
+                cursor: pointer;
+                display: inline-block;
+                float: right;
+                font-weight: 700;
+                letter-spacing: 0.05em;
+                margin: 0;
+                outline: none;
+                overflow: visible;
+                padding: 1.25em 2em;
+                position: relative;
+                text-align: center;
+                text-decoration: none;
+                text-transform: none;
+                transition: all 0.3s ease-in-out;
+                user-select: none;
+                font-size: 13px;
+        }
+
+                .fancy::before {
+                content: " ";
+                width: 1.5625rem;
+                height: 2px;
+                background: black;
+                top: 50%;
+                left: 1.5em;
+                position: absolute;
+                transform: translateY(-50%);
+                transform-origin: center;
+                transition: background 0.3s linear, width 0.3s linear;
+        }
+
+                .fancy .text {
+                font-size: 1.125em;
+                line-height: 1.33333em;
+                padding-left: 2em;
+                display: block;
+                text-align: left;
+                transition: all 0.3s ease-in-out;
+                text-transform: uppercase;
+                text-decoration: none;
+                color: rgb(23, 18, 95);
+        }
+
+                .fancy .top-key {
+                height: 2px;
+                width: 1.5625rem;
+                top: -2px;
+                left: 0.625rem;
+                position: absolute;
+                background: #e8e8e8;
+                transition: width 0.5s ease-out, left 0.3s ease-out;
+        }
+
+                .fancy .bottom-key-1 {
+                height: 2px;
+                width: 1.5625rem;
+                right: 1.875rem;
+                bottom: -2px;
+                position: absolute;
+                background: #e8e8e8;
+                transition: width 0.5s ease-out, right 0.3s ease-out;
+        }
+
+                .fancy .bottom-key-2 {
+                height: 2px;
+                width: 0.625rem;
+                right: 0.625rem;
+                bottom: -2px;
+                position: absolute;
+                background: #e8e8e8;
+                transition: width 0.5s ease-out, right 0.3s ease-out;
+        }
+
+                .fancy:hover {
+                color: white;
+                background: linear-gradient(135deg, #364a60, #384c6c);
+        }
+
+                .fancy:hover::before {
+                width: 0.9375rem;
+                background: white;
+        }
+
+                .fancy:hover .text {
+                color: white;
+                padding-left: 1.5em;
+        }
+
+                .fancy:hover .top-key {
+                left: -2px;
+                width: 0px;
+        }
+
+                .fancy:hover .bottom-key-1,
+                .fancy:hover .bottom-key-2 {
+                right: 0;
+                width: 0;
+        }
+        .table{
+            border: 1px solid #b7babb;
+        }
+        .headline{
+            /* border-bottom: 2px solid  rgb(183, 186, 187); */
+            text-decoration: underline 3px  rgb(183, 186, 187);
+            margin: 0;
+            padding: 0;
+
+
+        }
+        .block{
+            margin: 50px 0;
+        }
+        .block h3{
+            font-size: 20px;
+        }
+        .box{
+            margin: 50px 0;
+        }
+        .box h3{
+            font-size: 20px;
+        }
+        .super{
+            margin: 50px 0;
+        }
+        .super h3{
+            font-size: 20px;
+        }
+        .table{
+            margin: 30px 0;
+        }
+    </style>
+        <!-- navbar -->
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand text-light" href="index.html">HOME</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mx-auto m-1">
+                <li class="nav-item">
+                    <a class="nav-link"  href="add.html">COUPON ADD</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link ms-4 text-light under_line"  href="draw.html">DRAW PORT</a>
+                </li>
+                </ul>
+            <div class="d-flex" role="search">
+                <button class="btn btn-outline-danger" type="submit">LOGOUT</button>
+            </div>
+            </div>
+        </div>
+        </nav>
+        <!-- section -->
+
+        <section>
+            <div class="container">
+                <div class="row mt-5">
+                    <div class="col-md-12 text-center">
+                        <h2 class="text-primary">Winner Announcement</h2>
+                    </div>
+                    <!-- <div class="col-md-6 text-center">
+                        <div class="">
+                            <div data-role="countdown" data-hours="3"></div>
+                        </div>
+                    </div> -->
+                </div>
+            </div>
+            <div class="container">
+                <hr style="height: 5px;
+                background: rgb(4, 49, 49);
+                margin: 20px 0;
+                box-shadow: 0px 0px 4px 2px rgba(204,204,204,1);">
+            </div>
+        </section>
+        <section class="text_Area">
+            <div class="container mt-5">
+                <div class="row">
+                    <div class="col-md-12">
+                        <!-- dropdown -->
+                        <!-- <select class="form-select form-select-lg mb-3" aria-label="Large select example">
+                            <option value="1">Kerala</option>
+                            <option value="2">Dear 1</option>
+                            <option value="3">Dear 2</option>
+                            <option value="3">Dear 3</option>
+                        </select> -->
+                        <div class="input-group mb-3">
+                            <select class="form-select form-select-lg" id="inputGroupSelect02">
+                              <!-- <option selected>Choose...</option> -->
+                              <option value="1">Kerala</option>
+                              <option value="2">Dear 1</option>
+                              <option value="3">Dear 2</option>
+                              <option value="4">Dear 3</option>
+                            </select>
+                            <select class="form-select form-select-lg" id="inputGroupSelect02">
+                              <option selected>Date</option>
+                              <!-- <option value="1">Date</option> -->
+                              <option value="2">12/04/2023</option>
+                              <option value="3">19/04/2023</option>
+                              <option value="4">21/05/2023</option>
+                            </select>
+                            <!-- <input class="input-group-text" for=""></input> -->
+                          </div>
+
+                        <div class="input-group">
+                            <textarea class="form-control" placeholder="Lucky Number Paste Here..."></textarea>
+                            <div class="input-group mt-3">
+                                <a class="fancy" href="#">
+                                    <span class="top-key"></span>
+                                    <span class="text">Announce the winner</span>
+                                    <span class="bottom-key-1"></span>
+                                    <span class="bottom-key-2"></span>
+                                  </a>                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Winners section -->
+        <section class="winners">
+            <div class="container mt-5">
+                <h2 class="text-center headline">Winners</h2>
+                <div class="row">
+                    <div class="col-md-4 block">
+                        <h3>Block Winners</h3>
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                  <th scope="col">#</th>
+                                  <th scope="col">Lucky No.</th>
+                                  <th scope="col">Price</th>
+                                  <th scope="col">Count</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr>
+                                  <th scope="row">1</th>
+                                  <td>239</td>
+                                  <td>239</td>
+                                  <td>4</td>
+                                </tr>
+                                <tr>
+                                  <th scope="row">2</th>
+                                  <td>987</td>
+                                  <td>987</td>
+                                  <td>2</td>
+                                </tr>
+                                <tr>
+                                  <th scope="row">3</th>
+                                  <td>987</td>
+                                  <td>6</td>
+                                  <td>6</td>
+                                </tr>
+                              </tbody>
+                        </table>
+                    </div>
+                    <!-- Box -->
+                    <div class="col-md-4 box">
+                        <h3>Box Winners</h3>
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                  <th scope="col">#</th>
+                                  <th scope="col">Lucky No.</th>
+                                  <th scope="col">Price</th>
+                                  <th scope="col">Count</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr>
+                                  <th scope="row">1</th>
+                                  <td>239</td>
+                                  <td>239</td>
+
+                                  <td>4</td>
+                                </tr>
+                                <tr>
+                                  <th scope="row">2</th>
+                                  <td>987</td>
+                                  <td>2</td>
+                                  <td>2</td>
+                                </tr>
+                                <tr>
+                                  <th scope="row">3</th>
+                                  <td>987</td>
+                                  <td>6</td>
+                                  <td>6</td>
+                                </tr>
+                              </tbody>
+                        </table>
+                    </div>
+                    <!-- Super Winners -->
+                    <div class="col-md-4 super">
+                        <h3>Super Winners</h3>
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                  <th scope="col">#</th>
+                                  <th scope="col">Lucky No.</th>
+                                  <th scope="col">Price</th>
+                                  <th scope="col">Count</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr>
+                                  <th scope="row">1</th>
+                                  <td>239</td>
+                                  <td>239</td>
+
+                                  <td>4</td>
+                                </tr>
+                                <tr>
+                                  <th scope="row">2</th>
+                                  <td>987</td>
+                                  <td>2</td>
+                                  <td>2</td>
+                                </tr>
+                                <tr>
+                                  <th scope="row">3</th>
+                                  <td>987</td>
+                                  <td>62</td>
+                                  <td>6</td>
+                                </tr>
+                              </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+</body>
+</html>

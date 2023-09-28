@@ -13,18 +13,17 @@
     {% comment %} list out lucky drow {% endcomment %}
 
     <ul>
-        {% if luckydrow_list %}
-        {% for luckydrow in luckydrow_list %}
+        
             <li>
-                <p>{{luckydrow.luckydrawtype_id}}</p>
-                <p>{{luckydrow.luckydraw_name}}</p>
-                <p>{{luckydrow.description}}</p>
-                <p>{{luckydrow.draw_time}}</p>
+                <p></p>
+                <p></p>
+                <p></p>
+                <p></p>
 
             </li>
-            <a href="{% url "get_contest" luckydrow.luckydrawtype_id %}">click here</a>
-        {% endfor %}
-        {% endif %}
+            <a href="">click here</a>
+            {% endfor %}
+            {% endif %}
 
     </ul>
     

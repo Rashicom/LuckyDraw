@@ -156,7 +156,7 @@ class AddParticipant(View):
 # get context
 class GetContext(View):
 
-    Addparticipant_templet = "addparticipant.html"
+    Addparticipant_templet = "lucky_add.html"
 
    
     def get(self, request, luckydrawtype_id):
@@ -171,16 +171,34 @@ class GetContext(View):
         # geting lucky drow instance to pass to show the details in the frond end
         luckydrow = LuckyDraw.objects.get(luckydrawtype_id = luckydrawtype_id)
 
-        return render(request,templet,{"luckydraw":luckydrow})
+        # get present context participant detains to list in the html
+        draw_time = datetime.strptime(str(luckydrow.draw_time), "%H:%M:%S").time()
+        time_zone = pytz.timezone('Asia/Kolkata')
+        time_now = datetime.now(time_zone).time()
+
+        if time_now < draw_time:
+            context_date = datetime.now(time_zone).date()
+        else:
+            context_date = datetime.now(time_zone).date() + timedelta(1)
+        
+        try:
+            contest = LuckyDrawContext.objects.get(luckydrawtype_id=luckydrow.luckydrawtype_id, context_date=context_date)
+        except Exception as e:
+            return render(request,templet,{"luckydraw":luckydrow})
+        
+        # fiter participants in the contst object
+        all_paerticipants = Participants.objects.filter(context_id= contest.context_id)
+
+        return render(request,templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants})
 
 
 # Annouce winner
 class AnnounceWinner(View):
     
     form_class = AnnounceWinnerForm
-    templet = 0
+    templet = "lucky_draw.html"
     coupen_filter_class = WinnersFilter
-
+    
     def post(self, request):
         """
         this method is anouncing winners by crossmatching the given lucky number set
@@ -237,3 +255,8 @@ class AnnounceWinner(View):
 
         return render(request,self.templet,data)
 
+    def get(self, request, *args, **kwargs):
+        """
+        retunr winner announcement page
+        """
+        return render(request,self.templet)
