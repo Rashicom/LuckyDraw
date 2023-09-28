@@ -330,12 +330,14 @@ class AnnounceWinner(View):
         and return all winner informations
         accept: lucky_numbers, luckydrawtype_id, context_date
         """
-        
+        print("ANNOUNCING WINNERES")
         # serialize and validate data
+        print(request.POST)
         form = self.form_class(request.POST)
         if not form.is_valid():
-            return render(request,self.templet,{"error":form.errors})
-
+            print("form not valied")
+            return render(request,self.templet,{"error":"Invalid Creadencials"})
+        
         # extract validate data
         luckydrawtype_id = form.cleaned_data.get('luckydrawtype_id')
         lucky_numbers = form.cleaned_data.get('lucky_numbers')
@@ -344,7 +346,7 @@ class AnnounceWinner(View):
         # CHECK 1 : context_date not grater than todays
         time_zone = pytz.timezone('Asia/Kolkata')
         today_date = datetime.now(time_zone).date()
-        context_date_obj = datetime.strptime(str(context_date), "%YYYY:%MM:%DD").date()
+        context_date_obj = datetime.strptime(str(context_date), "%Y-%m-%d").date()
         
         if context_date_obj > today_date:
             return render(request,self.templet,{"error":"Invalied date"})
@@ -359,11 +361,16 @@ class AnnounceWinner(View):
             
 
         # CHECK 3 : never allow the announcement if already announced befor
-        context_obj = LuckyDrawContext.objects.get(luckydrawtype_id = luckydraw_obj.luckydrawtype_id, context_date=context_date)
-        
+        try:
+            context_obj = LuckyDrawContext.objects.get(luckydrawtype_id = luckydraw_obj.luckydrawtype_id, context_date=context_date)
+        except Exception as e:
+            return render(request,self.templet,{"error":"Context not found"})
+            
+
         # if the winner is already announced
-        if context_obj.is_winner_announced == True:
-            return render(request,self.templet,{"error":"Already announced"})
+        # if context_obj.is_winner_announced == True:
+        #     print("already announced")
+        #     return render(request,self.templet,{"error":"Already announced"})
         
         # ALL TEST IS PASSESD
         context_winners = AnnounceWinners(luckydrawtype_id=luckydrawtype_id, context_date=context_date, lucky_numbers=lucky_numbers)
@@ -377,14 +384,19 @@ class AnnounceWinner(View):
         # get announced winners data
         coupen_filter = self.coupen_filter_class(luckydrawtype_id= luckydrawtype_id, context_date=context_date)
         data = coupen_filter.getcontext_and_validate()
-
+        print(data)
         return render(request,self.templet,data)
+
+
 
     def get(self, request, *args, **kwargs):
         """
         retunr winner announcement page
         """
-        return render(request,self.templet)
+        lucky_draw = LuckyDraw.objects.all()
+        contests = LuckyDrawContext.objects.values('context_date').distinct()
+        
+        return render(request,self.templet,{"lucky_draw":lucky_draw, "contests":contests})
 
 
 

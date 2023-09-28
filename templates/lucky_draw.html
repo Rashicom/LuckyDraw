@@ -166,17 +166,17 @@
         <!-- navbar -->
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
-            <a class="navbar-brand text-light" href="index.html">HOME</a>
+            <a class="navbar-brand text-light" href="{% url "login" %}">HOME</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mx-auto m-1">
                 <li class="nav-item">
-                    <a class="nav-link"  href="add.html">COUPON ADD</a>
+                    <a class="nav-link"  href="#">COUPON ADD</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link ms-4 text-light under_line"  href="draw.html">DRAW PORT</a>
+                    <a class="nav-link ms-4 text-light under_line"  href="#">DRAW PORT</a>
                 </li>
                 </ul>
             <div class="d-flex" role="search">
@@ -210,6 +210,8 @@
         <section class="text_Area">
             <div class="container mt-5">
                 <div class="row">
+                    <form action="" method="POST">
+                    {% csrf_token %}
                     <div class="col-md-12">
                         <!-- dropdown -->
                         <!-- <select class="form-select form-select-lg mb-3" aria-label="Large select example">
@@ -219,35 +221,43 @@
                             <option value="3">Dear 3</option>
                         </select> -->
                         <div class="input-group mb-3">
-                            <select class="form-select form-select-lg" id="inputGroupSelect02">
+
+                            <select class="form-select form-select-lg" name="luckydrawtype_id" id="inputGroupSelect02">
                               <!-- <option selected>Choose...</option> -->
-                              <option value="1">Kerala</option>
-                              <option value="2">Dear 1</option>
-                              <option value="3">Dear 2</option>
-                              <option value="4">Dear 3</option>
+                              {% for i in lucky_draw %}
+                              <option value={{i.luckydrawtype_id}}>{{i.luckydraw_name}}</option>
+                              {% endfor %}
                             </select>
-                            <select class="form-select form-select-lg" id="inputGroupSelect02">
-                              <option selected>Date</option>
+
+
+                            <select class="form-select form-select-lg" name="context_date" id="inputGroupSelect02">
+                              
                               <!-- <option value="1">Date</option> -->
-                              <option value="2">12/04/2023</option>
-                              <option value="3">19/04/2023</option>
-                              <option value="4">21/05/2023</option>
+                              {% for i in contests %}
+                                <option value="{{i.context_date|date:"Y-m-d"}}">{{i.context_date|date:"Y-m-d"}}</option>
+                              {% endfor %}
                             </select>
                             <!-- <input class="input-group-text" for=""></input> -->
                           </div>
 
                         <div class="input-group">
-                            <textarea class="form-control" placeholder="Lucky Number Paste Here..."></textarea>
+                            <textarea class="form-control" rows="6" name="lucky_numbers" placeholder="Lucky Number Paste Here..."></textarea>
+                            
                             <div class="input-group mt-3">
-                                <a class="fancy" href="#">
+                                <button class="fancy" type="submit">
                                     <span class="top-key"></span>
                                     <span class="text">Announce the winner</span>
                                     <span class="bottom-key-1"></span>
                                     <span class="bottom-key-2"></span>
-                                  </a>                
+                                </button>
+                                              
                             </div>
+                            {% if error %}
+                                <p>{{error}}</p>
+                            {% endif %}
                         </div>
                     </div>
+                    </form>
                 </div>
             </div>
         </section>
@@ -257,105 +267,170 @@
                 <h2 class="text-center headline">Winners</h2>
                 <div class="row">
                     <div class="col-md-4 block">
-                        <h3>Block Winners</h3>
+                        <h3> First prizes</h3>
                         <table class="table table-hover">
                             <thead>
                                 <tr>
-                                  <th scope="col">#</th>
                                   <th scope="col">Lucky No.</th>
                                   <th scope="col">Price</th>
                                   <th scope="col">Count</th>
                                 </tr>
                               </thead>
                               <tbody>
-                                <tr>
-                                  <th scope="row">1</th>
-                                  <td>239</td>
-                                  <td>239</td>
-                                  <td>4</td>
-                                </tr>
-                                <tr>
-                                  <th scope="row">2</th>
-                                  <td>987</td>
-                                  <td>987</td>
-                                  <td>2</td>
-                                </tr>
-                                <tr>
-                                  <th scope="row">3</th>
-                                  <td>987</td>
-                                  <td>6</td>
-                                  <td>6</td>
-                                </tr>
+
+                                {% if FIRST_PRIZE %}
+                                    {% for prize in FIRST_PRIZE %}
+                                        <tr>
+                                        <td>{{prize.coupen_number}}</td>
+                                        <td>{{prize.prize}}</td>
+                                        <td>{{prize.coupen_count}}</td>
+                                        </tr>
+                                    {% endfor %}
+                                {% endif %}
+                                
                               </tbody>
                         </table>
                     </div>
                     <!-- Box -->
                     <div class="col-md-4 box">
-                        <h3>Box Winners</h3>
+                        <h3>Second prizes</h3>
                         <table class="table table-hover">
                             <thead>
                                 <tr>
-                                  <th scope="col">#</th>
                                   <th scope="col">Lucky No.</th>
                                   <th scope="col">Price</th>
                                   <th scope="col">Count</th>
                                 </tr>
                               </thead>
                               <tbody>
-                                <tr>
-                                  <th scope="row">1</th>
-                                  <td>239</td>
-                                  <td>239</td>
+                        
 
-                                  <td>4</td>
-                                </tr>
-                                <tr>
-                                  <th scope="row">2</th>
-                                  <td>987</td>
-                                  <td>2</td>
-                                  <td>2</td>
-                                </tr>
-                                <tr>
-                                  <th scope="row">3</th>
-                                  <td>987</td>
-                                  <td>6</td>
-                                  <td>6</td>
-                                </tr>
+                                {% if SECOND_PRIZE %}
+                                    {% for prize in SECOND_PRIZE %}
+                                        <tr>
+                                        <td>{{prize.coupen_number}}</td>
+                                        <td>{{prize.prize}}</td>
+                                        <td>{{prize.coupen_count}}</td>
+                                        </tr>
+                                    {% endfor %}
+                                {% endif %}
+                                
+
                               </tbody>
                         </table>
                     </div>
                     <!-- Super Winners -->
                     <div class="col-md-4 super">
-                        <h3>Super Winners</h3>
+                        <h3>Third Prizes</h3>
                         <table class="table table-hover">
                             <thead>
                                 <tr>
-                                  <th scope="col">#</th>
                                   <th scope="col">Lucky No.</th>
                                   <th scope="col">Price</th>
                                   <th scope="col">Count</th>
                                 </tr>
                               </thead>
                               <tbody>
-                                <tr>
-                                  <th scope="row">1</th>
-                                  <td>239</td>
-                                  <td>239</td>
 
-                                  <td>4</td>
-                                </tr>
+                                {% if THIRD_PRIZE %}
+                                    {% for prize in THIRD_PRIZE %}
+                                        <tr>
+                                        <td>{{prize.coupen_number}}</td>
+                                        <td>{{prize.prize}}</td>
+                                        <td>{{prize.coupen_count}}</td>
+                                        </tr>
+                                    {% endfor %}
+                                {% endif %}
+                                
+                              </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <section class="winners">
+            <div class="container mt-5">
+                <div class="row">
+                    <div class="col-md-4 block">
+                        <h3> Fourth prizes</h3>
+                        <table class="table table-hover">
+                            <thead>
                                 <tr>
-                                  <th scope="row">2</th>
-                                  <td>987</td>
-                                  <td>2</td>
-                                  <td>2</td>
+                                  <th scope="col">Lucky No.</th>
+                                  <th scope="col">Price</th>
+                                  <th scope="col">Count</th>
                                 </tr>
+                              </thead>
+                              <tbody>
+
+
+                                {% if FOURTH_PRIZE %}
+                                    {% for prize in FOURTH_PRIZE %}
+                                        <tr>
+                                        <td>{{prize.coupen_number}}</td>
+                                        <td>{{prize.prize}}</td>
+                                        <td>{{prize.coupen_count}}</td>
+                                        </tr>
+                                    {% endfor %}
+                                {% endif %}
+                                
+                                
+                              </tbody>
+                        </table>
+                    </div>
+                    <!-- Box -->
+                    <div class="col-md-4 box">
+                        <h3>Fifth prizes</h3>
+                        <table class="table table-hover">
+                            <thead>
                                 <tr>
-                                  <th scope="row">3</th>
-                                  <td>987</td>
-                                  <td>62</td>
-                                  <td>6</td>
+                                  <th scope="col">Lucky No.</th>
+                                  <th scope="col">Price</th>
+                                  <th scope="col">Count</th>
                                 </tr>
+                              </thead>
+                              <tbody>
+                        
+
+                                {% if FIFTH_PRIZE %}
+                                    {% for prize in FIFTH_PRIZE %}
+                                        <tr>
+                                        <td>{{prize.coupen_number}}</td>
+                                        <td>{{prize.prize}}</td>
+                                        <td>{{prize.coupen_count}}</td>
+                                        </tr>
+                                    {% endfor %}
+                                {% endif %}
+                                
+
+                              </tbody>
+                        </table>
+                    </div>
+                    <!-- Super Winners -->
+                    <div class="col-md-4 super">
+                        <h3>Complimentary Prizes</h3>
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                  <th scope="col">Lucky No.</th>
+                                  <th scope="col">Price</th>
+                                  <th scope="col">Count</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+
+                                {% if COMPLIMENTERY_PRIZE %}
+                                    {% for prize in COMPLIMENTERY_PRIZE %}
+                                        <tr>
+                                        <td>{{prize.coupen_number}}</td>
+                                        <td>{{prize.prize}}</td>
+                                        <td>{{prize.coupen_count}}</td>
+                                        </tr>
+                                    {% endfor %}
+                                {% endif %}
+                                
                               </tbody>
                         </table>
                     </div>
