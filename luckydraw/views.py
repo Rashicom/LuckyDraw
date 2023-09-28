@@ -7,7 +7,7 @@ from datetime import timedelta, datetime, time
 from .coupens import CoupenValidator, AnnounceWinners, WinnersFilter
 from django.http import JsonResponse
 import pytz
-
+from .helper import time_to_seconds
 
 
 class GetorSetLuckyDraw(View):
@@ -164,7 +164,8 @@ class Context(View):
 
         # geting lucky drow instance to pass to show the details in the frond end
         luckydrow = LuckyDraw.objects.get(luckydrawtype_id = luckydrawtype_id)
-
+        print("request hit")
+        print(luckydrow)
         # get present context participant detains to list in the html
         draw_time = datetime.strptime(str(luckydrow.draw_time), "%H:%M:%S").time()
         time_zone = pytz.timezone('Asia/Kolkata')
@@ -174,15 +175,22 @@ class Context(View):
             context_date = datetime.now(time_zone).date()
         else:
             context_date = datetime.now(time_zone).date() + timedelta(1)
-        
-        try:
-            contest = LuckyDrawContext.objects.get(luckydrawtype_id=luckydrow.luckydrawtype_id, context_date=context_date)
-        except Exception as e:
-            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow})
-        
-        # fiter participants in the contst object
-        all_paerticipants = Participants.objects.filter(context_id= contest.context_id)
+            
 
+        # find time difference to show in the frond end in any case
+        time1 = time_to_seconds(time_now)
+        time2 = time_to_seconds(draw_time)
+        time_diff = abs(time1 - time2)
+
+
+        contest = LuckyDrawContext.objects.filter(luckydrawtype_id=luckydrow.luckydrawtype_id, context_date=context_date)
+        if contest.exists():
+            # fiter participants in the contst object
+            contest = contest[0]
+            all_paerticipants = Participants.objects.filter(context_id= contest.context_id)
+        else:
+            all_paerticipants = ""
+        
 
         # CHECK 1 : fetching data and validatiog form
         form = self.form_class(request.POST)
@@ -190,20 +198,20 @@ class Context(View):
             print("form validation FAILED")
             print(form.errors)
 
-            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"form not valied"})
+            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"form not valied", "time_diff":time_diff})
 
 
-        # CHECK 2 : data entry time contrain check
+        # CHECK 2 : data entry time constrain check
 
         # if the time is blow draw time get or create todays dates context instance
         # if the time is high(todys context is finished and winner announced), get or create tomorrows date context instance
         print(form.cleaned_data.get("coupen_count"))
-
+        
         try:
             luckydraw_instance = LuckyDraw.objects.get(luckydrawtype_id=form.cleaned_data.get("luckydrawtype_id"))
         except Exception as e:
             print(e)
-            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"Not found"})
+            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"Not found", "time_diff":time_diff})
 
             
         draw_time = luckydraw_instance.draw_time
@@ -251,16 +259,16 @@ class Context(View):
                 new_participant.save()
             except Exception as e:
                 print(e)
-                return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"coupen not updated"})
+                return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"coupen not updated", "time_diff":time_diff})
 
 
             all_paerticipants = Participants.objects.filter(context_id= contest.context_id)
-            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants})
+            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"time_diff":time_diff})
 
 
         else:
             print("invalied coupen")
-            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"Invalied coupan"})
+            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"Invalied coupan", "time_diff":time_diff})
 
 
    
@@ -283,6 +291,14 @@ class Context(View):
         time_zone = pytz.timezone('Asia/Kolkata')
         time_now = datetime.now(time_zone).time()
 
+
+        # calculate time diff to show
+        time1 = time_to_seconds(time_now)
+        time2 = time_to_seconds(draw_time)
+        time_diff = abs(time1 - time2)
+        print(time_diff)
+        print(type(time_diff))
+
         if time_now < draw_time:
             context_date = datetime.now(time_zone).date()
         else:
@@ -291,12 +307,12 @@ class Context(View):
         try:
             contest = LuckyDrawContext.objects.get(luckydrawtype_id=luckydrow.luckydrawtype_id, context_date=context_date)
         except Exception as e:
-            return render(request,templet,{"luckydraw":luckydrow})
+            return render(request,templet,{"luckydraw":luckydrow,"time_diff":time_diff})
         
         # fiter participants in the contst object
         all_paerticipants = Participants.objects.filter(context_id= contest.context_id)
 
-        return render(request,templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants})
+        return render(request,templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"time_diff":time_diff})
 
 
 
@@ -379,7 +395,7 @@ class DeleteParticipant(View):
         try:
             participant = Participants.objects.get(participant_id=participant_id)
             participant.delete()
-            
+
         except Exception as e:
             print(e)
             return JsonResponse({"status":404})
