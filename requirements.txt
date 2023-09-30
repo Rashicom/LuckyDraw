@@ -6,3 +6,23 @@ psycopg2-pool==1.1
 pytz==2023.3.post1
 sqlparse==0.4.4
 typing_extensions==4.8.0
+
+
+
+# [Unit]
+# Description=gunicorn daemon
+# Requires=gunicorn.socket
+# After=network.target
+
+# [Service]
+# User=ubuntu
+# Group=www-data
+# WorkingDirectory=/home/ubuntu/LuckyDraw
+# ExecStart=/home/ubuntu/env/bin/gunicorn \
+#           --access-logfile - \
+#           --workers 3 \
+#           --bind unix:/run/gunicorn.sock \
+#           config.wsgi:application
+
+# [Install]
+# WantedBy=multi-user.target
