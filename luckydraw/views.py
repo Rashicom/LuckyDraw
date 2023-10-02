@@ -131,6 +131,7 @@ class AddParticipant(View):
         coupen_count = coupen_scraper.cleaned_coupen_count
         print(coupen_number)
         print(coupen_count)
+
         # creating instace for validator class and pass credencials
         coupen = self.coupenvalidator_class(coupen_number=coupen_number, coupen_type=coupen_type)
         
@@ -214,7 +215,6 @@ class Context(View):
 
         # if the time is blow draw time get or create todays dates context instance
         # if the time is high(todys context is finished and winner announced), get or create tomorrows date context instance
-        print(form.cleaned_data.get("coupen_count"))
         
         try:
             luckydraw_instance = LuckyDraw.objects.get(luckydrawtype_id=form.cleaned_data.get("luckydrawtype_id"))
@@ -251,6 +251,17 @@ class Context(View):
         coupen_number = form.cleaned_data.get("coupen_number")
         coupen_type = form.cleaned_data.get("coupen_type")
         
+        # CHECK 4 : seperate coupen count and coupen count and identify coupen type from coupen number
+        coupen_scraper = CoupenScraper(raw_string=coupen_number, coupen_type=coupen_type)
+        coupen_scraper.scrappify_coupen()
+
+        # get cleaned values
+        coupen_number = coupen_scraper.cleaned_coupen 
+        coupen_type = coupen_scraper.coupen_type
+        coupen_count = coupen_scraper.cleaned_coupen_count
+        print(coupen_number)
+        print(coupen_count)
+
         # creating instace for validator class and pass credencials
         coupen = self.coupenvalidator_class(coupen_number=coupen_number, coupen_type=coupen_type)
         
@@ -263,7 +274,7 @@ class Context(View):
                     context_id=context_instance,
                     coupen_number = coupen_number,
                     coupen_type = coupen_type,
-                    coupen_count = form.cleaned_data.get("coupen_count")
+                    coupen_count = coupen_count
                 )
                 new_participant.save()
             except Exception as e:
