@@ -191,7 +191,7 @@
                 <th>Coupan Number</th>
                 <th>Types</th>
                 <th>Count</th>
-                
+                <th>Rate</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -212,7 +212,7 @@
                   <p class="text-muted mb-0">{{participant.coupen_type}}</p>
                 </td>
                 <td class="text-muted mb-0">{{participant.coupen_count}}</td>
-                
+                <td class="text-muted mb-0">{{participant.coupen_rate}}</td>
                 <td>
                   <button type="button" data-participant-id="{{ participant.participant_id }}" class="delete_participant btn btn-link btn-sm btn-rounded">
                     <i class="bi bi-trash3-fill text-danger"></i>
@@ -282,7 +282,7 @@
         let participant_name = $("#participant_name").val()
         let coupen_number = $("#coupen_number").val()
         let coupen_type = $("#coupen_type").val()
-        let coupen_count = $("#coupen_count").val()
+        
         
         //validation
         if (coupen_number=="" || coupen_type=="") {
@@ -290,12 +290,7 @@
             return 
         }
         else{$("#error").text("")}
-        if (coupen_count < 0) {
-            $("#error").text("Invalid count")
-            return
-        }
-        else{$("#error").text("")}
-        console.log(coupen_count)
+        
         // coupen_number and coupen_type validation needed for better perfomance
         // otherwise we make ajax call using invalied data
         // backend does have a validation, but frond end validation needed for better perfomance

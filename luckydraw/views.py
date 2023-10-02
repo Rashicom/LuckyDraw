@@ -265,16 +265,44 @@ class Context(View):
         # creating instace for validator class and pass credencials
         coupen = self.coupenvalidator_class(coupen_number=coupen_number, coupen_type=coupen_type)
         
+
         # if coupen is valied update data base
         if coupen.is_valied():
             print("coupen validated and READY TO SAVE DATA BASE")
+            
+            # single coupen rate calculation
+            if coupen_type=="SUPER":
+                single_coupen_rate = 8
+            elif coupen_type=="BOX":
+                single_coupen_rate = 48
+            
+            else:
+                # for block there is a seperate rate machanism
+                number = ""
+                char = ""
+                for i in coupen_number:
+                    if i.isnumeric():
+                        number = number+i
+                    else:
+                        char = char + i
+                
+                if len(char)==1:
+                    single_coupen_rate = 10.50
+                elif len(number) < len(char):
+                    single_coupen_rate = 21
+                elif len(number)==len(char):
+                    single_coupen_rate = 8
+
+            
+
             # create participant with lucky number
             try:
                 new_participant = Participants(
                     context_id=context_instance,
                     coupen_number = coupen_number,
                     coupen_type = coupen_type,
-                    coupen_count = coupen_count
+                    coupen_count = coupen_count,
+                    coupen_rate = coupen_count*single_coupen_rate
                 )
                 new_participant.save()
             except Exception as e:
@@ -433,3 +461,12 @@ class DeleteParticipant(View):
             return JsonResponse({"status":404})
 
         return JsonResponse({"status":200})
+
+
+
+
+
+                
+
+
+

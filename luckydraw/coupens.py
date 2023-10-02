@@ -196,9 +196,9 @@ class AnnounceWinners:
         
         self.winning_prizes = []
         self.complimentery_prizes = set()
-        print("constructor inetyialized")
 
         self.prize = ""
+        self.prize_rate = 0
 
 
     # clean input
@@ -247,7 +247,7 @@ class AnnounceWinners:
             - these methods are responsible to update the data base of teh winnign statuses.
             - after gong through all queryset set is_winner_announced to True
         """
-        print("announcing winner")
+        
         # populating winning prizes list and complimetery winning prizes set
         self.winning_prizes.extend(self.cleaned_data[:5])
         self.complimentery_prizes.update(self.cleaned_data[5:])
@@ -288,18 +288,28 @@ class AnnounceWinners:
                 # seting winning prize level
                 if i == 0:
                     self.prize = "FIRST_PRIZE"
+                    self.prize_rate = 5400
                 elif i == 1:
                     self.prize = "SECOND_PRIZE"
+                    self.prize_rate = 550
                 elif i == 2:
                     self.prize = "THIRD_PRIZE"
+                    self.prize_rate = 270
                 elif i == 3:
                     self.prize = "FOURTH_PRIZE"
+                    self.prize_rate = 120
                 elif i == 4:
                     self.prize = "FIFTH_PRIZE"
+                    self.prize_rate = 70
+                else:
+                    self.prize = "COMPLIMENTERY_PRIZE"
+                    self.prize_rate = 30
+
 
                 # update data base
                 participant.is_winner = True
                 participant.prize = self.prize
+                participant.prize_rate = self.prize_rate
                 participant.save()
 
                 print("---------winning prize------------")
@@ -317,6 +327,9 @@ class AnnounceWinners:
             self.prize = "COMPLIMENTERY_PRIZE"
             participant.is_winner = True
             participant.prize = self.prize
+            self.prize_rate = 30
+            participant.prize_rate = self.prize_rate
+
             participant.save()
 
 
@@ -472,18 +485,27 @@ class AnnounceWinners:
                     # seting winning prize level
                     if i == 0:
                         self.prize = "FIRST_PRIZE"
+                        self.prize_rate = 5400
                     elif i == 1:
                         self.prize = "SECOND_PRIZE"
+                        self.prize_rate = 550
                     elif i == 2:
                         self.prize = "THIRD_PRIZE"
+                        self.prize_rate = 270
                     elif i == 3:
                         self.prize = "FOURTH_PRIZE"
+                        self.prize_rate = 120
                     elif i == 4:
                         self.prize = "FIFTH_PRIZE"
+                        self.prize_rate = 70
+                    else:
+                        self.prize = "COMPLIMENTERY_PRIZE"
+                        self.prize_rate = 30
 
                     # update data base
                     participant.is_winner = True
                     participant.prize = self.prize
+                    participant.prize_rate = self.prize_rate
                     participant.save()
 
                     print("--------Winning prize---------")
@@ -499,8 +521,11 @@ class AnnounceWinners:
 
                 # updte data base
                 self.prize = "COMPLIMENTERY_PRIZE"
+                self.prize_rate = 30
                 participant.is_winner = True
                 participant.prize = self.prize
+                participant.prize_rate = self.prize_rate
+
                 participant.save()
 
                 # we dont want further iteration
@@ -565,7 +590,45 @@ class WinnersFilter:
 
 
 
+
+
+
+
+class CoupenCounter:
+    
+    def __init__(self,coupen_number = None,coupen_type = None, context_id=None,needed_count=None):
+        self.coupen_type = coupen_type
+        self.context_id = context_id
+        self.needed_count = needed_count
         
+        # if coupen type is box, there are 6 compinations
+        # we form a set of 6 compinations to reduce the complexity when we perform search
+        if coupen_type=="BOX":
+            self.coupen_number = set()
+        else:
+            self.coupen_number = coupen_number
+
+        self.query_set = Participants.objects.filter(context_id=self.context_id).values_list("coupen_number","coupen_count")
+
+
+    def is_count_exceeded(self):
+        count = 0
+        for participant in self.query_set:
+            
+            # if participant limit set to true already, it means its count already exceeded before
+            # so we dond want to loop more return True
+            if participant.is_limit_exceeded == True:
+                return True
+            count += participant.coupen_count
+
+        # check needed count is exceede or not
+        count += self.needed_count
+
+        # match with count limit user set.
+        if count >= 000:
+            return True
+        else:
+            return False
         
 
         

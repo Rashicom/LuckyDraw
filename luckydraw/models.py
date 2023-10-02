@@ -71,10 +71,11 @@ class Participants(models.Model):
     coupen_number = models.CharField(max_length=10)
     coupen_type = models.CharField(choices=CoupenType.choices, max_length=50)
     coupen_count = models.IntegerField()
+    coupen_rate = models.IntegerField()
     is_winner = models.BooleanField(default=False)
     prize = models.CharField(choices=Prizes.choices, max_length=50, blank=True, null=True)
-    
-
+    prize_rate = models.IntegerField(blank=True,null=True)
+    is_limit_exceeded = models.BooleanField(default=False)
 
     
  
