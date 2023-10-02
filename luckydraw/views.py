@@ -4,7 +4,7 @@ from .forms import AddParticipantForm, GetorSetLuckyDrawForm, AnnounceWinnerForm
 from .models import LuckyDraw, LuckyDrawContext, Participants
 from django.contrib.auth.decorators import login_required
 from datetime import timedelta, datetime, time
-from .coupens import CoupenValidator, AnnounceWinners, WinnersFilter
+from .coupens import CoupenValidator, AnnounceWinners, WinnersFilter, CoupenScraper
 from django.http import JsonResponse
 import pytz
 from .helper import time_to_seconds
@@ -74,7 +74,7 @@ class AddParticipant(View):
         4 - update data to database
         """
         
-        print("request hit")
+        print("request hitted")
         # CHECK 1 : fetching data and validatiog form
         form = self.form_class(request.POST)
         if not form.is_valid():
@@ -87,7 +87,6 @@ class AddParticipant(View):
 
         # if the time is blow draw time get or create todays dates context instance
         # if the time is high(todys context is finished and winner announced), get or create tomorrows date context instance
-        print(form.cleaned_data.get("coupen_count"))
         try:
             luckydraw_instance = LuckyDraw.objects.get(luckydrawtype_id=form.cleaned_data.get("luckydrawtype_id"))
         except Exception as e:
@@ -115,13 +114,23 @@ class AddParticipant(View):
             # get or create tommorrows context instance
             print("context: tommorow")
             tomorow_date = datetime.now(time_zone).date()+timedelta(1)
-            print(tomorow_date)
             context_instance,_ = LuckyDrawContext.objects.get_or_create(luckydrawtype_id = luckydraw_instance,context_date=tomorow_date)
 
         # CHECK 3 : validate coupen
+        # this coupen number is a row string , a compination of coupen number and count
         coupen_number = form.cleaned_data.get("coupen_number")
         coupen_type = form.cleaned_data.get("coupen_type")
-        
+
+        # CHECK 4 : seperate coupen count and coupen count and identify coupen type from coupen number
+        coupen_scraper = CoupenScraper(raw_string=coupen_number, coupen_type=coupen_type)
+        coupen_scraper.scrappify_coupen()
+
+        # get cleaned values
+        coupen_number = coupen_scraper.cleaned_coupen 
+        coupen_type = coupen_scraper.coupen_type
+        coupen_count = coupen_scraper.cleaned_coupen_count
+        print(coupen_number)
+        print(coupen_count)
         # creating instace for validator class and pass credencials
         coupen = self.coupenvalidator_class(coupen_number=coupen_number, coupen_type=coupen_type)
         
@@ -134,7 +143,7 @@ class AddParticipant(View):
                     context_id=context_instance,
                     coupen_number = coupen_number,
                     coupen_type = coupen_type,
-                    coupen_count = form.cleaned_data.get("coupen_count")
+                    coupen_count = coupen_count
                 )
                 new_participant.save()
             except Exception as e:

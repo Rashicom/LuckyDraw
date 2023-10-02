@@ -4,6 +4,71 @@ from .models import Participants,LuckyDraw,LuckyDrawContext
 from itertools import permutations
 
 
+class CoupenScraper:
+    """
+    this class is accpeting a string of coupen number and coupne type
+    this class is for identifying coupen, coupen type and count from the coupennumber string
+    
+    IMPORTANT INFO: this class can handle and identify multiple row coupens and returns a list of cleaned coupens
+                    dond want to create an extra thinks to add
+                    in the first verion we are only providing single coupen validation
+                    multiple coupen validation can be added in the next updation
+    """
+
+    def __init__(self, raw_string=None, coupen_type=None):
+        self.raw_string = raw_string
+        self.coupen_type = coupen_type
+        self.cleaned_coupen = ""
+        self.cleaned_coupen_count = 1
+
+        
+    def scrappify_coupen(self):
+        """
+        string contains multiple coupen numbers and counts
+        this method initially check the string is a set of  block coupens or not
+        then perform operations for block and super,set numbers seprarately
+        """
+        
+        # ditits may contain coupen number and seperation specal char and count
+        # eg : 1,5  254,2  897 2
+        # it means we the number is wether a box or a super
+
+        # check the string contain any letters
+        if not re.search('[a-zA-Z]', self.raw_string):
+            """
+            if the raw string not contains any of the letters the string is consisting of
+            only boc and super numbers
+            """
+
+            # Define a regular expression pattern to match the coupon and count
+            pattern = r'(\d{3})(?:[^0-9]*(\d+))?'
+
+            # Use re.findall to find all matching patterns in the input string
+            matches = re.findall(pattern, self.raw_string)
+
+            # here the coupen type is considered as the provided one
+        
+        else:
+            """
+            raw string contains letters and its a box numbers
+            """
+            pattern = r'([a-zA-Z0-9]+)(?:[^a-zA-Z0-9]+(\d+))?'
+            # Use re.findall to find all matching patterns in the input string
+            matches = re.findall(pattern, self.raw_string)
+
+            # set coupen type as block forcefully, even the user is provided box or super
+            self.coupen_type = "BLOCK"
+        
+
+        self.cleaned_coupen = matches[0][0]
+        self.cleaned_coupen_count = matches[0][1] or 1
+        print(self.cleaned_coupen)
+        print(self.coupen_type)
+        print(self.cleaned_coupen_count)
+        
+
+
+
 # coupen validation check agains its type
 class CoupenValidator:
     """
