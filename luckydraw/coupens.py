@@ -590,9 +590,6 @@ class WinnersFilter:
 
 
 
-
-
-
 # coupen counter for seperate limit exceeded coupens
 class CoupenCounter:
     
@@ -604,28 +601,40 @@ class CoupenCounter:
         # if coupen type is box, there are 6 compinations
         # we form a set of 6 compinations to reduce the complexity when we perform search
         if coupen_type=="BOX":
-            self.coupen_number = set()
-        else:
-            self.coupen_number = coupen_number
+            # we have to create a permutaion(all possible permutaions) list of the coupen number
+            permutation_list = list(permutations(str(coupen_number)))
 
-        self.query_set = Participants.objects.filter(context_id=self.context_id).values_list("coupen_number","coupen_count")
+            # Convert each permutation back to an integer and save them to a list
+            possible_combinations = ["".join(permutation) for permutation in permutation_list]
+            self.coupen_number = set(possible_combinations)
+        
+        else:
+            self.coupen_number = set()
+            self.coupen_number.add(str(coupen_number))
+
+        self.query_set = Participants.objects.filter(context_id=self.context_id).values_list("coupen_number","coupen_count","is_limit_exceeded")
 
 
     def is_count_exceeded(self):
         count = 0
         for participant in self.query_set:
             
-            # if participant limit set to true already, it means its count already exceeded before
-            # so we dond want to loop more return True
-            if participant.is_limit_exceeded == True:
-                return True
-            count += participant.coupen_count
+            if participant[0] in self.coupen_number:
+                # if participant limit set to true already, it means its count already exceeded before
+                # so we dond want to loop more return True
+                
+                if participant[2] == True:
+                    return True
+                count += int(participant[1])
+            
 
         # check needed count is exceede or not
-        count += self.needed_count
-
+        count += int(self.needed_count)
+        
         # match with count limit user set.
-        if count >= 000:
+        context = LuckyDrawContext.objects.get(context_id=self.context_id)
+        
+        if int(count) >= int(context.count_limit):
             return True
         else:
             return False

@@ -39,7 +39,7 @@ class LuckyDrawContext(models.Model):
     # array field which save all the lucky nubers for a perticular context
     context_luckynumber_list = ArrayField(models.CharField(max_length=6), null=True, blank=True)
     is_winner_announced = models.BooleanField(default=False)
-
+    count_limit = models.IntegerField(default=20)
 
 # particants with lucky number
 class Participants(models.Model):

@@ -161,16 +161,14 @@
 
             </div>
           
-
-
             <div class="col-6">
 
               <div class="input-group">
                 <span>
-                  <input type="number" class="form-control ms-1" id="inlineFormInputGroupUsername" placeholder="Count Limit" />
+                  <input type="number" value={% if contest.count_limit %}{{contest.count_limit}}{% else %}20{% endif %} class="form-control ms-1" name="count_limit" id="inlineFormInputGroupUsername" placeholder="Count Limit" />
                 </span>
               </div>
-              
+            
               
             </div>
             
@@ -199,6 +197,7 @@
 
               {% if all_paerticipants %}
               {% for participant in all_paerticipants %}
+              {% if participant.is_limit_exceeded == False %}
               <tr id="participant-{{ participant.participant_id }}">
                 <td>
                   <div class="d-flex align-items-center ">
@@ -219,6 +218,61 @@
                   </button>
                 </td>
               </tr>
+              {% endif %}
+              {% endfor %}
+              {% endif %}
+              
+              
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {% comment %} Limit Exceeded numbers {% endcomment %}
+
+      
+      <section class="order-list">
+        
+        <div class="container list-orders ">
+          <h3>Coupen beyond limits</h3>
+          <hr>
+          <table class="table align-middle mb-0 bg-white">
+            <thead class="bg-light ">
+              <tr>
+                <th>Coupans numbers</th>
+                <th>Types</th>
+                <th>Count</th>
+                <th>Rate</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+
+              {% if all_paerticipants %}
+              {% for participant in all_paerticipants %}
+              {% if participant.is_limit_exceeded %}
+              <tr id="participant-{{ participant.participant_id }}">
+                <td>
+                  <div class="d-flex align-items-center ">
+                    
+                    <div class="">
+                      <p class="text-muted mb-0 ">{{participant.coupen_number}}</p>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <p class="text-muted mb-0">{{participant.coupen_type}}</p>
+                </td>
+                <td class="text-muted mb-0">{{participant.coupen_count}}</td>
+                <td class="text-muted mb-0">{{participant.coupen_rate}}</td>
+                <td>
+                  <button type="button" data-participant-id="{{ participant.participant_id }}" class="delete_participant btn btn-link btn-sm btn-rounded">
+                    <i class="bi bi-trash3-fill text-danger"></i>
+                  </button>
+                </td>
+              </tr>
+              {% endif %}
               {% endfor %}
               {% endif %}
               

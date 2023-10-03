@@ -6,6 +6,7 @@ class AddParticipantForm(forms.Form):
     participant_name = forms.CharField(required=False)
     coupen_number = forms.CharField(required=True)
     coupen_type = forms.CharField(required=True)
+    count_limit = forms.IntegerField(required=True)
     
 
 class GetorSetLuckyDrawForm(forms.ModelForm):

@@ -4,7 +4,7 @@ from .forms import AddParticipantForm, GetorSetLuckyDrawForm, AnnounceWinnerForm
 from .models import LuckyDraw, LuckyDrawContext, Participants
 from django.contrib.auth.decorators import login_required
 from datetime import timedelta, datetime, time
-from .coupens import CoupenValidator, AnnounceWinners, WinnersFilter, CoupenScraper
+from .coupens import CoupenCounter, CoupenValidator, AnnounceWinners, WinnersFilter, CoupenScraper
 from django.http import JsonResponse
 import pytz
 from .helper import time_to_seconds
@@ -246,6 +246,12 @@ class Context(View):
             tomorow_date = datetime.now(time_zone).date()+timedelta(1)
             print(tomorow_date)
             context_instance,_ = LuckyDrawContext.objects.get_or_create(luckydrawtype_id = luckydraw_instance,context_date=tomorow_date)
+        
+        # crossmatch with provided countimit, if user set new count limit update it
+        count_limit = form.cleaned_data.get("count_limit")
+        if int(context_instance.count_limit) != int(count_limit):
+            context_instance.count_limit = count_limit
+            context_instance.save()
 
         # CHECK 3 : validate coupen
         coupen_number = form.cleaned_data.get("coupen_number")
@@ -293,6 +299,12 @@ class Context(View):
                 elif len(number)==len(char):
                     single_coupen_rate = 8
             
+            # calculation for limit exceeded or not
+            counter = CoupenCounter(coupen_number=coupen_number,coupen_type=coupen_type,needed_count=coupen_count,context_id=context_instance.context_id)
+            if counter.is_count_exceeded():
+                is_limit_exceeded = True
+            else:
+                is_limit_exceeded = False
 
             # create participant with lucky number
             try:
@@ -301,21 +313,23 @@ class Context(View):
                     coupen_number = coupen_number,
                     coupen_type = coupen_type,
                     coupen_count = coupen_count,
-                    coupen_rate = int(coupen_count)*float(single_coupen_rate)
+                    coupen_rate = int(coupen_count)*float(single_coupen_rate),
+                    is_limit_exceeded = is_limit_exceeded
+
                 )
                 new_participant.save()
             except Exception as e:
                 print(e)
-                return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"coupen not updated", "time_diff":time_diff})
+                return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"coupen not updated", "time_diff":time_diff,"contest":context_instance})
 
-
+            
             all_paerticipants = Participants.objects.filter(context_id= context_instance.context_id)
-            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"time_diff":time_diff})
+            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"time_diff":time_diff,"contest":context_instance})
 
 
         else:
             print("invalied coupen")
-            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"Invalied coupan", "time_diff":time_diff})
+            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"Invalied coupan", "time_diff":time_diff,"contest":context_instance})
 
 
    
@@ -359,7 +373,7 @@ class Context(View):
         # fiter participants in the contst object
         all_paerticipants = Participants.objects.filter(context_id= contest.context_id)
 
-        return render(request,templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"time_diff":time_diff})
+        return render(request,templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"time_diff":time_diff,"contest":contest})
 
 
 
