@@ -406,6 +406,7 @@ class AnnounceWinners:
                     # update database
                     participant.is_winner = True
                     participant.prize = self.prize
+                    participant.prize_rate = 700
                     participant.save()
 
                     # stop further checking
@@ -461,6 +462,7 @@ class AnnounceWinners:
                     # update database
                     participant.is_winner = True
                     participant.prize = self.prize
+                    participant.prize_rate = 700
                     participant.save()
 
                     # stop further checking
