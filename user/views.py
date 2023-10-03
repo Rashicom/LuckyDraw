@@ -3,7 +3,7 @@ from django.views import View
 from .forms import LoginForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from luckydraw.models import LuckyDraw
+from luckydraw.models import LuckyDraw,Participants
 
 # Login
 class UserLogin(View):
@@ -45,10 +45,22 @@ class UserLogin(View):
             """
             login(request,user)
 
+            # calculating total sales profit
+            coupen_price = 0
+            prize_given = 0
+            for i in Participants.objects.filter(context_id__is_winner_announced=True):
+                coupen_price += i.coupen_rate
+                
+                if i.is_winner:
+                    prize_given += i.prize_rate * i.coupen_count
+            
+            profit = coupen_price - prize_given
+
+
             # return
             templet = self.home_templet
             luckydrow_list = LuckyDraw.objects.all()
-            return render(request,templet,{"luckydrow_list":luckydrow_list})
+            return render(request,templet,{"luckydrow_list":luckydrow_list,"profit":profit})
         
         else:
             """
@@ -70,8 +82,20 @@ class UserLogin(View):
         returning login template
         """
         if request.user.is_authenticated:
+
+            # calculating total sales profit
+            coupen_price = 0
+            prize_given = 0
+            for i in Participants.objects.filter(context_id__is_winner_announced=True):
+                coupen_price += i.coupen_rate
+                
+                if i.is_winner:
+                    prize_given += i.prize_rate * i.coupen_count
+            
+            profit = coupen_price - prize_given
+
             luckydrow_list = LuckyDraw.objects.all()
-            return render(request,self.home_templet,{"luckydrow_list":luckydrow_list})
+            return render(request,self.home_templet,{"luckydrow_list":luckydrow_list,"profit":profit})
 
         return render(request, self.login_templet)
         

@@ -181,16 +181,17 @@ class Context(View):
         time_zone = pytz.timezone('Asia/Kolkata')
         time_now = datetime.now(time_zone).time()
 
-        if time_now < draw_time:
-            context_date = datetime.now(time_zone).date()
-        else:
-            context_date = datetime.now(time_zone).date() + timedelta(1)
-            
-
         # find time difference to show in the frond end in any case
         time1 = time_to_seconds(time_now)
         time2 = time_to_seconds(draw_time)
-        time_diff = abs(time1 - time2)
+
+        if time_now < draw_time:
+            context_date = datetime.now(time_zone).date()
+            time_diff = abs(time1 - time2)
+            
+        else:
+            context_date = datetime.now(time_zone).date() + timedelta(1)
+            time_diff = abs(86400 - (time1 - time2))
 
 
         contest = LuckyDrawContext.objects.filter(luckydrawtype_id=luckydrow.luckydrawtype_id, context_date=context_date)
@@ -265,8 +266,6 @@ class Context(View):
         coupen_number = coupen_scraper.cleaned_coupen 
         coupen_type = coupen_scraper.coupen_type
         coupen_count = coupen_scraper.cleaned_coupen_count
-        print(coupen_number)
-        print(coupen_count)
 
         # creating instace for validator class and pass credencials
         coupen = self.coupenvalidator_class(coupen_number=coupen_number, coupen_type=coupen_type)
@@ -322,7 +321,7 @@ class Context(View):
                 print(e)
                 return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"coupen not updated", "time_diff":time_diff,"contest":context_instance})
 
-            
+
             all_paerticipants = Participants.objects.filter(context_id= context_instance.context_id)
             return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"time_diff":time_diff,"contest":context_instance})
 
@@ -352,19 +351,18 @@ class Context(View):
         time_zone = pytz.timezone('Asia/Kolkata')
         time_now = datetime.now(time_zone).time()
 
-
         # calculate time diff to show
         time1 = time_to_seconds(time_now)
         time2 = time_to_seconds(draw_time)
-        time_diff = abs(time1 - time2)
-        print(time_diff)
-        print(type(time_diff))
 
         if time_now < draw_time:
             context_date = datetime.now(time_zone).date()
+            time_diff = abs(time1 - time2)
+            
         else:
             context_date = datetime.now(time_zone).date() + timedelta(1)
-        
+            time_diff = abs(86400 - (time1 - time2))
+
         try:
             contest = LuckyDrawContext.objects.get(luckydrawtype_id=luckydrow.luckydrawtype_id, context_date=context_date)
         except Exception as e:

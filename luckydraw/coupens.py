@@ -338,7 +338,12 @@ class AnnounceWinners:
         """
         programm flow:
             - seperate checking based on char and number
+
+        WARNING: this method is designed for calculating all prizes
+                  loop is limited to 1 to find first prize as per customer requirements
+                  this method must be redisign to find the same in a less complex way, avoide additional complexities
         """
+
         print("ANNOUNCING BLOCK WINNERS")
         # Regular expression to separate characters and digits
         match = re.match(r'([A-Za-z]+)([0-9]+)', participant.coupen_number)
@@ -354,7 +359,8 @@ class AnnounceWinners:
         if len(characters) == len(digits):
             print("length of chat is == len digit")
         
-            for i in range(len(self.cleaned_data)):
+            # only check for first prize
+            for i in range(1):
                 
                 # iterate through coupen charecter
                 # check any of the positional number matches
@@ -411,7 +417,8 @@ class AnnounceWinners:
         # 2'ST CASE: len(characters) > len(digits) ag: abc1
         elif len(characters) > len(digits):
             
-            for i in range(len(self.cleaned_data)):
+            # only check for first prize
+            for i in range(1):
                 
                 # iterate through coupen charecter
                 is_winner_flag = False
@@ -544,7 +551,7 @@ class WinnersFilter:
 
     def getcontext_and_validate(self):
         """
-        this checks the context is exest of not
+        this checks the context is exist or not
         if exist make sure that the context is already announced
         """
 
@@ -581,6 +588,7 @@ class WinnersFilter:
                 "coupen_type": participant.coupen_type,
                 "coupen_count": participant.coupen_count,
                 "prize": participant.prize,
+                "prize_amnt": int(participant.coupen_count)*int(participant.prize_rate)
             }
 
             # appending to data lists
