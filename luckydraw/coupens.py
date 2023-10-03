@@ -593,7 +593,7 @@ class WinnersFilter:
 
 
 
-
+# coupen counter for seperate limit exceeded coupens
 class CoupenCounter:
     
     def __init__(self,coupen_number = None,coupen_type = None, context_id=None,needed_count=None):

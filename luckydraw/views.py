@@ -292,7 +292,6 @@ class Context(View):
                     single_coupen_rate = 21
                 elif len(number)==len(char):
                     single_coupen_rate = 8
-
             
 
             # create participant with lucky number
@@ -302,7 +301,7 @@ class Context(View):
                     coupen_number = coupen_number,
                     coupen_type = coupen_type,
                     coupen_count = coupen_count,
-                    coupen_rate = coupen_count*single_coupen_rate
+                    coupen_rate = int(coupen_count)*float(single_coupen_rate)
                 )
                 new_participant.save()
             except Exception as e:
@@ -310,7 +309,7 @@ class Context(View):
                 return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"coupen not updated", "time_diff":time_diff})
 
 
-            all_paerticipants = Participants.objects.filter(context_id= contest.context_id)
+            all_paerticipants = Participants.objects.filter(context_id= context_instance.context_id)
             return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"time_diff":time_diff})
 
 
