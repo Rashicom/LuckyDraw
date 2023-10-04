@@ -78,7 +78,7 @@ class Participants(models.Model):
     is_limit_exceeded = models.BooleanField(default=False)
 
     
- 
+    
 
 
 

@@ -20,3 +20,8 @@ class AnnounceWinnerForm(forms.Form):
     luckydrawtype_id = forms.IntegerField(required=True)
     context_date = forms.DateField(required=True)
     
+
+class ResultsForm(forms.Form):
+    lucky_drawtype_id = forms.CharField(required=True)
+    from_date = forms.DateField(required=True)
+    to_date = forms.DateField(required=True)

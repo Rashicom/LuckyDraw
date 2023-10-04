@@ -1,10 +1,11 @@
 from django.shortcuts import render
 from django.views import View
-from .forms import AddParticipantForm, GetorSetLuckyDrawForm, AnnounceWinnerForm
+from .forms import AddParticipantForm, GetorSetLuckyDrawForm, AnnounceWinnerForm, ResultsForm
 from .models import LuckyDraw, LuckyDrawContext, Participants
 from django.contrib.auth.decorators import login_required
 from datetime import timedelta, datetime, time
-from .coupens import CoupenCounter, CoupenValidator, AnnounceWinners, WinnersFilter, CoupenScraper
+from .coupens import CoupenCounter, CoupenValidator, AnnounceWinners, CoupenScraper
+from .coupenfilter import WinnersFilter, DateFilter
 from django.http import JsonResponse
 import pytz
 from .helper import time_to_seconds
@@ -442,7 +443,7 @@ class AnnounceWinner(View):
 
         # get announced winners data
         coupen_filter = self.coupen_filter_class(luckydrawtype_id= luckydrawtype_id, context_date=context_date)
-        data = coupen_filter.getcontext_and_validate()
+        data = coupen_filter.get_filtered_data()
         print(data)
         return render(request,self.templet,data)
 
@@ -476,7 +477,44 @@ class DeleteParticipant(View):
 
 
 
+class Results(View):
 
+    result_templet = "lucky_results.html"
+    form_class = ResultsForm
+
+    def get(self, request):
+
+        lucky_draw = LuckyDraw.objects.all()
+        return render(request,self.result_templet,{"lucky_draw":lucky_draw})
+
+
+    def post(self, request):
+
+        form = self.form_class(request.POST)
+        lucky_draw = LuckyDraw.objects.all()
+        print("request hit")
+        # validate form
+        if not form.is_valid():
+            return render(request,self.result_templet, {"lucky_draw":lucky_draw,"error":"invalied date"})
+
+        print("form validated") 
+        print(form.cleaned_data)       
+        # filter data by date using DateFilter class instance
+        date_filter = DateFilter(
+            from_date=form.cleaned_data.get("from_date"),
+            to_date = form.cleaned_data.get("to_date"),
+            lucky_drawtype_id=form.cleaned_data.get("lucky_drawtype_id"),
+
+        )
+
+        # fiter by date and return data
+        data = date_filter.get_filtered_data()
+
+        # get account detains in the selected time period
+        accounts = date_filter.get_accounts()
+
+        # return result
+        return render(request, self.result_templet,{"lucky_draw":lucky_draw, **data, **accounts})
                 
 
 
