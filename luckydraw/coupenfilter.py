@@ -50,6 +50,7 @@ class WinnersFilter(BaseCoupenFilter):
             prize_category = participant.prize
             participant_info = {
                 "coupen_number": participant.coupen_number,
+                "participant_name": participant.participant_name,
                 "coupen_type": participant.coupen_type,
                 "coupen_count": participant.coupen_count,
                 "prize": participant.prize,
@@ -60,6 +61,8 @@ class WinnersFilter(BaseCoupenFilter):
             self.data[prize_category].append(participant_info)
 
         return self.data  
+
+
 
 
 class DateFilter(BaseCoupenFilter):
@@ -102,6 +105,7 @@ class DateFilter(BaseCoupenFilter):
             prize_category = participant.prize
             participant_info = {
                 "coupen_number": participant.coupen_number,
+                "participant_name": participant.participant_name,
                 "coupen_type": participant.coupen_type,
                 "coupen_count": participant.coupen_count,
                 "prize": participant.prize,
@@ -143,7 +147,8 @@ class DateFilter(BaseCoupenFilter):
             "fifth_prize_total":0,
             "complimentary_prize_total":0,
 
-            "total_prize":0
+            "total_prize":0,
+            "profit":0
         }
 
         for i in winning_participants:
@@ -181,6 +186,7 @@ class DateFilter(BaseCoupenFilter):
 
         accounts["total_value"] = accounts["box_total_value"] + accounts["block_total_value"] + accounts["super_total_value"]
         accounts["total_prize"] = accounts["first_prize_total"] + accounts["second_prize_total"] + accounts["third_prize_total"] + accounts["fourth_prize_total"] + accounts["fifth_prize_total"] + accounts["fifth_prize_total"] + accounts["complimentary_prize_total"]
-        
+        accounts["profit"] = accounts["total_value"] - accounts["first_prize_total"] - accounts["total_prize"]
+
         return accounts
 

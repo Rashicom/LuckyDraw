@@ -423,22 +423,25 @@ class AnnounceWinners:
                 
                 # iterate through coupen charecter
                 is_winner_flag = False
+                match_count = 0
                 for idx in characters:
                     
                     if idx == "A":
                         if digits[0] == str(self.cleaned_data[i])[0]:
                             is_winner_flag = True
-                            break
+                            match_count += 1
+                            
 
-                    if idx == "B":
+                    elif idx == "B":
                         if digits[0] == str(self.cleaned_data[i][1]):
                             is_winner_flag = True
-                            break
+                            match_count += 1
 
-                    if idx == "C":
+
+                    elif idx == "C":
                         if digits[0] == str(self.cleaned_data[i][2]):
                             is_winner_flag = True
-                            break
+                            match_count += 1
 
 
                 # if all the positions are perfectly marched 
@@ -462,7 +465,7 @@ class AnnounceWinners:
                     # update database
                     participant.is_winner = True
                     participant.prize = self.prize
-                    participant.prize_rate = 700
+                    participant.prize_rate = match_count * 100
                     participant.save()
 
                     # stop further checking
