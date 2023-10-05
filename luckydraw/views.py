@@ -418,16 +418,16 @@ class AnnounceWinner(View):
         luckydraw_obj = LuckyDraw.objects.get(luckydrawtype_id=luckydrawtype_id)
         draw_time_obj = datetime.strptime(str(luckydraw_obj.draw_time), "%H:%M:%S").time()
 
-        if present_time < draw_time_obj:
+        if present_time < draw_time_obj and context_date_obj == today_date:
             return render(request,self.templet,{"error":"Drow Time not passed"})
             
 
         # CHECK 3 : never allow the announcement if already announced befor
+        
         try:
             context_obj = LuckyDrawContext.objects.get(luckydrawtype_id = luckydraw_obj.luckydrawtype_id, context_date=context_date)
         except Exception as e:
-            return render(request,self.templet,{"error":"Context not found"})
-            
+            return render(request,self.templet,{"error":"Context not found"})    
 
         # if the winner is already announced
         # if context_obj.is_winner_announced == True:
