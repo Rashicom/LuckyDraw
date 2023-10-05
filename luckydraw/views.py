@@ -446,7 +446,8 @@ class AnnounceWinner(View):
         # get announced winners data
         coupen_filter = self.coupen_filter_class(luckydrawtype_id= luckydrawtype_id, context_date=context_date)
         data = coupen_filter.get_filtered_data()
-        print(data)
+
+
         return render(request,self.templet,data)
 
 

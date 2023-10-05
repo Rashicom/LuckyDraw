@@ -333,7 +333,7 @@
                 
 
             </div>
-            
+            <h3>Total Profit :₹ {{profit}}</h3>
 
         </div>
     </section>
@@ -350,6 +350,7 @@
                         <thead>
                             <tr>
                               <th scope="col">Lucky No.</th>
+                              <th scope="col">Name</th>
                               <th scope="col">Price</th>
                               <th scope="col">Count</th>
                               <th scope="col">Prize Amnt</th>
@@ -362,6 +363,7 @@
                                 {% for prize in FIRST_PRIZE %}
                                     <tr>
                                     <td>{{prize.coupen_number}}</td>
+                                    <td>{{prize.participant_name}}</td>
                                     <td>{{prize.prize}}</td>
                                     <td>{{prize.coupen_count}}</td>
                                     <td>{{prize.prize_amnt}}</td>
@@ -380,6 +382,7 @@
                         <thead>
                             <tr>
                               <th scope="col">Lucky No.</th>
+                              <th scope="col">Name</th>
                               <th scope="col">Price</th>
                               <th scope="col">Count</th>
                               <th scope="col">Prize Amnt</th>
@@ -393,6 +396,7 @@
                                 {% for prize in SECOND_PRIZE %}
                                     <tr>
                                     <td>{{prize.coupen_number}}</td>
+                                    <td>{{prize.participant_name}}</td>
                                     <td>{{prize.prize}}</td>
                                     <td>{{prize.coupen_count}}</td>
                                     <td>{{prize.prize_amnt}}</td>
@@ -412,6 +416,7 @@
                         <thead>
                             <tr>
                               <th scope="col">Lucky No.</th>
+                              <th scope="col">Name</th>
                               <th scope="col">Price</th>
                               <th scope="col">Count</th>
                               <th scope="col">Prize Amnt</th>
@@ -424,6 +429,7 @@
                                 {% for prize in THIRD_PRIZE %}
                                     <tr>
                                     <td>{{prize.coupen_number}}</td>
+                                    <td>{{prize.participant_name}}</td>
                                     <td>{{prize.prize}}</td>
                                     <td>{{prize.coupen_count}}</td>
                                     <td>{{prize.prize_amnt}}</td>
@@ -449,6 +455,7 @@
                         <thead>
                             <tr>
                               <th scope="col">Lucky No.</th>
+                              <th scope="col">Name</th>
                               <th scope="col">Price</th>
                               <th scope="col">Count</th>
                               <th scope="col">Prize Amnt</th>
@@ -462,6 +469,7 @@
                                 {% for prize in FOURTH_PRIZE %}
                                     <tr>
                                     <td>{{prize.coupen_number}}</td>
+                                    <td>{{prize.participant_name}}</td>
                                     <td>{{prize.prize}}</td>
                                     <td>{{prize.coupen_count}}</td>
                                     <td>{{prize.prize_amnt}}</td>
@@ -481,6 +489,7 @@
                         <thead>
                             <tr>
                               <th scope="col">Lucky No.</th>
+                              <th scope="col">Name</th>
                               <th scope="col">Price</th>
                               <th scope="col">Count</th>
                               <th scope="col">Prize Amnt</th>
@@ -494,6 +503,7 @@
                                 {% for prize in FIFTH_PRIZE %}
                                     <tr>
                                     <td>{{prize.coupen_number}}</td>
+                                    <td>{{prize.participant_name}}</td>
                                     <td>{{prize.prize}}</td>
                                     <td>{{prize.coupen_count}}</td>
                                     <td>{{prize.prize_amnt}}</td>
@@ -513,6 +523,7 @@
                         <thead>
                             <tr>
                               <th scope="col">Lucky No.</th>
+                              <th scope="col">Name</th>
                               <th scope="col">Price</th>
                               <th scope="col">Count</th>
                               <th scope="col">Prize Amnt</th>
@@ -525,6 +536,7 @@
                                 {% for prize in COMPLIMENTERY_PRIZE %}
                                     <tr>
                                     <td>{{prize.coupen_number}}</td>
+                                    <td>{{prize.participant_name}}</td>
                                     <td>{{prize.prize}}</td>
                                     <td>{{prize.coupen_count}}</td>
                                     <td>{{prize.prize_amnt}}</td>
