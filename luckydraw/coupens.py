@@ -398,7 +398,13 @@ class AnnounceWinners:
                     # update database
                     participant.is_winner = True
                     participant.prize = self.prize
-                    participant.prize_rate = 700
+
+                    # in the case of A1 or len(ahar) == 1 prize is 100 
+                    if len(characters) == 1:
+                        participant.prize_rate = 100
+                    else:
+                        participant.prize_rate = 700
+
                     participant.save()
 
                     return
