@@ -410,16 +410,16 @@ class AnnounceWinner(View):
         today_date = datetime.now(time_zone).date()
         context_date_obj = datetime.strptime(str(context_date), "%Y-%m-%d").date()
         
-        if context_date_obj > today_date:
-            return render(request,self.templet,{"error":"Invalied date"})
+        # if context_date_obj > today_date:
+        #     return render(request,self.templet,{"error":"Invalied date"})
 
         # CHECK 2 : never allow to perform announce winneres if the present time is less than context time
         present_time = datetime.now(time_zone).time()
         luckydraw_obj = LuckyDraw.objects.get(luckydrawtype_id=luckydrawtype_id)
         draw_time_obj = datetime.strptime(str(luckydraw_obj.draw_time), "%H:%M:%S").time()
 
-        if present_time < draw_time_obj and context_date_obj == today_date:
-            return render(request,self.templet,{"error":"Drow Time not passed"})
+        # if present_time < draw_time_obj and context_date_obj == today_date:
+        #     return render(request,self.templet,{"error":"Drow Time not passed"})
             
 
         # CHECK 3 : never allow the announcement if already announced befor

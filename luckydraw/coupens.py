@@ -251,8 +251,7 @@ class AnnounceWinners:
         # populating winning prizes list and complimetery winning prizes set
         self.winning_prizes.extend(self.cleaned_data[:5])
         self.complimentery_prizes.update(self.cleaned_data[5:])
-        print(self.winning_prizes)
-        print(self.complimentery_prizes)
+        
         context_instance = LuckyDrawContext.objects.get(luckydrawtype_id = self.luckydrawtype_id, context_date=self.context_date)
         
         # get all participant_query_dict list and iterate through it
@@ -261,6 +260,7 @@ class AnnounceWinners:
         all_participants = Participants.objects.filter(context_id=context_instance)
         
         for participant in all_participants:
+            print(participant.coupen_number)
             if participant.coupen_type == "SUPER":
                  self.super_winner(participant)
             if participant.coupen_type == "BOX":
@@ -312,16 +312,11 @@ class AnnounceWinners:
                 participant.prize_rate = self.prize_rate
                 participant.save()
 
-                print("---------winning prize------------")
-                print(self.prize)
-                print(participant.coupen_number)
                 # if coupen is in winner we dont wnant to ckeck the number in complimentery
                 return
 
         # lookup for complimentery winners
         if participant.coupen_number in self.complimentery_prizes:
-            print("-----------Complimentery prize----------")
-            print(participant.coupen_number)
 
             # updte data base
             self.prize = "COMPLIMENTERY_PRIZE"
@@ -344,7 +339,6 @@ class AnnounceWinners:
                   this method must be redisign to find the same in a less complex way, avoide additional complexities
         """
 
-        print("ANNOUNCING BLOCK WINNERS")
         # Regular expression to separate characters and digits
         match = re.match(r'([A-Za-z]+)([0-9]+)', participant.coupen_number)
 
@@ -353,11 +347,9 @@ class AnnounceWinners:
             characters = characters.upper()
             digits = str(digits)
 
-        print(characters,digits)
 
         # 1'ST CASE: len(characters) == len(digits) eg: ab12
         if len(characters) == len(digits):
-            print("length of chat is == len digit")
         
             # only check for first prize
             for i in range(1):
@@ -409,10 +401,6 @@ class AnnounceWinners:
                     participant.prize_rate = 700
                     participant.save()
 
-                    # stop further checking
-                    print("----BOX WINNER------")
-                    print(self.prize)
-                    print(participant.coupen_number," === ",self.cleaned_data[i])
                     return
             
         # 2'ST CASE: len(characters) > len(digits) ag: abc1
@@ -469,9 +457,6 @@ class AnnounceWinners:
                     participant.save()
 
                     # stop further checking
-                    print("----BOX WINNER------")
-                    print(self.prize)
-                    print(participant.coupen_number," === ",self.cleaned_data[i])
                     return
 
         
@@ -484,7 +469,7 @@ class AnnounceWinners:
 
         # Convert each permutation back to an integer and save them to a list
         possible_combinations = ["".join(permutation) for permutation in permutation_list]
-        print(possible_combinations)
+
         # iterate through possibli compinations
         for coupen in possible_combinations:
             """
@@ -520,16 +505,11 @@ class AnnounceWinners:
                     participant.prize_rate = self.prize_rate
                     participant.save()
 
-                    print("--------Winning prize---------")
-                    print(self.prize)
-                    print(coupen)
                     # if coupen is in winner we dont wnant to ckeck the number in complimentery
                     return
 
             # lookup for complimentery winners
             if coupen in self.complimentery_prizes:
-                print("--------Complimentry prize---------")
-                print(coupen)
 
                 # updte data base
                 self.prize = "COMPLIMENTERY_PRIZE"
