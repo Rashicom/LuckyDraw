@@ -78,6 +78,10 @@ class Participants(models.Model):
     is_limit_exceeded = models.BooleanField(default=False)
 
     
+    # default sorting
+    class Meta:
+        # last added item apperes in first
+        ordering = ['-participant_id']
     
 
 
