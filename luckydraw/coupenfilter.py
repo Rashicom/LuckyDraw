@@ -185,8 +185,8 @@ class DateFilter(BaseCoupenFilter):
                 accounts["complimentary_prize_total"] += i.prize_rate * i.coupen_count
 
         accounts["total_value"] = accounts["box_total_value"] + accounts["block_total_value"] + accounts["super_total_value"]
-        accounts["total_prize"] = accounts["first_prize_total"] + accounts["second_prize_total"] + accounts["third_prize_total"] + accounts["fourth_prize_total"] + accounts["fifth_prize_total"] + accounts["fifth_prize_total"] + accounts["complimentary_prize_total"]
-        accounts["profit"] = accounts["total_value"] - accounts["first_prize_total"] - accounts["total_prize"]
+        accounts["total_prize"] = accounts["first_prize_total"] + accounts["second_prize_total"] + accounts["third_prize_total"] + accounts["fourth_prize_total"] + accounts["fifth_prize_total"] + accounts["complimentary_prize_total"]
+        accounts["profit"] = accounts["total_value"] - accounts["total_prize"]
 
         return accounts
 
