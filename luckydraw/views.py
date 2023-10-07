@@ -292,12 +292,12 @@ class Context(View):
                     else:
                         char = char + i
                 
-                if len(char)==1:
+                if len(char)==1 and len(number) == 1:
                     single_coupen_rate = 10.50
-                elif len(char) == 2:
+
+                elif len(char) > len(number):
                     single_coupen_rate = 21
-                elif len(char) == 3:
-                    single_coupen_rate = 31.50
+
                 elif len(number)==len(char):
                     single_coupen_rate = 8
             
