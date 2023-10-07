@@ -298,7 +298,7 @@ class Context(View):
                     single_coupen_rate = 10.50
 
                 elif len(char) > len(number):
-                    single_coupen_rate = 21
+                    single_coupen_rate = 10.5 * len(char)
 
                 elif len(number)==len(char):
                     single_coupen_rate = 8
