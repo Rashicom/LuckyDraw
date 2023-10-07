@@ -328,7 +328,7 @@ class Context(View):
 
                 except Exception as e:
                     print(e)
-                    return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"coupen not updated", "time_diff":time_diff,"contest":context_instance})
+                    return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"coupen not updated", "time_diff":time_diff,"contest":context_instance,"last_participant_name":participant_name})
                 
             
 
@@ -351,16 +351,16 @@ class Context(View):
 
                 except Exception as e:
                     print(e)
-                    return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"coupen not updated", "time_diff":time_diff,"contest":context_instance})
+                    return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"coupen not updated", "time_diff":time_diff,"contest":context_instance,"last_participant_name":participant_name})
 
 
             all_paerticipants = Participants.objects.filter(context_id= context_instance.context_id)
-            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"time_diff":time_diff,"contest":context_instance})
+            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"time_diff":time_diff,"contest":context_instance,"last_participant_name":participant_name})
 
 
         else:
             print("invalied coupen")
-            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"Invalied coupan", "time_diff":time_diff,"contest":context_instance})
+            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"Invalied coupan", "time_diff":time_diff,"contest":context_instance,"last_participant_name":participant_name})
 
 
    
