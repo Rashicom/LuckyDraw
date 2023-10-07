@@ -347,124 +347,86 @@ class AnnounceWinners:
             characters = characters.upper()
             digits = str(digits)
 
+        # fetching first lucky number form the cleaned data
+        # block is only applicable for first prize
+        first_prize_number = str(self.cleaned_data[0])
 
         # 1'ST CASE: len(characters) == len(digits) eg: ab12
-        if len(characters) == len(digits):
-        
-            # only check for first prize
-            for i in range(1):
-                
-                # iterate through coupen charecter
-                # check any of the positional number matches
-                # winner flag assert all the positons are matching not only one. eg: ab23, bothe a and b position contain2 and 3 respectivelly to win, Not a or b
-                is_winner_flag = False
-                for idx,digit in zip(characters,digits):
-                    if idx == "A":
-                        if digit == str(self.cleaned_data[i])[0]:
-                            is_winner_flag = True
-                        else:
-                            is_winner_flag = False
-
-                    if idx == "B":
-                        if digit == str(self.cleaned_data[i])[1]:
-                            is_winner_flag = True
-                        else:
-                            is_winner_flag = False
-                                
-                    if idx == "C":
-                        if digit == str(self.cleaned_data[i])[2]:
-                            is_winner_flag = True
-                        else:
-                            is_winner_flag = False
-
-                # if all the positions are perfectly marched 
-                if is_winner_flag == True:
-
-                    # figure out which winner is this
-                    if i == 0:
-                        self.prize = "FIRST_PRIZE"
-                    elif i == 1:
-                        self.prize = "SECOND_PRIZE"
-                    elif i == 2:
-                        self.prize = "THIRD_PRIZE"
-                    elif i == 3:
-                        self.prize = "FOURTH_PRIZE"
-                    elif i == 4:
-                        self.prize = "FIFTH_PRIZE"
-
-                    else:
-                        self.prize = "COMPLIMENTERY_PRIZE"
-                    
-                    # update database
-                    participant.is_winner = True
-                    participant.prize = self.prize
-
-                    # in the case of A1 or len(ahar) == 1 prize is 100 
-                    if len(characters) == 1:
-                        participant.prize_rate = 100
-                    else:
-                        participant.prize_rate = 700
-
-                    participant.save()
-
-                    return
+        if len(characters) == len(digits) and len(characters) > 1:
             
-        # 2'ST CASE: len(characters) > len(digits) ag: abc1
-        elif len(characters) > len(digits):
-            
-            # only check for first prize
-            for i in range(1):
-                
-                # iterate through coupen charecter
-                is_winner_flag = False
-                match_count = 0
-                for idx in characters:
-                    
-                    if idx == "A":
-                        if digits[0] == str(self.cleaned_data[i])[0]:
-                            is_winner_flag = True
-                            match_count += 1
+            # iterate through coupen charecter
+            # check any of the positional number matches
+            # winner flag assert all the positons are matching not only one. eg: ab23, bothe a and b position contain2 and 3 respectivelly to win, Not a or b
+            is_winner_flag = False
+            for idx,digit in zip(characters,digits):
+                if idx == "A":
+                    if digit == first_prize_number[0]:
+                        is_winner_flag = True
+                    else:
+                        is_winner_flag = False
+                        break
+                elif idx == "B":
+                    if digit == first_prize_number[1]:
+                        is_winner_flag = True
+                    else:
+                        is_winner_flag = False
+                        break
                             
-
-                    elif idx == "B":
-                        if digits[0] == str(self.cleaned_data[i][1]):
-                            is_winner_flag = True
-                            match_count += 1
-
-
-                    elif idx == "C":
-                        if digits[0] == str(self.cleaned_data[i][2]):
-                            is_winner_flag = True
-                            match_count += 1
-
-
-                # if all the positions are perfectly marched 
-                if is_winner_flag == True:
-
-                    # figure out which winner is this
-                    if i == 0:
-                        self.prize = "FIRST_PRIZE"
-                    elif i == 1:
-                        self.prize = "SECOND_PRIZE"
-                    elif i == 2:
-                        self.prize = "THIRD_PRIZE"
-                    elif i == 3:
-                        self.prize = "FOURTH_PRIZE"
-                    elif i == 4:
-                        self.prize = "FIFTH_PRIZE"
-
+                elif idx == "C":
+                    if digit == first_prize_number[2]:
+                        is_winner_flag = True
                     else:
-                        self.prize = "COMPLIMENTERY_PRIZE"
-                    
-                    # update database
-                    participant.is_winner = True
-                    participant.prize = self.prize
-                    participant.prize_rate = match_count * 100
-                    participant.save()
+                        is_winner_flag = False
+                        break
+            # if all the positions are perfectly marched 
+            if is_winner_flag == True:
+                
+                self.prize = "FIRST_PRIZE"
 
-                    # stop further checking
-                    return
+                # update database
+                participant.is_winner = True
+                participant.prize = self.prize
+                participant.prize_rate = 700
+                participant.save()
+                return
+            return
+                
+            
+        # 2'ST CASE: len(characters) > len(digits) or len(char) == 1 ag: abc1
+        else:
+                
+            # iterate through coupen charecter
+            is_winner_flag = False
+            match_count = 0
+            for idx in characters:
+                
+                if idx == "A":
+                    if digits[0] == first_prize_number[0]:
+                        is_winner_flag = True
+                        match_count += 1
+                        
+                elif idx == "B":
+                    if digits[0] == first_prize_number[1]:
+                        is_winner_flag = True
+                        match_count += 1
+                elif idx == "C":
+                    if digits[0] == first_prize_number[2]:
+                        is_winner_flag = True
+                        match_count += 1
+            # if all the positions are perfectly marched 
+            if is_winner_flag == True:
+                
+                self.prize = "FIRST_PRIZE"
 
+                # update database
+                participant.is_winner = True
+                participant.prize = self.prize
+                participant.prize_rate = match_count * 100
+                participant.save()
+                # stop further checking
+                return
+            return
+            
         
 
     # annownsing box winners
