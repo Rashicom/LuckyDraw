@@ -208,10 +208,8 @@ class Context(View):
         form = self.form_class(request.POST)
         if not form.is_valid():
             print("form validation FAILED")
-            print(form.errors)
-
-            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"form not valied", "time_diff":time_diff})
-
+            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"Invalied fields", "time_diff":time_diff})
+        
 
         # CHECK 2 : data entry time constrain check
 
@@ -258,7 +256,8 @@ class Context(View):
         # CHECK 3 : validate coupen
         coupen_number = form.cleaned_data.get("coupen_number")
         coupen_type = form.cleaned_data.get("coupen_type")
-        
+        participant_name = form.cleaned_data.get("participant_name")
+
         # CHECK 4 : seperate coupen count and coupen count and identify coupen type from coupen number
         coupen_scraper = CoupenScraper(raw_string=coupen_number, coupen_type=coupen_type)
         coupen_scraper.scrappify_coupen()
@@ -267,6 +266,9 @@ class Context(View):
         coupen_number = coupen_scraper.cleaned_coupen 
         coupen_type = coupen_scraper.coupen_type
         coupen_count = coupen_scraper.cleaned_coupen_count
+
+        if int(coupen_count) == 0:
+            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"Invalied count", "time_diff":time_diff,"contest":context_instance})
 
         # creating instace for validator class and pass credencials
         coupen = self.coupenvalidator_class(coupen_number=coupen_number, coupen_type=coupen_type)
@@ -304,25 +306,52 @@ class Context(View):
             # calculation for limit exceeded or not
             counter = CoupenCounter(coupen_number=coupen_number,coupen_type=coupen_type,needed_count=coupen_count,context_id=context_instance.context_id)
             if counter.is_count_exceeded():
-                is_limit_exceeded = True
-            else:
-                is_limit_exceeded = False
+                """
+                if the count limit is exceeded we have to save tocken with limited avalilable count
+                rest of the count is added as a seperate row as is count_limit_exceeded as True
+                """
+                countlimit_exceeded = counter.countlimit_exceeded
 
-            # create participant with lucky number
-            try:
-                new_participant = Participants(
-                    context_id=context_instance,
-                    coupen_number = coupen_number,
-                    coupen_type = coupen_type,
-                    coupen_count = coupen_count,
-                    coupen_rate = int(coupen_count)*float(single_coupen_rate),
-                    is_limit_exceeded = is_limit_exceeded
+                # create participant with lucky number
+                try:
+                    new_participant = Participants(
+                        context_id=context_instance,
+                        participant_name = participant_name,
+                        coupen_number = coupen_number,
+                        coupen_type = coupen_type,
+                        coupen_count = countlimit_exceeded,
+                        coupen_rate = int(countlimit_exceeded)*float(single_coupen_rate),
+                        is_limit_exceeded = True
 
-                )
-                new_participant.save()
-            except Exception as e:
-                print(e)
-                return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"coupen not updated", "time_diff":time_diff,"contest":context_instance})
+                    )
+                    new_participant.save()
+
+                except Exception as e:
+                    print(e)
+                    return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"coupen not updated", "time_diff":time_diff,"contest":context_instance})
+                
+            
+
+
+            if counter.available_count is not None:
+
+                # create participant with lucky number
+                try:
+                    new_participant = Participants(
+                        context_id=context_instance,
+                        participant_name = participant_name,
+                        coupen_number = coupen_number,
+                        coupen_type = coupen_type,
+                        coupen_count = counter.available_count,
+                        coupen_rate = int(counter.available_count)*float(single_coupen_rate),
+                        is_limit_exceeded = False
+
+                    )
+                    new_participant.save()
+
+                except Exception as e:
+                    print(e)
+                    return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"coupen not updated", "time_diff":time_diff,"contest":context_instance})
 
 
             all_paerticipants = Participants.objects.filter(context_id= context_instance.context_id)

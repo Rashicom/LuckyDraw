@@ -37,7 +37,7 @@ class CoupenScraper:
         if not re.search('[a-zA-Z]', self.raw_string):
             """
             if the raw string not contains any of the letters the string is consisting of
-            only boc and super numbers
+            only box and super numbers
             """
 
             # Define a regular expression pattern to match the coupon and count
@@ -501,6 +501,10 @@ class CoupenCounter:
         self.coupen_type = coupen_type
         self.context_id = context_id
         self.needed_count = needed_count
+
+        # exceeded and available coupen counts
+        self.countlimit_exceeded = None
+        self.available_count = None
         
         # if coupen type is box, there are 6 compinations
         # we form a set of 6 compinations to reduce the complexity when we perform search
@@ -524,13 +528,19 @@ class CoupenCounter:
         for participant in self.query_set:
             
             if participant[0] in self.coupen_number:
+                # participant[0] is coupen_number
                 # if participant limit set to true already, it means its count already exceeded before
-                # so we dond want to loop more return True
+                # so we dont want to loop more, return True
                 
                 if participant[2] == True:
+                    # participant[2] == is_limit_exceeded
+
+                    # if the limit is already exceeded all the needed count is exceeded count
+                    self.countlimit_exceeded = self.needed_count
                     return True
+                
                 count += int(participant[1])
-            
+                # participant[1] == coupen count
 
         # check needed count is exceede or not
         count += int(self.needed_count)
@@ -538,9 +548,19 @@ class CoupenCounter:
         # match with count limit user set.
         context = LuckyDrawContext.objects.get(context_id=self.context_id)
         
-        if int(count) >= int(context.count_limit):
+        if int(count) > int(context.count_limit):
+            """
+            set avalilable count and exceeded count for further processing
+            available count : count which can be updated without count limit exceeded
+            exceeded count : balance count considered as exceeded count
+            """
+        
+            self.countlimit_exceeded = int(count) - int(context.count_limit)
+            self.available_count = int(self.needed_count) - self.countlimit_exceeded
+            
             return True
         else:
+            self.available_count = self.needed_count
             return False
         
 
