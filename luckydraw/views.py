@@ -8,7 +8,7 @@ from .coupens import CoupenCounter, CoupenValidator, AnnounceWinners, CoupenScra
 from .coupenfilter import WinnersFilter, DateFilter
 from django.http import JsonResponse
 import pytz
-from .helper import time_to_seconds
+from .helper import time_to_seconds, box_permutation_count
 
 
 class GetorSetLuckyDraw(View):
@@ -164,7 +164,7 @@ class AddParticipant(View):
     
 
 
-# get context
+# get and post context
 class Context(View):
 
     Addparticipant_templet = "lucky_add.html"
@@ -282,7 +282,12 @@ class Context(View):
             if coupen_type=="SUPER":
                 single_coupen_rate = 8
             elif coupen_type=="BOX":
-                single_coupen_rate = 48
+                """
+                here may be the coupen contains 2 same digits in, this case there is no 6 compinations
+                we have to find the coupen rate according to the compbinations
+                """
+                permutation_count = box_permutation_count(coupen_number=coupen_number)
+                single_coupen_rate = int(permutation_count) * 8
             
             else:
                 # for block there is a seperate rate machanism
@@ -492,6 +497,7 @@ class AnnounceWinner(View):
 
 
 
+
 class DeleteParticipant(View):
     def get(self, request, *args, **kwargs):
         participant_id = request.GET.get("participant_id")
@@ -499,12 +505,11 @@ class DeleteParticipant(View):
         try:
             participant = Participants.objects.get(participant_id=participant_id)
             participant.delete()
-
+        
         except Exception as e:
             print(e)
             return JsonResponse({"status":404})
-
-        return JsonResponse({"status":200})
+        return JsonResponse({"status":200,"coupen_type":participant.coupen_type})
 
 
 

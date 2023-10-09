@@ -21,7 +21,7 @@
             font-weight: 500;
         }
         .form-section{
-          margin-top: 100px;
+          margin-top: 50px;
         }
         .under_line{
           color: #fff !important;
@@ -122,6 +122,8 @@
       <section>
         <div class="container">
 
+          <div class="row">
+          <div class="col-8">
 
           <form method="POST" class="row row-cols-lg-auto g-3 align-items-center form-section">
 
@@ -174,6 +176,31 @@
             
             
           </form>
+          </div>
+          <div class="col-4 form-section">
+            <table class="table">
+        
+              <tbody>
+                <tr>
+                  <td>Box count</td>
+                  <td id="BOX">12</td>
+                </tr>
+                <tr>
+                  <td>Block count</td>
+                  <td id="BLOCK">10</td>
+                </tr>
+                <tr>
+                  <td>Super count</td>
+                  <td id="SUPER">15</td>
+                </tr>
+                
+              </tbody>
+            </table>
+
+          </div>
+          </div>
+
+          
         </div>
       </section>
 
@@ -323,8 +350,6 @@
         updateCountdown();
 
       
-
-      
       //participant save button
       $("#add_participant").on("click", function(e) {
         /*
@@ -375,12 +400,9 @@
                 console.log(data.error)
                 $("#error").text(data.error)
             },
-
         })
-        
-        
-
     })
+
     
     $(".delete_participant").on('click', function(e) {
       e.preventDefault()
@@ -395,10 +417,19 @@
         data: data,
 
         success: function(data) {
+          
             // handle response
             if(data.status == 200) {
               $("#" + rowId).remove();
-            }   
+
+              // reduce appropreate coupen count
+              //get current count
+              var count = parseInt($("#"+data.coupen_type).text())
+              
+              //reduce count and show
+              count--
+              $("#"+data.coupen_type).text(count)
+            }
             
         },
 

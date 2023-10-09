@@ -520,7 +520,7 @@ class CoupenCounter:
             self.coupen_number = set()
             self.coupen_number.add(str(coupen_number))
 
-        self.query_set = Participants.objects.filter(context_id=self.context_id).values_list("coupen_number","coupen_count","is_limit_exceeded")
+        self.query_set = Participants.objects.filter(context_id=self.context_id,coupen_type=self.coupen_type).values_list("coupen_number","coupen_count","is_limit_exceeded")
 
 
     def is_count_exceeded(self):

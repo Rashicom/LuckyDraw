@@ -76,7 +76,7 @@ class Participants(models.Model):
     prize = models.CharField(choices=Prizes.choices, max_length=50, blank=True, null=True)
     prize_rate = models.IntegerField(blank=True,null=True)
     is_limit_exceeded = models.BooleanField(default=False)
-
+    
     
     # default sorting
     class Meta:
