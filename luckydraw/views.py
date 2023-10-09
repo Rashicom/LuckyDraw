@@ -8,7 +8,7 @@ from .coupens import CoupenCounter, CoupenValidator, AnnounceWinners, CoupenScra
 from .coupenfilter import WinnersFilter, DateFilter
 from django.http import JsonResponse
 import pytz
-from .helper import time_to_seconds, box_permutation_count
+from .helper import time_to_seconds, box_permutation_count, coupen_type_counts
 
 
 class GetorSetLuckyDraw(View):
@@ -204,11 +204,14 @@ class Context(View):
             all_paerticipants = ""
         
 
+        # coupen wise count to show in html
+        coupen_typewise_count = coupen_type_counts(context_id=contest.context_id)
+
         # CHECK 1 : fetching data and validatiog form
         form = self.form_class(request.POST)
         if not form.is_valid():
             print("form validation FAILED")
-            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"Invalied fields", "time_diff":time_diff})
+            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"Invalied fields", "time_diff":time_diff, **coupen_typewise_count})
         
 
         # CHECK 2 : data entry time constrain check
@@ -333,7 +336,7 @@ class Context(View):
 
                 except Exception as e:
                     print(e)
-                    return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"coupen not updated", "time_diff":time_diff,"contest":context_instance,"last_participant_name":participant_name})
+                    return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"coupen not updated", "time_diff":time_diff,"contest":context_instance,"last_participant_name":participant_name, **coupen_typewise_count})
                 
             
 
@@ -356,16 +359,17 @@ class Context(View):
 
                 except Exception as e:
                     print(e)
-                    return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"coupen not updated", "time_diff":time_diff,"contest":context_instance,"last_participant_name":participant_name})
+                    return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"coupen not updated", "time_diff":time_diff,"contest":context_instance,"last_participant_name":participant_name, **coupen_typewise_count})
 
 
             all_paerticipants = Participants.objects.filter(context_id= context_instance.context_id)
-            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"time_diff":time_diff,"contest":context_instance,"last_participant_name":participant_name})
+            coupen_typewise_count = coupen_type_counts(context_id=contest.context_id)
+            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"time_diff":time_diff,"contest":context_instance,"last_participant_name":participant_name, **coupen_typewise_count})
 
 
         else:
             print("invalied coupen")
-            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"Invalied coupan", "time_diff":time_diff,"contest":context_instance,"last_participant_name":participant_name})
+            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"Invalied coupan", "time_diff":time_diff,"contest":context_instance,"last_participant_name":participant_name, **coupen_typewise_count})
 
 
    
