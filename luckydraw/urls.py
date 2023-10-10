@@ -8,6 +8,6 @@ urlpatterns = [
     path('draw/', views.AnnounceWinner.as_view(),name="draw"),
     path('delete_participant/', views.DeleteParticipant.as_view(),name="delete_participant"),
     path('results/', views.Results.as_view(),name="results"),
-    
+    path('user_report/',views.UserReport.as_view(),name="user_report"),
     
 ]

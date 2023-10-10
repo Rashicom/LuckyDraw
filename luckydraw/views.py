@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.views import View
-from .forms import AddParticipantForm, GetorSetLuckyDrawForm, AnnounceWinnerForm, ResultsForm
+from .forms import AddParticipantForm, GetorSetLuckyDrawForm, AnnounceWinnerForm, ResultsForm, UserReportForm
 from .models import LuckyDraw, LuckyDrawContext, Participants
 from django.contrib.auth.decorators import login_required
 from datetime import timedelta, datetime, time
@@ -9,7 +9,7 @@ from .coupenfilter import WinnersFilter, DateFilter
 from django.http import JsonResponse
 import pytz
 from .helper import time_to_seconds, box_permutation_count, coupen_type_counts
-
+from django.http import HttpResponse
 
 class GetorSetLuckyDraw(View):
     """
@@ -200,12 +200,16 @@ class Context(View):
             # fiter participants in the contst object
             contest = contest[0]
             all_paerticipants = Participants.objects.filter(context_id= contest.context_id)
+
+            # coupen wise count to show in html
+            coupen_typewise_count = coupen_type_counts(context_id = contest.context_id)
+        
         else:
+            # no cpontext fount means this is the first data
+            # if there is no contest fount set participants and coupen counts to null/0
+            coupen_typewise_count = {"box_count":0, "block_count":0,"super_count":0}
             all_paerticipants = ""
         
-
-        # coupen wise count to show in html
-        coupen_typewise_count = coupen_type_counts(context_id=contest.context_id)
 
         # CHECK 1 : fetching data and validatiog form
         form = self.form_class(request.POST)
@@ -249,7 +253,7 @@ class Context(View):
             tomorow_date = datetime.now(time_zone).date()+timedelta(1)
             print(tomorow_date)
             context_instance,_ = LuckyDrawContext.objects.get_or_create(luckydrawtype_id = luckydraw_instance,context_date=tomorow_date)
-        
+
         # crossmatch with provided countimit, if user set new count limit update it
         count_limit = form.cleaned_data.get("count_limit")
         if int(context_instance.count_limit) != int(count_limit):
@@ -271,7 +275,7 @@ class Context(View):
         coupen_count = coupen_scraper.cleaned_coupen_count
 
         if int(coupen_count) == 0:
-            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"Invalied count", "time_diff":time_diff,"contest":context_instance})
+            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"Invalied count", "time_diff":time_diff,"contest":context_instance,**coupen_typewise_count})
 
         # creating instace for validator class and pass credencials
         coupen = self.coupenvalidator_class(coupen_number=coupen_number, coupen_type=coupen_type)
@@ -313,6 +317,7 @@ class Context(View):
             
             # calculation for limit exceeded or not
             counter = CoupenCounter(coupen_number=coupen_number,coupen_type=coupen_type,needed_count=coupen_count,context_id=context_instance.context_id)
+            
             if counter.is_count_exceeded():
                 """
                 if the count limit is exceeded we have to save tocken with limited avalilable count
@@ -363,7 +368,8 @@ class Context(View):
 
 
             all_paerticipants = Participants.objects.filter(context_id= context_instance.context_id)
-            coupen_typewise_count = coupen_type_counts(context_id=contest.context_id)
+            # coupen wise count to show in html
+            coupen_typewise_count = coupen_type_counts(context_id = context_instance.context_id)
             return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"time_diff":time_diff,"contest":context_instance,"last_participant_name":participant_name, **coupen_typewise_count})
 
 
@@ -560,3 +566,39 @@ class Results(View):
 
 
 
+# user based reports
+class UserReport(View):
+
+    form_class = UserReportForm
+    templet = "user_report.html"
+
+    def post(self, request):
+        """
+        this mehod filter participants based on the given form data
+        return filtered data(coupens of a perticular coupens)
+        """
+
+        # fetching data and validating
+        form = self.form_class(request.POST)
+        if not form.is_valid():
+            return render(request)
+        
+        luckydrawtype_id = form.cleaned_data.get("luckydrawtype_id")
+        name = form.cleaned_data.get("name")
+        from_date = form.cleaned_data.get("from_date")
+        to_date = form.cleaned_data.get("to_date")
+
+
+        # filter
+        if form.cleaned_data.get("luckydrawtype_id") == "ALL":
+            filtered_data = Participants.objects.filter(context_id__context_date__range=[from_date,to_date], participant_name=name)
+        else:
+            filtered_data = Participants.objects.filter(context_id__context_date__range=[from_date,to_date], participant_name=name, context_id__luckydrawtype_id = luckydrawtype_id)
+        
+        return render(request,self.templet,{"filtered_data":filtered_data})
+
+    
+    def get(self,request):
+        
+        return render(request, self.templet)
+        
