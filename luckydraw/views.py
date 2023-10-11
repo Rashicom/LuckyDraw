@@ -8,8 +8,13 @@ from .coupens import CoupenCounter, CoupenValidator, AnnounceWinners, CoupenScra
 from .coupenfilter import WinnersFilter, DateFilter
 from django.http import JsonResponse
 import pytz
-from .helper import time_to_seconds, box_permutation_count, coupen_type_counts
+from .helper import time_to_seconds, box_permutation_count, coupen_type_counts,coupen_type_rate
 from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from .pdf import generate_pdf
+from django.http import FileResponse
+
 
 class GetorSetLuckyDraw(View):
     """
@@ -42,7 +47,8 @@ class GetorSetLuckyDraw(View):
         
         
         return render(request,self.templet,data)
-        
+    
+
     def get(self,request):
         luckydrow_list = LuckyDraw.objects.all()
         return render(request,self.templet,{"luckydrow_list":luckydrow_list})
@@ -166,7 +172,7 @@ class AddParticipant(View):
 
 # get and post context
 class Context(View):
-
+    
     Addparticipant_templet = "lucky_add.html"
     form_class = AddParticipantForm
     coupenvalidator_class = CoupenValidator
@@ -379,8 +385,7 @@ class Context(View):
 
 
    
-
-
+    @method_decorator(login_required(login_url="login"))
     def get(self, request, luckydrawtype_id):
         """
         this method returns Add participant page
@@ -601,4 +606,56 @@ class UserReport(View):
     def get(self,request):
         
         return render(request, self.templet)
+    
+
+
+
+"""--------------------  PDF GENERATON VIEWS  ----------------------"""
+
+# Download user report pdf
+class UserReportPdf(View):
+
+    form_class = UserReportForm
+    templet = "user_report.html"
+
+    def post(self, request):
+
+        # fetching data and validating
+        form = self.form_class(request.POST)
+        if not form.is_valid():
+            print("invalied forrm")
+            return render(request,self.templet)
         
+        # fetching elements from form
+        luckydrawtype_id = form.cleaned_data.get("luckydrawtype_id")
+        name = form.cleaned_data.get("name")
+        from_date = form.cleaned_data.get("from_date")
+        to_date = form.cleaned_data.get("to_date")
+        
+        # filter
+        if form.cleaned_data.get("luckydrawtype_id") == "ALL":
+            filtered_data = Participants.objects.filter(context_id__context_date__range=[from_date,to_date], participant_name=name, is_winner=True)
+        else:
+            filtered_data = Participants.objects.filter(context_id__context_date__range=[from_date,to_date], participant_name=name, context_id__luckydrawtype_id = luckydrawtype_id, is_winner=True)
+
+        pdf_data = [[i.coupen_number,i.coupen_count,i.prize_rate * i.coupen_count] for i in filtered_data]
+        
+        # calculating total winnign prizes
+        # got through the pdf_data and last value of the sublist is the total prize of each coupen
+        total_winning_prize = 0
+        for i in pdf_data:
+            total_winning_prize += i[2]
+
+        # this fuctin returns a dict of coupen_type as key and sum as value of passes query set
+        coupen_type_wise_rate_sum = coupen_type_rate(query_set=filtered_data)
+        
+        # create a account dict using generated data and pass to generate_pdf func to show in pdf
+        accounts_dict = {}
+        accounts_dict.update(coupen_type_wise_rate_sum)
+        accounts_dict["total_winning_prize"] = total_winning_prize
+        accounts_dict["account_balance"] = total_winning_prize - coupen_type_wise_rate_sum["total_sum"]
+
+        # creating pdf
+        buffer = generate_pdf(pdf_data,accounts_dict)
+        
+        return FileResponse(buffer, as_attachment=True, filename="report.pdf")
