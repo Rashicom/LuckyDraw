@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.views import View
-from .forms import AddParticipantForm, GetorSetLuckyDrawForm, AnnounceWinnerForm, ResultsForm
+from .forms import AddParticipantForm, GetorSetLuckyDrawForm, AnnounceWinnerForm, ResultsForm, UserReportForm, WinnerAnnouncementPdfForm
 from .models import LuckyDraw, LuckyDrawContext, Participants
 from django.contrib.auth.decorators import login_required
 from datetime import timedelta, datetime, time
@@ -8,7 +8,12 @@ from .coupens import CoupenCounter, CoupenValidator, AnnounceWinners, CoupenScra
 from .coupenfilter import WinnersFilter, DateFilter
 from django.http import JsonResponse
 import pytz
-from .helper import time_to_seconds
+from .helper import time_to_seconds, box_permutation_count, coupen_type_counts,coupen_type_rate
+from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from .pdf import generate_pdf, generate_winner_pdf, generate_resultreport_pdf
+from django.http import FileResponse
 
 
 class GetorSetLuckyDraw(View):
@@ -42,7 +47,8 @@ class GetorSetLuckyDraw(View):
         
         
         return render(request,self.templet,data)
-        
+    
+
     def get(self,request):
         luckydrow_list = LuckyDraw.objects.all()
         return render(request,self.templet,{"luckydrow_list":luckydrow_list})
@@ -164,9 +170,9 @@ class AddParticipant(View):
     
 
 
-# get context
+# get and post context
 class Context(View):
-
+    
     Addparticipant_templet = "lucky_add.html"
     form_class = AddParticipantForm
     coupenvalidator_class = CoupenValidator
@@ -200,7 +206,14 @@ class Context(View):
             # fiter participants in the contst object
             contest = contest[0]
             all_paerticipants = Participants.objects.filter(context_id= contest.context_id)
+
+            # coupen wise count to show in html
+            coupen_typewise_count = coupen_type_counts(context_id = contest.context_id)
+        
         else:
+            # no cpontext fount means this is the first data
+            # if there is no contest fount set participants and coupen counts to null/0
+            coupen_typewise_count = {"box_count":0, "block_count":0,"super_count":0}
             all_paerticipants = ""
         
 
@@ -208,7 +221,7 @@ class Context(View):
         form = self.form_class(request.POST)
         if not form.is_valid():
             print("form validation FAILED")
-            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"Invalied fields", "time_diff":time_diff})
+            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"Invalied fields", "time_diff":time_diff, **coupen_typewise_count})
         
 
         # CHECK 2 : data entry time constrain check
@@ -246,7 +259,7 @@ class Context(View):
             tomorow_date = datetime.now(time_zone).date()+timedelta(1)
             print(tomorow_date)
             context_instance,_ = LuckyDrawContext.objects.get_or_create(luckydrawtype_id = luckydraw_instance,context_date=tomorow_date)
-        
+
         # crossmatch with provided countimit, if user set new count limit update it
         count_limit = form.cleaned_data.get("count_limit")
         if int(context_instance.count_limit) != int(count_limit):
@@ -268,7 +281,7 @@ class Context(View):
         coupen_count = coupen_scraper.cleaned_coupen_count
 
         if int(coupen_count) == 0:
-            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"Invalied count", "time_diff":time_diff,"contest":context_instance})
+            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"Invalied count", "time_diff":time_diff,"contest":context_instance,**coupen_typewise_count})
 
         # creating instace for validator class and pass credencials
         coupen = self.coupenvalidator_class(coupen_number=coupen_number, coupen_type=coupen_type)
@@ -282,7 +295,12 @@ class Context(View):
             if coupen_type=="SUPER":
                 single_coupen_rate = 8
             elif coupen_type=="BOX":
-                single_coupen_rate = 48
+                """
+                here may be the coupen contains 2 same digits in, this case there is no 6 compinations
+                we have to find the coupen rate according to the compbinations
+                """
+                permutation_count = box_permutation_count(coupen_number=coupen_number)
+                single_coupen_rate = int(permutation_count) * 8
             
             else:
                 # for block there is a seperate rate machanism
@@ -305,6 +323,7 @@ class Context(View):
             
             # calculation for limit exceeded or not
             counter = CoupenCounter(coupen_number=coupen_number,coupen_type=coupen_type,needed_count=coupen_count,context_id=context_instance.context_id)
+            
             if counter.is_count_exceeded():
                 """
                 if the count limit is exceeded we have to save tocken with limited avalilable count
@@ -328,7 +347,7 @@ class Context(View):
 
                 except Exception as e:
                     print(e)
-                    return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"coupen not updated", "time_diff":time_diff,"contest":context_instance,"last_participant_name":participant_name})
+                    return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"coupen not updated", "time_diff":time_diff,"contest":context_instance,"last_participant_name":participant_name, **coupen_typewise_count})
                 
             
 
@@ -351,21 +370,22 @@ class Context(View):
 
                 except Exception as e:
                     print(e)
-                    return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"coupen not updated", "time_diff":time_diff,"contest":context_instance,"last_participant_name":participant_name})
+                    return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"coupen not updated", "time_diff":time_diff,"contest":context_instance,"last_participant_name":participant_name, **coupen_typewise_count})
 
 
             all_paerticipants = Participants.objects.filter(context_id= context_instance.context_id)
-            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"time_diff":time_diff,"contest":context_instance,"last_participant_name":participant_name})
+            # coupen wise count to show in html
+            coupen_typewise_count = coupen_type_counts(context_id = context_instance.context_id)
+            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"time_diff":time_diff,"contest":context_instance,"last_participant_name":participant_name, **coupen_typewise_count})
 
 
         else:
             print("invalied coupen")
-            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"Invalied coupan", "time_diff":time_diff,"contest":context_instance,"last_participant_name":participant_name})
+            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"Invalied coupan", "time_diff":time_diff,"contest":context_instance,"last_participant_name":participant_name, **coupen_typewise_count})
 
 
    
-
-
+    @method_decorator(login_required(login_url="login"))
     def get(self, request, luckydrawtype_id):
         """
         this method returns Add participant page
@@ -492,6 +512,7 @@ class AnnounceWinner(View):
 
 
 
+
 class DeleteParticipant(View):
     def get(self, request, *args, **kwargs):
         participant_id = request.GET.get("participant_id")
@@ -499,19 +520,18 @@ class DeleteParticipant(View):
         try:
             participant = Participants.objects.get(participant_id=participant_id)
             participant.delete()
-
+        
         except Exception as e:
             print(e)
             return JsonResponse({"status":404})
-
-        return JsonResponse({"status":200})
+        return JsonResponse({"status":200,"coupen_type":participant.coupen_type})
 
 
 
 
 class Results(View):
 
-    result_templet = "lucky_results.html"
+    result_templet = "result_reports.html"
     form_class = ResultsForm
 
     def get(self, request):
@@ -528,9 +548,7 @@ class Results(View):
         # validate form
         if not form.is_valid():
             return render(request,self.result_templet, {"lucky_draw":lucky_draw,"error":"invalied date"})
-
-        print("form validated") 
-        print(form.cleaned_data)       
+     
         # filter data by date using DateFilter class instance
         date_filter = DateFilter(
             from_date=form.cleaned_data.get("from_date"),
@@ -551,3 +569,221 @@ class Results(View):
 
 
 
+# user based reports
+class UserReport(View):
+
+    form_class = UserReportForm
+    templet = "user_report.html"
+
+    def post(self, request):
+        """
+        this mehod filter participants based on the given form data
+        return filtered data(coupens of a perticular coupens)
+        """
+
+        # fetching data and validating
+        form = self.form_class(request.POST)
+        lucydraw = LuckyDraw.objects.all()
+        if not form.is_valid():
+            print("invalied form")
+            return render(request,self.templet,{"error":"Invalied data","lucydraw":lucydraw})
+        
+        luckydrawtype_id = form.cleaned_data.get("luckydrawtype_id")
+        name = form.cleaned_data.get("name")
+        from_date = form.cleaned_data.get("from_date")
+        to_date = form.cleaned_data.get("to_date")
+
+
+        # filter
+        if form.cleaned_data.get("luckydrawtype_id") == "ALL":
+            filtered_data = Participants.objects.filter(context_id__context_date__range=[from_date,to_date], participant_name=name)
+        else:
+            filtered_data = Participants.objects.filter(context_id__context_date__range=[from_date,to_date], participant_name=name, context_id__luckydrawtype_id = luckydrawtype_id)
+        
+        lucky_obj = LuckyDraw.objects.get(luckydrawtype_id=luckydrawtype_id)
+
+        return render(request,self.templet,{"filtered_data":filtered_data, "lucydraw":lucydraw, "from_date":from_date, "to_date":to_date, "luckydrawtype_id":luckydrawtype_id,"lucky_obj":lucky_obj,"name":name})
+        
+    
+    def get(self,request):
+        
+        lucydraw = LuckyDraw.objects.all()
+        return render(request, self.templet,{"lucydraw":lucydraw})
+    
+
+
+
+"""--------------------  PDF GENERATON VIEWS  ----------------------"""
+
+# Download user report pdf
+class UserReportPdf(View):
+
+    form_class = UserReportForm
+
+    def post(self, request):
+
+        # fetching data and validating
+        form = self.form_class(request.POST)
+        if not form.is_valid():
+            print("invalied forrm")
+            return JsonResponse({"status":401})
+        
+        # fetching elements from form
+        luckydrawtype_id = form.cleaned_data.get("luckydrawtype_id")
+        name = form.cleaned_data.get("name")
+        from_date = form.cleaned_data.get("from_date")
+        to_date = form.cleaned_data.get("to_date")
+        
+        # filter
+        if form.cleaned_data.get("luckydrawtype_id") == "ALL":
+            filtered_data = Participants.objects.filter(context_id__context_date__range=[from_date,to_date], participant_name=name, is_winner=True)
+        else:
+            filtered_data = Participants.objects.filter(context_id__context_date__range=[from_date,to_date], participant_name=name, context_id__luckydrawtype_id = luckydrawtype_id, is_winner=True)
+
+        pdf_data = [[i.coupen_number,i.coupen_count,i.prize_rate * i.coupen_count] for i in filtered_data]
+        
+        # calculating total winnign prizes
+        # got through the pdf_data and last value of the sublist is the total prize of each coupen
+        total_winning_prize = 0
+        for i in pdf_data:
+            total_winning_prize += i[2]
+
+        # this fuctin returns a dict of coupen_type as key and sum as value of passes query set
+        coupen_type_wise_rate_sum = coupen_type_rate(query_set=filtered_data)
+        
+        # create a account dict using generated data and pass to generate_pdf func to show in pdf
+        accounts_dict = {}
+        accounts_dict.update(coupen_type_wise_rate_sum)
+        accounts_dict["total_winning_prize"] = total_winning_prize
+        accounts_dict["account_balance"] = total_winning_prize - coupen_type_wise_rate_sum["total_sum"]
+
+        # creating pdf
+        date_range = [from_date,to_date]
+        buffer = generate_pdf(pdf_data,accounts_dict,date_range)
+
+        response = FileResponse(buffer, as_attachment=True, filename="report.pdf")
+        response['Content-Disposition'] = 'attachment; filename="report.pdf"'
+        return response
+        
+    
+
+# winner announcement report
+class WinnerAnnouncementPdf(View):
+
+    form_class = WinnerAnnouncementPdfForm
+    pdf_generator_class = generate_winner_pdf
+
+    def post(self, request):
+        """
+        this method accepting a date range
+        and returs winners prize list in between the date range
+        """
+        
+        # validate form and fetch cleaned data
+        form = self.form_class(request.POST)
+        if not form.is_valid():
+            return FileResponse()
+        
+        luckydrawtype_id = form.cleaned_data.get("luckydrawtype_id")
+        context_date = form.cleaned_data.get("context_date")
+
+        # getting wontext instance by given data 
+        context_instance = LuckyDrawContext.objects.get(luckydrawtype_id = luckydrawtype_id, context_date=context_date)
+        
+        # fiter participants who is winners
+        all_participants = Participants.objects.filter(context_id=context_instance, is_winner=True)
+
+        # seperating winners in to box , block, super reduced format(simpler) to show in pdf
+        first_prize_winners = [[i.coupen_number,i.prize, i.coupen_count, i.coupen_count * i.prize_rate] for i in all_participants if i.prize=="FIRST_PRIZE"]
+        second_prize_winners = [[i.coupen_number,i.prize, i.coupen_count, i.coupen_count * i.prize_rate] for i in all_participants if i.prize=="SECOND_PRIZE"]
+        third_prize_winners = [[i.coupen_number,i.prize, i.coupen_count, i.coupen_count * i.prize_rate] for i in all_participants if i.prize=="THIRD_PRIZE"]
+        fourth_prize_winners = [[i.coupen_number,i.prize, i.coupen_count, i.coupen_count * i.prize_rate] for i in all_participants if i.prize=="FOURTH_PRIZE"]
+        fifth_prize_winners = [[i.coupen_number,i.prize, i.coupen_count, i.coupen_count * i.prize_rate] for i in all_participants if i.prize=="FIFTH_PRIZE"]
+        complimentery_prize_winners = [[i.coupen_number,i.prize, i.coupen_count, i.coupen_count * i.prize_rate] for i in all_participants if i.prize=="COMPLIMENTERY_PRIZE"]
+
+        reduced_winners = first_prize_winners + second_prize_winners + third_prize_winners + fourth_prize_winners + fifth_prize_winners + complimentery_prize_winners
+
+        # generate pdf
+        pdf_buffer = generate_winner_pdf(reduced_winners, context_instance)
+        
+        return FileResponse(pdf_buffer,as_attachment=True, filename="winner_report.pdf")
+
+
+
+
+class ResultFilterPdf(View):
+
+    form_class = ResultsForm
+
+    def post(self, request):
+
+        form = self.form_class(request.POST)
+        
+        # validate form
+        if not form.is_valid():
+            print("form not valied")
+            print(form.errors)
+            return JsonResponse({"status":401})
+
+        # fetch cleaned data
+        from_date=form.cleaned_data.get("from_date")
+        to_date = form.cleaned_data.get("to_date")
+        lucky_drawtype_id=form.cleaned_data.get("lucky_drawtype_id")
+
+        # filter all winner participans data
+        all_participants = Participants.objects.filter(context_id__luckydrawtype_id=lucky_drawtype_id, is_winner=True, context_id__context_date__range=[from_date,to_date])
+
+        # seperating winners in to box , block, super reduced format(simpler) to show in pdf
+        first_prize_winners = [[i.coupen_number,i.prize, i.coupen_count, i.coupen_count * i.prize_rate] for i in all_participants if i.prize=="FIRST_PRIZE"]
+        second_prize_winners = [[i.coupen_number,i.prize, i.coupen_count, i.coupen_count * i.prize_rate] for i in all_participants if i.prize=="SECOND_PRIZE"]
+        third_prize_winners = [[i.coupen_number,i.prize, i.coupen_count, i.coupen_count * i.prize_rate] for i in all_participants if i.prize=="THIRD_PRIZE"]
+        fourth_prize_winners = [[i.coupen_number,i.prize, i.coupen_count, i.coupen_count * i.prize_rate] for i in all_participants if i.prize=="FOURTH_PRIZE"]
+        fifth_prize_winners = [[i.coupen_number,i.prize, i.coupen_count, i.coupen_count * i.prize_rate] for i in all_participants if i.prize=="FIFTH_PRIZE"]
+        complimentery_prize_winners = [[i.coupen_number,i.prize, i.coupen_count, i.coupen_count * i.prize_rate] for i in all_participants if i.prize=="COMPLIMENTERY_PRIZE"]
+
+        reduced_winners_list = first_prize_winners + second_prize_winners + third_prize_winners + fourth_prize_winners + fifth_prize_winners + complimentery_prize_winners
+
+        # filter data by date using DateFilter class instance
+        date_filter = DateFilter(
+            from_date=form.cleaned_data.get("from_date"),
+            to_date = form.cleaned_data.get("to_date"),
+            lucky_drawtype_id=form.cleaned_data.get("lucky_drawtype_id"),
+        )
+
+        # get account detains in the selected time period
+        accounts = date_filter.get_accounts()
+        print(reduced_winners_list)
+        print(accounts)
+        # prepare table content
+        # TABLE 1  coupen type, count, amount and sum it
+        # this table shows in the top of the pdf, this format is directly inject to the pdf
+        count_table = [
+            ["BOX",accounts.get("box_count"),accounts.get("box_total_value")],
+            ["BLOCK",accounts.get("block_count"),accounts.get("block_total_value")],
+            ["SUPER",accounts.get("super_count"),accounts.get("super_total_value")],
+            ["","Total Coupen amount",accounts.get("total_value")]
+        ]
+
+        prize_table = [
+            ["First prize total",accounts.get("first_prize_total")],
+            ["Second prize totat",accounts.get("second_prize_total")],
+            ["Third prize total",accounts.get("third_prize_total")],
+            ["Fourth prize total",accounts.get("fourth_prize_total")],
+            ["Fifth prize total",accounts.get("fifth_prize_total")],
+            ["Complimentary prize total",accounts.get("complimentary_prize_total")],
+            ["Total Prize amount",accounts.get("total_prize")]
+        ]
+        
+        # callign pdf generator
+        buffer = generate_resultreport_pdf(
+            count_table = count_table,
+            prize_table = prize_table,
+            reduced_winners_list = reduced_winners_list,
+            profit = accounts["profit"],
+            date_range = [from_date,to_date]
+        )
+        
+        response = FileResponse(buffer,as_attachment=True, filename="resultandreport.pdf")
+        response['Content-Disposition'] = 'attachment; filename="report.pdf"'
+        return response
+        
