@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+
+</head>
+<body>
+    <style>
+        body{
+            background-color: rgb(241, 241, 160);
+        } 
+        .navbar{
+        background: linear-gradient(135deg, #364a60, #384c6c);
+        }  
+        .nav-item a{
+            color: #fff;
+            font-size: 13px;
+            font-family: Helvetica;
+            font-weight: 600;
+        }
+        .under_line{
+          color: #fff !important;
+          border-bottom: 2px solid #bdcfe2 !important;
+        }
+        .navbar-brand {
+            font-weight: 600 ;
+            font-size: 13px;
+            font-family: Helvetica;
+        }
+        /* button style */
+        .fancy {
+                background-color: transparent;
+                border: 2px solid #b4b1b1;
+                border-radius: 0;
+                box-sizing: border-box;
+                color: #fff;
+                cursor: pointer;
+                display: inline-block;
+                float: right;
+                font-weight: 700;
+                letter-spacing: 0.05em;
+                margin: 0;
+                outline: none;
+                overflow: visible;
+                padding: 1.25em 2em;
+                position: relative;
+                text-align: center;
+                text-decoration: none;
+                text-transform: none;
+                transition: all 0.3s ease-in-out;
+                user-select: none;
+                font-size: 13px;
+        }
+
+                .fancy::before {
+                content: " ";
+                width: 1.5625rem;
+                height: 2px;
+                background: black;
+                top: 50%;
+                left: 1.5em;
+                position: absolute;
+                transform: translateY(-50%);
+                transform-origin: center;
+                transition: background 0.3s linear, width 0.3s linear;
+        }
+
+                .fancy .text {
+                font-size: 1.125em;
+                line-height: 1.33333em;
+                padding-left: 2em;
+                display: block;
+                text-align: left;
+                transition: all 0.3s ease-in-out;
+                text-transform: uppercase;
+                text-decoration: none;
+                color: rgb(23, 18, 95);
+        }
+
+                .fancy .top-key {
+                height: 2px;
+                width: 1.5625rem;
+                top: -2px;
+                left: 0.625rem;
+                position: absolute;
+                background: #e8e8e8;
+                transition: width 0.5s ease-out, left 0.3s ease-out;
+        }
+
+                .fancy .bottom-key-1 {
+                height: 2px;
+                width: 1.5625rem;
+                right: 1.875rem;
+                bottom: -2px;
+                position: absolute;
+                background: #e8e8e8;
+                transition: width 0.5s ease-out, right 0.3s ease-out;
+        }
+
+                .fancy .bottom-key-2 {
+                height: 2px;
+                width: 0.625rem;
+                right: 0.625rem;
+                bottom: -2px;
+                position: absolute;
+                background: #e8e8e8;
+                transition: width 0.5s ease-out, right 0.3s ease-out;
+        }
+
+                .fancy:hover {
+                color: white;
+                background: linear-gradient(135deg, #364a60, #384c6c);
+        }
+
+                .fancy:hover::before {
+                width: 0.9375rem;
+                background: white;
+        }
+
+                .fancy:hover .text {
+                color: white;
+                padding-left: 1.5em;
+        }
+
+                .fancy:hover .top-key {
+                left: -2px;
+                width: 0px;
+        }
+
+                .fancy:hover .bottom-key-1,
+                .fancy:hover .bottom-key-2 {
+                right: 0;
+                width: 0;
+        }
+        .table{
+            border: 1px solid #b7babb;
+        }
+        .headline{
+            /* border-bottom: 2px solid  rgb(183, 186, 187); */
+            text-decoration: underline 3px  rgb(183, 186, 187);
+            margin: 0;
+            padding: 0;
+            font-weight: 600;
+
+
+        }
+        .block{
+            margin: 50px 0;
+        }
+        .blocks{
+          margin: 10px 0;
+        }
+        .block h3{
+            font-size: 20px;
+        }
+        .box{
+            margin: 50px 0;
+        }
+        .box h3{
+            font-size: 20px;
+        }
+        .super{
+            margin: 50px 0;
+        }
+        .super h3{
+            font-size: 20px;
+        }
+        .table{
+            margin: 30px 0;
+        }
+        .date-input{
+            margin: 10px;
+            margin-left: 5px !important;
+        }
+        .row-table{
+            margin-top: 90px;
+            width: 500px;
+        }
+        .back-color{
+            background-color: #384c6c;
+            color: #fff;
+        }
+        .total-table{
+            margin: 60px 0;
+        }
+        /* total btn styles */
+        .card-title {
+  color: #262626;
+  font-size: 1.5em;
+  line-height: normal;
+  font-weight: 700;
+  margin-bottom: 0.5em;
+}
+
+.small-desc {
+  font-size: 1em;
+  font-weight: 400;
+  line-height: 1.5em;
+  color: #452c2c;
+}
+
+.small-desc {
+  font-size: 1em;
+}
+
+.go-corner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  width: 2em;
+  height: 2em;
+  overflow: hidden;
+  top: 0;
+  right: 0;
+  background: linear-gradient(135deg, #6293c8, #384c6c);
+  border-radius: 0 4px 0 32px;
+}
+
+.go-arrow {
+  margin-top: -4px;
+  margin-right: -4px;
+  color: white;
+  font-family: courier, sans;
+}
+
+.card {
+  display: block;
+  position: relative;
+  max-width: 300px;
+  max-height: 320px;
+  background-color: #f2f8f9;
+  border-radius: 10px;
+  padding: 2em 1.2em;
+  margin: 12px;
+  text-decoration: none;
+  z-index: 0;
+  overflow: hidden;
+  background: linear-gradient(to bottom, #c3e6ec, #a7d1d9);
+  font-family: Arial, Helvetica, sans-serif;
+  margin-left: 0;
+}
+
+.card:before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: -16px;
+  right: -16px;
+  background: linear-gradient(135deg, #364a60, #384c6c);
+  height: 32px;
+  width: 32px;
+  border-radius: 32px;
+  transform: scale(1);
+  transform-origin: 50% 50%;
+  transition: transform 0.35s ease-out;
+}
+
+.card:hover:before {
+  transform: scale(28);
+}
+
+.card:hover .small-desc {
+  transition: all 0.5s ease-out;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.card:hover .card-title {
+  transition: all 0.5s ease-out;
+  color: #ffffff;
+}
+    </style>
+        <!-- navbar -->
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand text-light" href="index.html">HOME</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <ul class="navbar-nav mx-auto">
+                <li class="nav-item">
+                  <a class="nav-link "  href="user_report.html">USER REPORT</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link ms-4 text-light under_line"  href="#">RESULTS & REPORTS</a>
+                </li>
+              </ul>
+
+            <div class="d-flex" role="search">
+                <button class="btn btn-outline-danger" type="submit">LOGOUT</button>
+            </div>
+            </div>
+        </div>
+        </nav>
+        <!-- section -->
+
+        <section>
+            <div class="container">
+                <div class="row mt-5">
+                    <div class="col-md-12 text-center">
+                        <h2 class="text-primary fw-semibold">RESULTS & REPORTS</h2>
+                    </div>
+                    <!-- <div class="col-md-6 text-center">
+                        <div class="">
+                            <div data-role="countdown" data-hours="3"></div>
+                        </div>
+                    </div> -->
+                </div>
+            </div>
+            <div class="container">
+                <hr style="height: 5px;
+                background: #043131;
+                margin: 20px 0;
+                box-shadow: 0px 0px 4px 2px rgba(204,204,204,1);">
+            </div>
+        </section>
+        <section class="text_Area">
+            <div class="container mt-5">
+                <div class="row">
+
+                    <form action="" method="POST">
+                    {% csrf_token %}
+                    <div class="col-md-12">
+                        <!-- dropdown -->
+                        <!-- <select class="form-select form-select-lg mb-3" aria-label="Large select example">
+                            <option value="1">Kerala</option>
+                            <option value="2">Dear 1</option>
+                            <option value="3">Dear 2</option>
+                            <option value="3">Dear 3</option>
+                        </select> -->
+                        <div class="input-group mb-3">
+                            <select class="form-select form-select-lg" name="lucky_drawtype_id" id="inputGroupSelect02">
+                              <!-- <option selected>Choose...</option> -->
+                              <option value="1">Kerala</option>
+                              {% if lucky_draw %}
+                                  {% for i in lucky_draw %}
+                                    <option value={{i.luckydrawtype_id}}>{{i.luckydraw_name}}</option>
+                                  {% endfor %}
+                              {% endif %}
+                            </select>
+                            <p class="date-input">From</p>
+                            <input class="form-select form-select-lg" id="inputGroupSelect01" type="date" name="from_date">
+                            
+                            <p class="date-input">To</p>
+                            <input class="form-select form-select-lg" id="inputGroupSelect01" type="date" name="to_date">
+                            
+                            <!-- <input class="input-group-text" for=""></input> -->
+                          </div>
+
+                        <div class="input-group">
+                            <!-- <textarea class="form-control" placeholder="Lucky Number Paste Here..."></textarea> -->
+                            <div class="input-group mt-3">
+                                <button class="fancy" type="submit">
+                                
+                                    <span class="top-key"></span>
+                                    <span class="text">Submit</span>
+                                    <span class="bottom-key-1"></span>
+                                    <span class="bottom-key-2"></span>
+                                
+                                </button>              
+                            </div>
+                        </div>
+                        <p class="">{% if error %}{{error}}{% endif %}</p>
+                    </div>
+                    </form>
+
+                </div>
+            </div>
+        </section>
+        <!-- Table Section -->
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 row-table">
+                    <table class="w3-table-all w3-hoverable">
+                        <thead>
+                          <tr class="tr-head">
+                            <th class="back-color">Coupen Count</th>
+                            <th class="back-color"></th>
+                          </tr>
+                        </thead>
+                        <tr>
+                          <td>Box Coupen Count</td>
+                          <td>{{box_count}}</td>
+                        </tr>
+                        <tr>
+                          <td>Block Coupen Count</td>
+                          <td>{{block_count}}</td>
+                        </tr>
+                        <tr>
+                          <td>Super Coupen Count</td>
+                          <td>{{super_count}}</td>
+                        </tr>
+                        </tr>
+                      </table>
+                </div>
+                <!-- table 2nd -->
+                <div class="col-md-6 row-table ms-auto">
+                    <table class="w3-table-all w3-hoverable">
+                        <thead>
+                          <tr class="tr-head">
+                            <th class="back-color">Coupen Amount</th>
+                            <th class="back-color"></th>
+                          </tr>
+                        </thead>
+                        <tr>
+                          <td>Box coupen amount</td>
+                          <td>{{box_total_value}}</td>
+                        </tr>
+                        <tr>
+                          <td>Block coupen amount</td>
+                          <td>{{block_total_value}}</td>
+                        </tr>
+                        <tr>
+                          <td>Super coupen amount</td>
+                          <td>{{super_total_value}}</td>
+                        </tr>
+                        <tr>
+                          <td class="fw-semibold">Total coupen amount</td>
+                          <td>{{total_value}}</td>
+                        </tr>
+                        </tr>
+                      </table>
+                </div>
+
+            </div>
+        </div>
+        <div class="container">
+            <div class="col-md-12 total-table">
+                    <table class="w3-table-all w3-hoverable">
+                        <thead>
+                          <tr class="tr-head">
+                            <th class="back-color">Price Total</th>
+                            <th class="back-color"></th>
+                          </tr>
+                        </thead>
+                        <tr>
+                          <td>First Price Total</td>
+                          <td>{{first_prize_total}}</td>
+                        </tr>
+                        <tr>
+                          <td>Second Price Total</td>
+                          <td>{{second_prize_total}}</td>
+                        </tr>
+                        <tr>
+                          <td>Third Price Total</td>
+                          <td>{{third_prize_total}}</td>
+                        </tr>
+                        <tr>
+                          <td>Fourth Price Total</td>
+                          <td>{{fourth_prize_total}}</td>
+                        </tr>
+                        <tr>
+                          <td>Fifth Price Total</td>
+                          <td>{{fifth_prize_total}}</td>
+                        </tr>
+                        <tr>
+                          <td>Complementary Price Total</td>
+                          <td>{{complimentary_prize_total}}</td>
+                        </tr>
+                        <tr>
+                          <td class="fw-semibold">Total Price Amount</td>
+                          <td>{{total_prize}}</td>
+                        </tr>
+                        </tr>
+                      </table>
+                </div>
+            </div>
+        </div> 
+        <div class="container">
+          <body>
+            <div class="card">
+                <p class="card-title">Total Price</p>
+                <p class="small-desc">
+                  ₹ {{profit}}
+                </p>
+                <div class="go-corner">
+                  <div class="go-arrow">→</div>
+                </div>
+              </div>
+        </div>   
+        <!-- Winners section -->
+        <section class="winners">
+            <div class="container mt-5">
+                <h2 class="text-center headline text-primary">Winners</h2>
+                <div class="row">
+                    <div class="col-md-4 block">
+                        <h3 class="fw-semibold">First Price</h3>
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                  <th scope="col">Lucky No.</th>
+                                  <th scope="col">Name</th>
+                                  <th scope="col">Price</th>
+                                  <th scope="col">Count</th>
+                                  <th scope="col">Price Amount</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {% if FIRST_PRIZE %}
+                                  {% for prize in FIRST_PRIZE %}
+                                    <tr class="text-center">
+                                      <th scope="row">{{prize.coupen_number}}</th>
+                                      <td>{{prize.participant_name}}</td>
+                                      <td>{{prize.prize}}</td>
+                                      <td>{{prize.coupen_count}}</td>
+                                      <td>{{prize.prize_amnt}}</td>
+                                    </tr>
+                                  {% endfor %}
+                                {% endif %}
+                                
+                              </tbody>
+                        </table>
+                    </div>
+                    <!-- Box -->
+                    <div class="col-md-4 box">
+                        <h3 class="fw-semibold">Second Price</h3>
+                        <table class="table table-hover">
+                          <thead>
+                              <tr>
+                                <th scope="col">Lucky No.</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Price</th>
+                                <th scope="col">Count</th>
+                                <th scope="col">Price Amount</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+
+                              {% if SECOND_PRIZE %}
+                                {% for prize in SECOND_PRIZE %}
+                                  <tr class="text-center">
+
+                                    <th scope="row">{{prize.coupen_number}}</th>
+                                    <td>{{prize.participant_name}}</td>
+                                    <td>{{prize.prize}}</td>
+                                    <td>{{prize.coupen_count}}</td>
+                                    <td>{{prize.prize_amnt}}</td>
+                                    
+                                  </tr>
+                                {% endfor %}
+                              {% endif %}
+                              
+                            </tbody>
+                      </table>
+                    </div>
+                    <!-- Super Winners -->
+                    <div class="col-md-4 super">
+                        <h3 class="fw-semibold">Third Price</h3>
+                            <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                  <th scope="col">Lucky No.</th>
+                                  <th scope="col">Name</th>
+                                  <th scope="col">Price</th>
+                                  <th scope="col">Count</th>
+                                  <th scope="col">Price Amount</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                
+                                {% if THIRD_PRIZE %}
+                                  {% for prize in THIRD_PRIZE %}
+                                    <tr class="text-center">
+                                      <th scope="row">{{prize.coupen_number}}</th>
+                                      <td>{{prize.participant_name}}</td>
+                                      <td>{{prize.prize}}</td>
+                                      <td>{{prize.coupen_count}}</td>
+                                      <td>{{prize.prize_amnt}}</td>
+                                    
+                                    </tr>
+                                  {% endfor %}
+                                {% endif %}
+                                
+                              </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- 2nd row -->
+                <!-- ================================= -->
+
+
+                <div class="row">
+                  <div class="col-md-4 blocks">
+                      <h3 class="fw-semibold">Fourth Price</h3>
+                      <table class="table table-hover">
+                          <thead>
+                              <tr>
+                                <th scope="col">Lucky No.</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Price</th>
+                                <th scope="col">Count</th>
+                                <th scope="col">Price Amount</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {% if FOURTH_PRIZE %}
+                                {% for prize in FOURTH_PRIZE %}
+                                    <tr class="text-center">
+                                      <th scope="row">{{prize.coupen_number}}</th>
+                                      <td>{{prize.participant_name}}</td>
+                                      <td>{{prize.prize}}</td>
+                                      <td>{{prize.coupen_count}}</td>
+                                      <td>{{prize.prize_amnt}}</td>
+
+                                    </tr>
+                                {% endfor %}
+                              {% endif %}
+                              
+                              
+                            </tbody>
+                      </table>
+                  </div>
+                  <!-- Box -->
+                  <div class="col-md-4 blocks">
+                      <h3 class="fw-semibold">Fifth  Price</h3>
+                      <table class="table table-hover">
+                        <thead>
+                            <tr>
+                              <th scope="col">Lucky No.</th>
+                              <th scope="col">Name</th>
+                              <th scope="col">Price</th>
+                              <th scope="col">Count</th>
+                              <th scope="col">Price Amount</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+
+                            {% if FIFTH_PRIZE %}
+                                {% for prize in FIFTH_PRIZE %}
+                                    <tr class="text-center">
+                                      <th scope="row">{{prize.coupen_number}}</th>
+                                      <td>{{prize.participant_name}}</td>
+                                      <td>{{prize.prize}}</td>
+                                      <td>{{prize.coupen_count}}</td>
+                                      <td>{{prize.prize_amnt}}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% endif %}
+                            
+                            
+                          </tbody>
+                    </table>
+                  </div>
+                  <!-- Super Winners -->
+                  <div class="col-md-4 blocks">
+                      <h3 class="fw-semibold">Complimentary Price</h3>
+                        <table class="table table-hover">
+                          <thead>
+                              <tr>
+                                <th scope="col">Lucky No.</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Price</th>
+                                <th scope="col">Count</th>
+                                <th scope="col">Price Amount</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+
+                              {% if COMPLIMENTERY_PRIZE %}
+                                {% for prize in COMPLIMENTERY_PRIZE %}
+                                    <tr class="text-center">
+                                      <th scope="row">{{prize.coupen_number}}</th>
+                                      <td>{{prize.participant_name}}</td>
+                                      <td>{{prize.prize}}</td>
+                                      <td>{{prize.coupen_count}}</td>
+                                      <td>{{prize.prize_amnt}}</td>
+                                    </tr>
+                                {% endfor %}
+                              {% endif %}
+
+                              
+                            </tbody>
+                      </table>
+                  </div>
+              </div>
+
+
+
+            </div>
+        </section>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+</body>
+</html>

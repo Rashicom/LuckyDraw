@@ -8,7 +8,7 @@ from reportlab.lib.units import inch
 import io
 
 
-def generate_pdf(pdf_data, accounts_dict):
+def generate_pdf(pdf_data, accounts_dict,date_range):
     # Create a file-like buffer to receive PDF data.
     buffer = io.BytesIO()
 
@@ -29,7 +29,7 @@ def generate_pdf(pdf_data, accounts_dict):
     elements.append(Paragraph("Name", heading_style))
 
     # Add a sub-information or caption
-    elements.append(Paragraph("2023-10-10  to  2023-10-10", normal_style))
+    elements.append(Paragraph(f"{date_range[0]} to {date_range[1]}", normal_style))
     
     # Add data to a table
     data = [["Coupen number", "Count", "Prize"]]
@@ -49,7 +49,7 @@ def generate_pdf(pdf_data, accounts_dict):
     elements.append(table)
     
     # Sum of winnig prizes
-    total_winning_amount = accounts_dict["total_winning_prize"]
+    total_winning_amount = accounts_dict.get("total_winning_prize")
     elements.append(Paragraph(f"Total Winning amount: {total_winning_amount}",styles['Heading3']))
 
     # Add a spacer
@@ -58,9 +58,9 @@ def generate_pdf(pdf_data, accounts_dict):
     # Create a new table to show the calculations
     data2 = [
         ["Coupen type","Type_total"],
-        ["BLOCK total",accounts_dict["BLOCK"]],
-        ["BOX total",accounts_dict["BOX"]],
-        ["Block total",accounts_dict["SUPER"]]
+        ["BLOCK total",accounts_dict.get("BLOCK")],
+        ["BOX total",accounts_dict.get("BOX")],
+        ["Block total",accounts_dict.get("SUPER")]
     ]
 
     table2 = Table(data2, colWidths=100, rowHeights=30)
@@ -147,3 +147,90 @@ def generate_winner_pdf(winner_list,context):
     return buffer
 
 
+
+
+def generate_resultreport_pdf(count_table=None,prize_table=None,reduced_winners_list=None, profit = None, date_range=None):
+    """
+    """
+    # Create a file-like buffer to receive PDF data.
+    buffer = io.BytesIO()
+
+    # Create the PDF object, using the buffer as its "file."
+    doc = SimpleDocTemplate(buffer, pagesize=letter)
+
+    # Create a list to hold the PDF contents
+    elements = []
+
+    # Define the styles
+    styles = getSampleStyleSheet()
+    normal_style = styles['Heading2']
+    heading_style = styles['Heading1']
+    normal_style.alignment = 1  # Center alignment
+    heading_style.alignment = 1  # Center alignment
+
+    # Add a heading
+    elements.append(Paragraph("Results and Reports", heading_style))
+
+    # Add a sub-information or caption
+    elements.append(Paragraph(f"{date_range[0]} to {date_range[1]}", normal_style))
+    
+    # Defining table
+    count_table_data = [["Coupen type", "Count","Amount"]]
+    prize_table_data = [["Prize", "Prize Amount"]]
+    reduced_winners_data = [["Coupen Number","Prize","Count","Amount"]]
+
+    # extend data into defined tables
+    count_table_data.extend(count_table)
+    prize_table_data.extend(prize_table)
+    reduced_winners_data.extend(reduced_winners_list)
+    
+
+    # create count_table_data
+    table1 = Table(count_table_data, colWidths=120, rowHeights=30)
+    table1.setStyle(TableStyle([('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                               ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                               ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                               ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                               ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                               ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                               ('GRID', (0, 0), (-1, -1), 1, colors.black)]))
+
+    elements.append(table1)
+
+    # Add a spacer
+    elements.append(Spacer(1, 12))
+
+    # create prize table
+    table2 = Table(prize_table_data, colWidths=120, rowHeights=30)
+    table2.setStyle(TableStyle([('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                               ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                               ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                               ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                               ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                               ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                               ('GRID', (0, 0), (-1, -1), 1, colors.black)]))
+
+    elements.append(table2)
+
+    # show profit
+    elements.append(Paragraph(f"Total Profit: {profit}", styles['Heading3']))
+
+    # winneres table data
+    table3 = Table(reduced_winners_data, colWidths=120, rowHeights=30)
+    table3.setStyle(TableStyle([('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                               ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                               ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                               ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                               ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                               ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                               ('GRID', (0, 0), (-1, -1), 1, colors.black)]))
+
+    elements.append(table3)
+
+    # Build the PDF document
+    doc.build(elements)
+
+    # FileResponse sets the Content-Disposition header so that browsers
+    # present the option to save the file.
+    buffer.seek(0)
+    return buffer

@@ -197,7 +197,7 @@
                         <option value="3">Dear 3</option>
                     </select> -->
                     <form>
-                        {% csrf_token %}
+                    {% csrf_token %}
                     <div class="input-group mb-3">
 
                         <div class="m-3">
@@ -358,7 +358,7 @@
                             </tr>
                           </thead>
                           <tbody>
-
+                            
                             {% if FIRST_PRIZE %}
                                 {% for prize in FIRST_PRIZE %}
                                     <tr>
@@ -367,7 +367,6 @@
                                     <td>{{prize.prize}}</td>
                                     <td>{{prize.coupen_count}}</td>
                                     <td>{{prize.prize_amnt}}</td>
-
                                     </tr>
                                 {% endfor %}
                             {% endif %}
