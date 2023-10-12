@@ -723,7 +723,7 @@ class ResultFilterPdf(View):
         if not form.is_valid():
             print("form not valied")
             print(form.errors)
-            return FileResponse()
+            return JsonResponse({"status":401})
 
         # fetch cleaned data
         from_date=form.cleaned_data.get("from_date")
@@ -782,5 +782,8 @@ class ResultFilterPdf(View):
             profit = accounts["profit"],
             date_range = [from_date,to_date]
         )
-
-        return FileResponse(buffer,as_attachment=True, filename="resultandreport.pdf")
+        
+        response = FileResponse(buffer,as_attachment=True, filename="resultandreport.pdf")
+        response['Content-Disposition'] = 'attachment; filename="report.pdf"'
+        return response
+        

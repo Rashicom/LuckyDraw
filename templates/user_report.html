@@ -250,21 +250,21 @@
         <!-- navbar -->
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid m-">
-            <a class="navbar-brand text-light" href="index.html">HOME</a>
+            <a class="navbar-brand text-light" href="{% url "login" %}">HOME</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
             </button>
 
             <ul class="navbar-nav mx-auto">
               <li class="nav-item">
-                <a class="nav-link under_line"  href="#">USER REPORT</a>
+                <a class="nav-link under_line"  href="{% url "user_report" %}">USER REPORT</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link ms-4 text-light" href="result_reports.html">RESULTS & REPORTS</a>
+                <a class="nav-link ms-4 text-light" href="{% url "results" %}">RESULTS & REPORTS</a>
               </li>
             </ul>
             <div class="d-flex" role="search">
-                <button class="btn btn-outline-danger" type="submit">LOGOUT</button>
+                <a class="btn btn-outline-danger" href="{% url "logout" %}">LOGOUT</a>
             </div>
             </div>
         </div>
