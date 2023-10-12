@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.views import View
-from .forms import AddParticipantForm, GetorSetLuckyDrawForm, AnnounceWinnerForm, ResultsForm, UserReportForm
+from .forms import AddParticipantForm, GetorSetLuckyDrawForm, AnnounceWinnerForm, ResultsForm, UserReportForm, WinnerAnnouncementPdfForm
 from .models import LuckyDraw, LuckyDrawContext, Participants
 from django.contrib.auth.decorators import login_required
 from datetime import timedelta, datetime, time
@@ -12,7 +12,7 @@ from .helper import time_to_seconds, box_permutation_count, coupen_type_counts,c
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from .pdf import generate_pdf
+from .pdf import generate_pdf, generate_winner_pdf
 from django.http import FileResponse
 
 
@@ -659,3 +659,43 @@ class UserReportPdf(View):
         buffer = generate_pdf(pdf_data,accounts_dict)
         
         return FileResponse(buffer, as_attachment=True, filename="report.pdf")
+
+    
+
+# winner announcement report
+class WinnerAnnouncementPdf(View):
+
+    form_class = WinnerAnnouncementPdfForm
+    pdf_generator_class = generate_winner_pdf
+
+    def post(self, request):
+        
+        # validate form and fetch cleaned data
+        form = self.form_class(request.POST)
+        if not form.is_valid():
+            return FileResponse()
+        
+        luckydrawtype_id = form.cleaned_data.get("luckydrawtype_id")
+        context_date = form.cleaned_data.get("context_date")
+
+        # getting wontext instance by given data 
+        context_instance = LuckyDrawContext.objects.get(luckydrawtype_id = luckydrawtype_id, context_date=context_date)
+        
+        # fiter instance participants who is winners
+        all_participants = Participants.objects.filter(context_id=context_instance, is_winner=True)
+
+        # seperating winners in to box , block, super reduced format(simpler) to show in pdf
+        first_prize_winners = [[i.coupen_number,i.prize, i.coupen_count, i.coupen_count * i.prize_rate] for i in all_participants if i.prize=="FIRST_PRIZE"]
+        second_prize_winners = [[i.coupen_number,i.prize, i.coupen_count, i.coupen_count * i.prize_rate] for i in all_participants if i.prize=="SECOND_PRIZE"]
+        third_prize_winners = [[i.coupen_number,i.prize, i.coupen_count, i.coupen_count * i.prize_rate] for i in all_participants if i.prize=="THIRD_PRIZE"]
+        fourth_prize_winners = [[i.coupen_number,i.prize, i.coupen_count, i.coupen_count * i.prize_rate] for i in all_participants if i.prize=="FOURTH_PRIZE"]
+        fifth_prize_winners = [[i.coupen_number,i.prize, i.coupen_count, i.coupen_count * i.prize_rate] for i in all_participants if i.prize=="FIFTH_PRIZE"]
+        complimentery_prize_winners = [[i.coupen_number,i.prize, i.coupen_count, i.coupen_count * i.prize_rate] for i in all_participants if i.prize=="COMPLIMENTERY_PRIZE"]
+
+        reduced_winners = first_prize_winners + second_prize_winners + third_prize_winners + third_prize_winners + fourth_prize_winners + fifth_prize_winners + complimentery_prize_winners
+        
+        # generate pdf
+        pdf_buffer = generate_winner_pdf(reduced_winners, context_instance)
+        
+        
+        return FileResponse(pdf_buffer,as_attachment=True, filename="winner_report.pdf")
