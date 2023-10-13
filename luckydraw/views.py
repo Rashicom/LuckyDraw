@@ -660,9 +660,18 @@ class UserReportPdf(View):
         accounts_dict["total_winning_prize"] = total_winning_prize
         accounts_dict["account_balance"] = total_winning_prize - coupen_type_wise_rate_sum["total_sum"]
 
+        # fetch luckydraw_instance
+        luckydraw_instance = LuckyDraw.objects.get(luckydrawtype_id=luckydrawtype_id)
+
         # creating pdf
         date_range = [from_date,to_date]
-        buffer = generate_pdf(pdf_data,accounts_dict,date_range)
+        buffer = generate_pdf(
+            name,
+            pdf_data,
+            accounts_dict,
+            date_range,
+            luckydraw_instance
+        )
 
         response = FileResponse(buffer, as_attachment=True, filename="report.pdf")
         response['Content-Disposition'] = 'attachment; filename="report.pdf"'

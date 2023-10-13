@@ -9,7 +9,7 @@ from datetime import datetime
 import io
 
 
-def generate_pdf(pdf_data, accounts_dict,date_range):
+def generate_pdf(name,pdf_data, accounts_dict,date_range,luckydraw_instance):
     # Create a file-like buffer to receive PDF data.
     buffer = io.BytesIO()
 
@@ -26,12 +26,20 @@ def generate_pdf(pdf_data, accounts_dict,date_range):
     normal_style.alignment = 1  # Center alignment
     heading_style.alignment = 1  # Center alignment
 
+    # showing lucky draw details
+    normal_time = luckydraw_instance.draw_time.strftime("%I:%M %p")
+
     # Add a heading
-    elements.append(Paragraph("Name", heading_style))
+    elements.append(Paragraph(f"{name}", heading_style))
 
     # Add a sub-information or caption
     elements.append(Paragraph(f"{date_range[0]} to {date_range[1]}", normal_style))
-    
+
+    # lucky draw instance detais
+    elements.append(Paragraph(f"{luckydraw_instance.luckydraw_name}", normal_style))
+    elements.append(Paragraph(f"Draw time: {normal_time}", normal_style))
+
+
     # Add data to a table
     data = [["Coupen number", "Count", "Prize"]]
 
