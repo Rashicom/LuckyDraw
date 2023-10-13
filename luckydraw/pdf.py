@@ -5,6 +5,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.platypus.tables import Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
+from datetime import datetime
 import io
 
 
@@ -149,7 +150,7 @@ def generate_winner_pdf(winner_list,context):
 
 
 
-def generate_resultreport_pdf(count_table=None,prize_table=None,reduced_winners_list=None, profit = None, date_range=None):
+def generate_resultreport_pdf(count_table=None,prize_table=None,reduced_winners_list=None, profit = None, date_range=None, luckydraw_instance=None):
     """
     """
     # Create a file-like buffer to receive PDF data.
@@ -174,6 +175,14 @@ def generate_resultreport_pdf(count_table=None,prize_table=None,reduced_winners_
     # Add a sub-information or caption
     elements.append(Paragraph(f"{date_range[0]} to {date_range[1]}", normal_style))
     
+    # lucky draw details
+    elements.append(Paragraph(f"{luckydraw_instance.luckydraw_name}", normal_style))
+    
+    # Format as 12-hour clock with AM/PM
+    normal_time = luckydraw_instance.draw_time.strftime("%I:%M %p")
+    
+    elements.append(Paragraph(f"Drow time: {normal_time}", normal_style))
+
     # Defining table
     count_table_data = [["Coupen type", "Count","Amount"]]
     prize_table_data = [["Prize", "Prize Amount"]]
@@ -184,7 +193,6 @@ def generate_resultreport_pdf(count_table=None,prize_table=None,reduced_winners_
     prize_table_data.extend(prize_table)
     reduced_winners_data.extend(reduced_winners_list)
     
-
     # create count_table_data
     table1 = Table(count_table_data, colWidths=120, rowHeights=30)
     table1.setStyle(TableStyle([('BACKGROUND', (0, 0), (-1, 0), colors.grey),

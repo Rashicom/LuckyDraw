@@ -32,6 +32,7 @@ def coupen_type_counts(context_id=None):
     return {"box_count":data_dict.get("BOX",0), "block_count":data_dict.get("BLOCK",0),"super_count":data_dict.get("SUPER",0)}
 
 
+
 # get coupen coupen rate annoutated by coupen type\
 def coupen_type_rate(query_set=None):
     """

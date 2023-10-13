@@ -777,13 +777,17 @@ class ResultFilterPdf(View):
             ["Total Prize amount",accounts.get("total_prize")]
         ]
         
+        # fetch lucky draw instance to show in pdf
+        luckydraw_instance = LuckyDraw.objects.get(luckydrawtype_id=lucky_drawtype_id)
+
         # callign pdf generator
         buffer = generate_resultreport_pdf(
             count_table = count_table,
             prize_table = prize_table,
             reduced_winners_list = reduced_winners_list,
             profit = accounts["profit"],
-            date_range = [from_date,to_date]
+            date_range = [from_date,to_date],
+            luckydraw_instance = luckydraw_instance
         )
         
         response = FileResponse(buffer,as_attachment=True, filename="resultandreport.pdf")
