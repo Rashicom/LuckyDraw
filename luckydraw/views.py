@@ -422,8 +422,11 @@ class Context(View):
         
         # fiter participants in the contst object
         all_paerticipants = Participants.objects.filter(context_id= contest.context_id)
-
-        return render(request,templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"time_diff":time_diff,"contest":contest})
+        
+        #coupen count
+        coupen_typewise_count = coupen_type_counts(context_id = contest.context_id)
+         
+        return render(request,templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"time_diff":time_diff,"contest":contest, **coupen_typewise_count})
 
 
 
