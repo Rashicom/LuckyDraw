@@ -422,8 +422,11 @@ class Context(View):
         
         # fiter participants in the contst object
         all_paerticipants = Participants.objects.filter(context_id= contest.context_id)
-
-        return render(request,templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"time_diff":time_diff,"contest":contest})
+        
+        #coupen count
+        coupen_typewise_count = coupen_type_counts(context_id = contest.context_id)
+         
+        return render(request,templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"time_diff":time_diff,"contest":contest, **coupen_typewise_count})
 
 
 
@@ -657,9 +660,18 @@ class UserReportPdf(View):
         accounts_dict["total_winning_prize"] = total_winning_prize
         accounts_dict["account_balance"] = total_winning_prize - coupen_type_wise_rate_sum["total_sum"]
 
+        # fetch luckydraw_instance
+        luckydraw_instance = LuckyDraw.objects.get(luckydrawtype_id=luckydrawtype_id)
+
         # creating pdf
         date_range = [from_date,to_date]
-        buffer = generate_pdf(pdf_data,accounts_dict,date_range)
+        buffer = generate_pdf(
+            name,
+            pdf_data,
+            accounts_dict,
+            date_range,
+            luckydraw_instance
+        )
 
         response = FileResponse(buffer, as_attachment=True, filename="report.pdf")
         response['Content-Disposition'] = 'attachment; filename="report.pdf"'
@@ -774,13 +786,17 @@ class ResultFilterPdf(View):
             ["Total Prize amount",accounts.get("total_prize")]
         ]
         
+        # fetch lucky draw instance to show in pdf
+        luckydraw_instance = LuckyDraw.objects.get(luckydrawtype_id=lucky_drawtype_id)
+
         # callign pdf generator
         buffer = generate_resultreport_pdf(
             count_table = count_table,
             prize_table = prize_table,
             reduced_winners_list = reduced_winners_list,
             profit = accounts["profit"],
-            date_range = [from_date,to_date]
+            date_range = [from_date,to_date],
+            luckydraw_instance = luckydraw_instance
         )
         
         response = FileResponse(buffer,as_attachment=True, filename="resultandreport.pdf")

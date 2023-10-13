@@ -21,15 +21,16 @@ def box_permutation_count(coupen_number = None):
 # get coupen type counts
 def coupen_type_counts(context_id=None):
     """
+    its returning the count of coupen types
     """
-    count = Participants.objects.filter(context_id = context_id).values("coupen_type").annotate(count=Count("coupen_type"))
-    
-    # Extract the counts for each type
-    box_count = next((item['count'] for item in count if item['coupen_type'] == 'BOX'), 0)
-    block_count = next((item['count'] for item in count if item['coupen_type'] == 'BLOCK'), 0)
-    super_count = next((item['count'] for item in count if item['coupen_type'] == 'SUPER'), 0)
-    
-    return {"box_count":box_count, "block_count":block_count,"super_count":super_count}
+    filtered_counts = Participants.objects.filter(context_id = context_id).values("coupen_type").annotate(count=Sum("coupen_count"))
+    print(filtered_counts)
+    data_dict = {}
+    for type_count in filtered_counts:
+        data_dict[type_count["coupen_type"]] = type_count["count"]
+
+    return {"box_count":data_dict.get("BOX",0), "block_count":data_dict.get("BLOCK",0),"super_count":data_dict.get("SUPER",0)}
+
 
 
 # get coupen coupen rate annoutated by coupen type\
