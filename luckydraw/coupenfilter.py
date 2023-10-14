@@ -1,5 +1,7 @@
 from .models import Participants, LuckyDrawContext
 from django.db.models import Q
+from itertools import permutations
+
 
 
 class BaseCoupenFilter:
@@ -81,7 +83,7 @@ class DateFilter(BaseCoupenFilter):
         """
 
         # if the lucky drow id is zero it represents retrun all lucky drow case, so we dond use lucky drow filter
-        if self.lucky_drawtype_id == "0":
+        if self.lucky_drawtype_id == "ALL":
             print("return all")
             date_filter = Q(context_id__context_date__lte = self.to_date) & Q(context_id__context_date__gte = self.from_date) & Q(is_winner=True)
         else:
@@ -121,7 +123,7 @@ class DateFilter(BaseCoupenFilter):
     def get_accounts(self):
 
         # if the lucky drow id is zero it represents retrun all lucky drow case, so we dond use lucky drow filter
-        if self.lucky_drawtype_id == "0":
+        if self.lucky_drawtype_id == "ALL":
             date_filter = Q(context_id__context_date__lte = self.to_date) & Q(context_id__context_date__gte = self.from_date) 
         else:
             date_filter = Q(context_id__context_date__lte = self.to_date) & Q(context_id__context_date__gte = self.from_date) & Q(context_id__luckydrawtype_id = self.lucky_drawtype_id)
@@ -154,7 +156,12 @@ class DateFilter(BaseCoupenFilter):
         for i in winning_participants:
             
             if i.coupen_type == "BOX":
-                accounts["box_count"] += i.coupen_count
+                # in box case the count is counpen count * coupen permutation count
+                # eg: 122,10 >> count = 10 permutation count = 3 total count = 30
+                # list value is the permutaion count
+                permutation_count = len(set(permutations(i.coupen_number)))
+                
+                accounts["box_count"] += i.coupen_count * permutation_count
                 accounts["box_total_value"] += i.coupen_rate
             
             elif i.coupen_type == "BLOCK":

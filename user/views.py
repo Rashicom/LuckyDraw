@@ -103,6 +103,7 @@ class UserLogin(View):
 # logout user
 class UserLogout(View):
 
+    
     def get(self, request, *args, **kwargs):
         """
         clearing sessions and loging out

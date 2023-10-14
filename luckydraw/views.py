@@ -22,7 +22,7 @@ class GetorSetLuckyDraw(View):
     form_class = GetorSetLuckyDrawForm
     templet = "adminhome.html"
 
-    
+    @method_decorator(login_required(login_url="login"))
     def post(self, request):
         """
         creating new lucky draw
@@ -61,7 +61,7 @@ class AddParticipant(View):
     form_class = AddParticipantForm
     coupenvalidator_class = CoupenValidator
 
-
+    @method_decorator(login_required(login_url="login"))
     def post(self, request):
         """
         this metthod is creating a new participant ajax call
@@ -177,6 +177,7 @@ class Context(View):
     form_class = AddParticipantForm
     coupenvalidator_class = CoupenValidator
 
+    @method_decorator(login_required(login_url="login"))
     def post(self, request, luckydrawtype_id):
 
         # geting lucky drow instance to pass to show the details in the frond end
@@ -438,6 +439,7 @@ class AnnounceWinner(View):
     templet = "lucky_draw.html"
     coupen_filter_class = WinnersFilter
     
+    @method_decorator(login_required(login_url="login"))
     def post(self, request):
         """
         this method is anouncing winners by crossmatching the given lucky number set
@@ -503,13 +505,13 @@ class AnnounceWinner(View):
         return render(request,self.templet,data)
 
 
-
+    @method_decorator(login_required(login_url="login"))
     def get(self, request, *args, **kwargs):
         """
         retunr winner announcement page
         """
         lucky_draw = LuckyDraw.objects.all()
-        contests = LuckyDrawContext.objects.values('context_date').distinct()
+        contests = LuckyDrawContext.objects.values('context_date').distinct().order_by('-context_date')
         
         return render(request,self.templet,{"lucky_draw":lucky_draw, "contests":contests})
 
@@ -517,6 +519,8 @@ class AnnounceWinner(View):
 
 
 class DeleteParticipant(View):
+
+    @method_decorator(login_required(login_url="login"))
     def get(self, request, *args, **kwargs):
         participant_id = request.GET.get("participant_id")
         
@@ -537,12 +541,13 @@ class Results(View):
     result_templet = "result_reports.html"
     form_class = ResultsForm
 
+    @method_decorator(login_required(login_url="login"))
     def get(self, request):
 
         lucky_draw = LuckyDraw.objects.all()
         return render(request,self.result_templet,{"lucky_draw":lucky_draw})
 
-
+    @method_decorator(login_required(login_url="login"))
     def post(self, request):
 
         form = self.form_class(request.POST)
@@ -578,6 +583,7 @@ class UserReport(View):
     form_class = UserReportForm
     templet = "user_report.html"
 
+    @method_decorator(login_required(login_url="login"))
     def post(self, request):
         """
         this mehod filter participants based on the given form data
@@ -607,7 +613,8 @@ class UserReport(View):
 
         return render(request,self.templet,{"filtered_data":filtered_data, "lucydraw":lucydraw, "from_date":from_date, "to_date":to_date, "luckydrawtype_id":luckydrawtype_id,"lucky_obj":lucky_obj,"name":name})
         
-    
+
+    @method_decorator(login_required(login_url="login"))
     def get(self,request):
         
         lucydraw = LuckyDraw.objects.all()
@@ -623,6 +630,7 @@ class UserReportPdf(View):
 
     form_class = UserReportForm
 
+    @method_decorator(login_required(login_url="login"))
     def post(self, request):
 
         # fetching data and validating
@@ -640,8 +648,16 @@ class UserReportPdf(View):
         # filter
         if form.cleaned_data.get("luckydrawtype_id") == "ALL":
             filtered_data = Participants.objects.filter(context_id__context_date__range=[from_date,to_date], participant_name=name, is_winner=True)
+
+            # if user need all data set lucky_draw data to all lucky draw and all time to show in pdf
+            luckydraw_data = ["ALL","ALL TIME"]
+
         else:
             filtered_data = Participants.objects.filter(context_id__context_date__range=[from_date,to_date], participant_name=name, context_id__luckydrawtype_id = luckydrawtype_id, is_winner=True)
+            
+            # fetch luckydraw_instance and fetch data such as lucky drow name and time to show in pdf
+            luckydraw_instance = LuckyDraw.objects.get(luckydrawtype_id=luckydrawtype_id)
+            luckydraw_data = [luckydraw_instance.luckydraw_name,luckydraw_instance.draw_time.strftime("%I:%M %p")]
 
         pdf_data = [[i.coupen_number,i.coupen_count,i.prize_rate * i.coupen_count] for i in filtered_data]
         
@@ -660,9 +676,6 @@ class UserReportPdf(View):
         accounts_dict["total_winning_prize"] = total_winning_prize
         accounts_dict["account_balance"] = total_winning_prize - coupen_type_wise_rate_sum["total_sum"]
 
-        # fetch luckydraw_instance
-        luckydraw_instance = LuckyDraw.objects.get(luckydrawtype_id=luckydrawtype_id)
-
         # creating pdf
         date_range = [from_date,to_date]
         buffer = generate_pdf(
@@ -670,14 +683,14 @@ class UserReportPdf(View):
             pdf_data,
             accounts_dict,
             date_range,
-            luckydraw_instance
+            luckydraw_data
         )
 
         response = FileResponse(buffer, as_attachment=True, filename="report.pdf")
         response['Content-Disposition'] = 'attachment; filename="report.pdf"'
         return response
         
-    
+
 
 # winner announcement report
 class WinnerAnnouncementPdf(View):
@@ -685,6 +698,7 @@ class WinnerAnnouncementPdf(View):
     form_class = WinnerAnnouncementPdfForm
     pdf_generator_class = generate_winner_pdf
 
+    @method_decorator(login_required(login_url="login"))
     def post(self, request):
         """
         this method accepting a date range
@@ -727,6 +741,7 @@ class ResultFilterPdf(View):
 
     form_class = ResultsForm
 
+    @method_decorator(login_required(login_url="login"))
     def post(self, request):
 
         form = self.form_class(request.POST)
@@ -743,7 +758,17 @@ class ResultFilterPdf(View):
         lucky_drawtype_id=form.cleaned_data.get("lucky_drawtype_id")
 
         # filter all winner participans data
-        all_participants = Participants.objects.filter(context_id__luckydrawtype_id=lucky_drawtype_id, is_winner=True, context_id__context_date__range=[from_date,to_date])
+        if lucky_drawtype_id == "ALL":
+            all_participants = Participants.objects.filter(context_id__context_date__range=[from_date,to_date],is_winner=True)
+
+            # if user need all data, lucky draw data set to all to shown in pdf
+            lucky_draw_data = ["ALL DRAW", "ALL TIME"]
+        
+        else:
+            all_participants = Participants.objects.filter(context_id__context_date__range=[from_date,to_date],context_id__luckydrawtype_id = lucky_drawtype_id, is_winner=True)
+
+            luckydraw_instance = LuckyDraw.objects.get(luckydrawtype_id = lucky_drawtype_id)
+            lucky_draw_data = [luckydraw_instance.luckydraw_name, luckydraw_instance.draw_time.strftime("%I:%M %p")]
 
         # seperating winners in to box , block, super reduced format(simpler) to show in pdf
         first_prize_winners = [[i.coupen_number,i.prize, i.coupen_count, i.coupen_count * i.prize_rate] for i in all_participants if i.prize=="FIRST_PRIZE"]
@@ -785,9 +810,6 @@ class ResultFilterPdf(View):
             ["Complimentary prize total",accounts.get("complimentary_prize_total")],
             ["Total Prize amount",accounts.get("total_prize")]
         ]
-        
-        # fetch lucky draw instance to show in pdf
-        luckydraw_instance = LuckyDraw.objects.get(luckydrawtype_id=lucky_drawtype_id)
 
         # callign pdf generator
         buffer = generate_resultreport_pdf(
@@ -796,7 +818,7 @@ class ResultFilterPdf(View):
             reduced_winners_list = reduced_winners_list,
             profit = accounts["profit"],
             date_range = [from_date,to_date],
-            luckydraw_instance = luckydraw_instance
+            lucky_draw_data = lucky_draw_data
         )
         
         response = FileResponse(buffer,as_attachment=True, filename="resultandreport.pdf")
