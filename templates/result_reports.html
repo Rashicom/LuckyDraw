@@ -337,9 +337,11 @@
                         </select> -->
                         <div class="input-group mb-3">
                             <select class="form-select form-select-lg" name="lucky_drawtype_id" id="lucky_drawtype_id">
-                              <!-- <option selected>Choose...</option> -->
-                              
+                              <!-- option for select all -->
+                              <option value="ALL">ALL</option>
+
                               {% if lucky_draw %}
+                                  
                                   {% for i in lucky_draw %}
                                     <option value={{i.luckydrawtype_id}}>{{i.luckydraw_name}}</option>
                                   {% endfor %}

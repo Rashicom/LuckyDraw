@@ -81,7 +81,7 @@ class DateFilter(BaseCoupenFilter):
         """
 
         # if the lucky drow id is zero it represents retrun all lucky drow case, so we dond use lucky drow filter
-        if self.lucky_drawtype_id == "0":
+        if self.lucky_drawtype_id == "ALL":
             print("return all")
             date_filter = Q(context_id__context_date__lte = self.to_date) & Q(context_id__context_date__gte = self.from_date) & Q(is_winner=True)
         else:
@@ -121,7 +121,7 @@ class DateFilter(BaseCoupenFilter):
     def get_accounts(self):
 
         # if the lucky drow id is zero it represents retrun all lucky drow case, so we dond use lucky drow filter
-        if self.lucky_drawtype_id == "0":
+        if self.lucky_drawtype_id == "ALL":
             date_filter = Q(context_id__context_date__lte = self.to_date) & Q(context_id__context_date__gte = self.from_date) 
         else:
             date_filter = Q(context_id__context_date__lte = self.to_date) & Q(context_id__context_date__gte = self.from_date) & Q(context_id__luckydrawtype_id = self.lucky_drawtype_id)

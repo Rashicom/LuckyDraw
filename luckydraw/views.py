@@ -745,8 +745,15 @@ class ResultFilterPdf(View):
         # filter all winner participans data
         if lucky_drawtype_id == "ALL":
             all_participants = Participants.objects.filter(context_id__context_date__range=[from_date,to_date],is_winner=True)
+
+            # if user need all data, lucky draw data set to all to shown in pdf
+            lucky_draw_data = ["ALL DRAW", "ALL TIME"]
+        
         else:
             all_participants = Participants.objects.filter(context_id__context_date__range=[from_date,to_date],context_id__luckydrawtype_id = lucky_drawtype_id, is_winner=True)
+
+            luckydraw_instance = LuckyDraw.objects.get(luckydrawtype_id = lucky_drawtype_id)
+            lucky_draw_data = [luckydraw_instance.luckydraw_name, luckydraw_instance.draw_time.strftime("%I:%M %p")]
 
         # seperating winners in to box , block, super reduced format(simpler) to show in pdf
         first_prize_winners = [[i.coupen_number,i.prize, i.coupen_count, i.coupen_count * i.prize_rate] for i in all_participants if i.prize=="FIRST_PRIZE"]
@@ -788,9 +795,6 @@ class ResultFilterPdf(View):
             ["Complimentary prize total",accounts.get("complimentary_prize_total")],
             ["Total Prize amount",accounts.get("total_prize")]
         ]
-        
-        # fetch lucky draw instance to show in pdf
-        luckydraw_instance = LuckyDraw.objects.get(luckydrawtype_id=lucky_drawtype_id)
 
         # callign pdf generator
         buffer = generate_resultreport_pdf(
@@ -799,7 +803,7 @@ class ResultFilterPdf(View):
             reduced_winners_list = reduced_winners_list,
             profit = accounts["profit"],
             date_range = [from_date,to_date],
-            luckydraw_instance = luckydraw_instance
+            lucky_draw_data = lucky_draw_data
         )
         
         response = FileResponse(buffer,as_attachment=True, filename="resultandreport.pdf")
