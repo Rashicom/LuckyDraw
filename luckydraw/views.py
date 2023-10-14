@@ -22,7 +22,7 @@ class GetorSetLuckyDraw(View):
     form_class = GetorSetLuckyDrawForm
     templet = "adminhome.html"
 
-    
+    @method_decorator(login_required(login_url="login"))
     def post(self, request):
         """
         creating new lucky draw
@@ -61,7 +61,7 @@ class AddParticipant(View):
     form_class = AddParticipantForm
     coupenvalidator_class = CoupenValidator
 
-
+    @method_decorator(login_required(login_url="login"))
     def post(self, request):
         """
         this metthod is creating a new participant ajax call
@@ -177,6 +177,7 @@ class Context(View):
     form_class = AddParticipantForm
     coupenvalidator_class = CoupenValidator
 
+    @method_decorator(login_required(login_url="login"))
     def post(self, request, luckydrawtype_id):
 
         # geting lucky drow instance to pass to show the details in the frond end
@@ -438,6 +439,7 @@ class AnnounceWinner(View):
     templet = "lucky_draw.html"
     coupen_filter_class = WinnersFilter
     
+    @method_decorator(login_required(login_url="login"))
     def post(self, request):
         """
         this method is anouncing winners by crossmatching the given lucky number set
@@ -503,7 +505,7 @@ class AnnounceWinner(View):
         return render(request,self.templet,data)
 
 
-
+    @method_decorator(login_required(login_url="login"))
     def get(self, request, *args, **kwargs):
         """
         retunr winner announcement page
@@ -517,6 +519,8 @@ class AnnounceWinner(View):
 
 
 class DeleteParticipant(View):
+
+    @method_decorator(login_required(login_url="login"))
     def get(self, request, *args, **kwargs):
         participant_id = request.GET.get("participant_id")
         
@@ -537,12 +541,13 @@ class Results(View):
     result_templet = "result_reports.html"
     form_class = ResultsForm
 
+    @method_decorator(login_required(login_url="login"))
     def get(self, request):
 
         lucky_draw = LuckyDraw.objects.all()
         return render(request,self.result_templet,{"lucky_draw":lucky_draw})
 
-
+    @method_decorator(login_required(login_url="login"))
     def post(self, request):
 
         form = self.form_class(request.POST)
@@ -578,6 +583,7 @@ class UserReport(View):
     form_class = UserReportForm
     templet = "user_report.html"
 
+    @method_decorator(login_required(login_url="login"))
     def post(self, request):
         """
         this mehod filter participants based on the given form data
@@ -607,7 +613,8 @@ class UserReport(View):
 
         return render(request,self.templet,{"filtered_data":filtered_data, "lucydraw":lucydraw, "from_date":from_date, "to_date":to_date, "luckydrawtype_id":luckydrawtype_id,"lucky_obj":lucky_obj,"name":name})
         
-    
+
+    @method_decorator(login_required(login_url="login"))
     def get(self,request):
         
         lucydraw = LuckyDraw.objects.all()
@@ -623,6 +630,7 @@ class UserReportPdf(View):
 
     form_class = UserReportForm
 
+    @method_decorator(login_required(login_url="login"))
     def post(self, request):
 
         # fetching data and validating
@@ -690,6 +698,7 @@ class WinnerAnnouncementPdf(View):
     form_class = WinnerAnnouncementPdfForm
     pdf_generator_class = generate_winner_pdf
 
+    @method_decorator(login_required(login_url="login"))
     def post(self, request):
         """
         this method accepting a date range
@@ -732,6 +741,7 @@ class ResultFilterPdf(View):
 
     form_class = ResultsForm
 
+    @method_decorator(login_required(login_url="login"))
     def post(self, request):
 
         form = self.form_class(request.POST)

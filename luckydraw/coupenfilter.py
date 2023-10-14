@@ -1,5 +1,7 @@
 from .models import Participants, LuckyDrawContext
 from django.db.models import Q
+from itertools import permutations
+
 
 
 class BaseCoupenFilter:
@@ -154,7 +156,12 @@ class DateFilter(BaseCoupenFilter):
         for i in winning_participants:
             
             if i.coupen_type == "BOX":
-                accounts["box_count"] += i.coupen_count
+                # in box case the count is counpen count * coupen permutation count
+                # eg: 122,10 >> count = 10 permutation count = 3 total count = 30
+                # list value is the permutaion count
+                permutation_count = len(set(permutations(i.coupen_number)))
+                
+                accounts["box_count"] += i.coupen_count * permutation_count
                 accounts["box_total_value"] += i.coupen_rate
             
             elif i.coupen_type == "BLOCK":
