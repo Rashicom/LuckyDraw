@@ -509,7 +509,7 @@ class AnnounceWinner(View):
         retunr winner announcement page
         """
         lucky_draw = LuckyDraw.objects.all()
-        contests = LuckyDrawContext.objects.values('context_date').distinct()
+        contests = LuckyDrawContext.objects.values('context_date').distinct().order_by('-context_date')
         
         return render(request,self.templet,{"lucky_draw":lucky_draw, "contests":contests})
 
@@ -640,8 +640,16 @@ class UserReportPdf(View):
         # filter
         if form.cleaned_data.get("luckydrawtype_id") == "ALL":
             filtered_data = Participants.objects.filter(context_id__context_date__range=[from_date,to_date], participant_name=name, is_winner=True)
+
+            # if user need all data set lucky_draw data to all lucky draw and all time to show in pdf
+            luckydraw_data = ["ALL","ALL TIME"]
+
         else:
             filtered_data = Participants.objects.filter(context_id__context_date__range=[from_date,to_date], participant_name=name, context_id__luckydrawtype_id = luckydrawtype_id, is_winner=True)
+            
+            # fetch luckydraw_instance and fetch data such as lucky drow name and time to show in pdf
+            luckydraw_instance = LuckyDraw.objects.get(luckydrawtype_id=luckydrawtype_id)
+            luckydraw_data = [luckydraw_instance.luckydraw_name,luckydraw_instance.draw_time.strftime("%I:%M %p")]
 
         pdf_data = [[i.coupen_number,i.coupen_count,i.prize_rate * i.coupen_count] for i in filtered_data]
         
@@ -660,9 +668,6 @@ class UserReportPdf(View):
         accounts_dict["total_winning_prize"] = total_winning_prize
         accounts_dict["account_balance"] = total_winning_prize - coupen_type_wise_rate_sum["total_sum"]
 
-        # fetch luckydraw_instance
-        luckydraw_instance = LuckyDraw.objects.get(luckydrawtype_id=luckydrawtype_id)
-
         # creating pdf
         date_range = [from_date,to_date]
         buffer = generate_pdf(
@@ -670,14 +675,14 @@ class UserReportPdf(View):
             pdf_data,
             accounts_dict,
             date_range,
-            luckydraw_instance
+            luckydraw_data
         )
 
         response = FileResponse(buffer, as_attachment=True, filename="report.pdf")
         response['Content-Disposition'] = 'attachment; filename="report.pdf"'
         return response
         
-    
+
 
 # winner announcement report
 class WinnerAnnouncementPdf(View):
