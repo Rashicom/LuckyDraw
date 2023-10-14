@@ -743,7 +743,10 @@ class ResultFilterPdf(View):
         lucky_drawtype_id=form.cleaned_data.get("lucky_drawtype_id")
 
         # filter all winner participans data
-        all_participants = Participants.objects.filter(context_id__luckydrawtype_id=lucky_drawtype_id, is_winner=True, context_id__context_date__range=[from_date,to_date])
+        if lucky_drawtype_id == "ALL":
+            all_participants = Participants.objects.filter(context_id__context_date__range=[from_date,to_date],is_winner=True)
+        else:
+            all_participants = Participants.objects.filter(context_id__context_date__range=[from_date,to_date],context_id__luckydrawtype_id = lucky_drawtype_id, is_winner=True)
 
         # seperating winners in to box , block, super reduced format(simpler) to show in pdf
         first_prize_winners = [[i.coupen_number,i.prize, i.coupen_count, i.coupen_count * i.prize_rate] for i in all_participants if i.prize=="FIRST_PRIZE"]
