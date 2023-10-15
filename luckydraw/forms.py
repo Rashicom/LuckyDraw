@@ -40,3 +40,11 @@ class UserReportForm(forms.Form):
 class WinnerAnnouncementPdfForm(forms.Form):
     luckydrawtype_id = forms.IntegerField(required=True)
     context_date = forms.DateField(required=True)
+
+
+
+# additional billign form
+class AdditionalBillingReportForm(forms.Form):
+    name = forms.CharField(required=True)
+    luckydrawtype_id = forms.CharField(required=False)
+    billing_date = forms.DateField(required=False)

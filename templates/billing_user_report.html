@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+</head>
+<body>
+    <style>
+        body{
+            background-color: rgb(241, 241, 160);
+        } 
+        .navbar{
+        background: linear-gradient(135deg, #364a60, #384c6c);
+        }  
+        .nav-item a{
+            color: #fff;
+            font-size: 13px;
+            font-family: Helvetica;
+            font-weight: 600;
+        }
+        .under_line{
+          color: #fff !important;
+          border-bottom: 2px solid #bdcfe2 !important;
+        }
+        .navbar-brand {
+            font-weight: 600 ;
+            font-size: 13px;
+            font-family: Helvetica;
+        }
+        /* button style */
+        .fancy {
+                background-color: transparent;
+                border: 2px solid #b4b1b1;
+                border-radius: 0;
+                box-sizing: border-box;
+                color: #fff;
+                cursor: pointer;
+                display: inline-block;
+                float: right;
+                font-weight: 700;
+                letter-spacing: 0.05em;
+                margin: 0;
+                outline: none;
+                overflow: visible;
+                padding: 1.25em 2em;
+                position: relative;
+                text-align: center;
+                text-decoration: none;
+                text-transform: none;
+                transition: all 0.3s ease-in-out;
+                user-select: none;
+                font-size: 13px;
+        }
+
+                .fancy::before {
+                content: " ";
+                width: 1.5625rem;
+                height: 2px;
+                background: black;
+                top: 50%;
+                left: 1.5em;
+                position: absolute;
+                transform: translateY(-50%);
+                transform-origin: center;
+                transition: background 0.3s linear, width 0.3s linear;
+        }
+
+                .fancy .text {
+                font-size: 1.125em;
+                line-height: 1.33333em;
+                padding-left: 2em;
+                display: block;
+                text-align: left;
+                transition: all 0.3s ease-in-out;
+                text-transform: uppercase;
+                text-decoration: none;
+                color: rgb(23, 18, 95);
+        }
+
+                .fancy .top-key {
+                height: 2px;
+                width: 1.5625rem;
+                top: -2px;
+                left: 0.625rem;
+                position: absolute;
+                background: #e8e8e8;
+                transition: width 0.5s ease-out, left 0.3s ease-out;
+        }
+
+                .fancy .bottom-key-1 {
+                height: 2px;
+                width: 1.5625rem;
+                right: 1.875rem;
+                bottom: -2px;
+                position: absolute;
+                background: #e8e8e8;
+                transition: width 0.5s ease-out, right 0.3s ease-out;
+        }
+
+                .fancy .bottom-key-2 {
+                height: 2px;
+                width: 0.625rem;
+                right: 0.625rem;
+                bottom: -2px;
+                position: absolute;
+                background: #e8e8e8;
+                transition: width 0.5s ease-out, right 0.3s ease-out;
+        }
+
+                .fancy:hover {
+                color: white;
+                background: linear-gradient(135deg, #364a60, #384c6c);
+        }
+
+                .fancy:hover::before {
+                width: 0.9375rem;
+                background: white;
+        }
+
+                .fancy:hover .text {
+                color: white;
+                padding-left: 1.5em;
+        }
+
+                .fancy:hover .top-key {
+                left: -2px;
+                width: 0px;
+        }
+
+                .fancy:hover .bottom-key-1,
+                .fancy:hover .bottom-key-2 {
+                right: 0;
+                width: 0;
+        }
+        .table{
+            border: 1px solid #b7babb;
+        }
+        .headline{
+            /* border-bottom: 2px solid  rgb(183, 186, 187); */
+            text-decoration: underline 3px  rgb(183, 186, 187);
+            margin: 0;
+            padding: 0;
+            font-weight: 600;
+            font-size: 25px;
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+
+
+        }
+        .block{
+            margin: 50px 0;
+        }
+        .blocks{
+          margin: 10px 0;
+        }
+        .block h3{
+            font-size: 20px;
+        }
+        .box{
+            margin: 50px 0;
+        }
+        .box h3{
+            font-size: 20px;
+        }
+        .super{
+            margin: 50px 0;
+        }
+        .super h3{
+            font-size: 20px;
+        }
+        .table{
+            margin: 30px 0;
+        }
+        .date-input{
+            margin: 10px;
+            margin-left: 5px !important;
+        }
+        .row-table{
+            margin-top: 90px;
+            width: 500px;
+        }
+        .back-color{
+            background-color: #384c6c;
+            color: #fff;
+        }
+        .total-table{
+            margin: 60px 0;
+        }
+        /* total btn styles */
+        .card-title {
+  color: #262626;
+  font-size: 1.5em;
+  line-height: normal;
+  font-weight: 700;
+  margin-bottom: 0.5em;
+}
+
+.small-desc {
+  font-size: 1em;
+  font-weight: 400;
+  line-height: 1.5em;
+  color: #452c2c;
+}
+
+.small-desc {
+  font-size: 1em;
+}
+
+.go-corner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  width: 2em;
+  height: 2em;
+  overflow: hidden;
+  top: 0;
+  right: 0;
+  background: linear-gradient(135deg, #6293c8, #384c6c);
+  border-radius: 0 4px 0 32px;
+}
+
+.go-arrow {
+  margin-top: -4px;
+  margin-right: -4px;
+  color: white;
+  font-family: courier, sans;
+}
+.card{
+    margin: 80px 0;
+}
+.column {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+}
+.info{
+    margin: 50px 0;
+}
+.tr-head{
+          background: linear-gradient(135deg, #364a60, #384c6c) !important;
+          color: #fff !important;
+
+}
+ </style>
+        <!-- navbar -->
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid m-">
+            <a class="navbar-brand text-light" href="{% url "login" %}">HOME</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+            </button>
+
+            
+            <div class="d-flex" role="search">
+                <a class="btn btn-outline-danger" href="{% url "logout" %}">LOGOUT</a>
+            </div>
+            </div>
+        </div>
+        </nav>
+        <!-- section -->
+
+        <section>
+            <div class="container">
+                <div class="row mt-5">
+                    <div class="col-md-12 text-center">
+                        <h2 class="text-primary fw-semibold">ADDITIONAL USER BILLING</h2>
+                    </div>
+                    <!-- <div class="col-md-6 text-center">
+                        <div class="">
+                            <div data-role="countdown" data-hours="3"></div>
+                        </div>
+                    </div> -->
+                </div>
+            </div>
+            <div class="container">
+                <hr style="height: 5px;
+                background: #043131;
+                margin: 20px 0;
+                box-shadow: 0px 0px 4px 2px rgba(204,204,204,1);">
+            </div>
+        </section>
+        <section class="text_Area">
+            <div class="container mt-5">
+                <div class="row">
+                    <div class="col-md-12">
+                      <form action="" method="POST">
+                        {% csrf_token %}
+                        <!-- dropdown -->
+                        <!-- <select class="form-select form-select-lg mb-3" aria-label="Large select example">
+                            <option value="1">Kerala</option>
+                            <option value="2">Dear 1</option>
+                            <option value="3">Dear 2</option>
+                            <option value="3">Dear 3</option>
+                        </select> -->
+                        
+                        <div class="input-group mb-3">
+                        
+                          
+                          <input type="text" class="form-control me-4" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg " placeholder="Username" name="name" id="name" value={% if name %}{{name}}{% endif %}>
+
+                            <select class="form-select form-select-lg" id="luckydrawtype_id" name="luckydrawtype_id">
+                              {% if lucydraw %}
+                                {% for i in lucydraw %}
+                                  <option value={{i.luckydrawtype_id}}> {{i.luckydraw_name}} </option>
+                                {% endfor %}
+                              {% endif %}
+                              
+                            </select>
+                            <p class="date-input">Billing date</p>
+                            <input type="date" class="form-select form-select-lg" id="from_date" name="billing_date">
+                                                   
+                        </div>
+
+                        <div class="input-group">
+                            <!-- <textarea class="form-control" placeholder="Lucky Number Paste Here..."></textarea> -->
+                            <div class="row">
+                                <div class="input-group mt-3">
+                                      <button type="submit" class="fancy">
+                                        <span class="top-key"></span>
+                                        <span class="text">Show</span>
+                                        <span class="bottom-key-1"></span>
+                                        <span class="bottom-key-2"></span>
+                                      </button>                
+                                      <button class="fancy ms-4" type="button" id="pdf_downloader">
+                                        <span class="top-key"></span>
+                                        <span class="text">Download pdf</span>
+                                        <span class="bottom-key-1"></span>
+                                        <span class="bottom-key-2"></span>
+                                      </button>                
+                                </div>
+                                <!-- 2nd btn -->
+                            </div>
+                            
+                        </div>
+                        {% if error %}
+                          <p>{{error}}</p>
+                        {% endif %}
+                      </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- user info -->
+        <section>
+            <div class="container">
+                <div class="container info">
+                    <div class="row">
+                        <div class="col-md-6 column">
+                            <h3 class="text-uppercase">{% if name %}{{name}}{% endif %}</h3>
+                        </div>
+                        <div class="col-md-6 column">
+                            <h3 class="text-uppercase">{% if lucky_obj %}{{lucky_obj.luckydraw_name}}{% endif %}</h3>
+                        </div>
+                    </div>
+                </div>
+        </section>
+
+        <section>
+            <div class="container">
+                <h2 class="text-center headline">TICKETS</h2>
+                <!-- Boxes -->
+                <div class="row">
+                    <div class="col-md-4 block">
+                        <h3>Block Tickets</h3>
+                        <table class="w3-table-all w3-hoverable">
+                            <thead>
+                              <tr class="tr-head">
+                                <th>Coupen No</th>
+                                <th>Count</th>
+                                <th>Price</th>
+                              </tr>
+                            </thead>
+
+                            {% if filtered_data %}
+                              {% for i in filtered_data %}
+                                {% if i.coupen_type == "BLOCK" %}
+                                  <tr>
+                                    <td>{{i.coupen_number}}</td>
+                                    <td>{{i.coupen_count}}</td>
+                                    <td>{{i.coupen_rate}}</td>
+                                  </tr>
+                                {% endif %}
+                              {% endfor %}
+                            {% endif %}
+                            
+                            
+                          </table>
+                    </div>
+                    <!-- Box -->
+                    <div class="col-md-4 box">
+                        <h3>Box Tickets</h3>
+                        <table class="w3-table-all w3-hoverable">
+                            <thead>
+                              <tr class="tr-head">
+                                <th>Coupen No</th>
+                                <th>Count</th>
+                                <th>Price</th>
+                              </tr>
+                            </thead>
+
+                            {% if filtered_data %}
+                              {% for i in filtered_data %}
+                                {% if i.coupen_type == "BOX" %}
+                                  <tr>
+                                    <td>{{i.coupen_number}}</td>
+                                    <td>{{i.coupen_count}}</td>
+                                    <td>{{i.coupen_rate}}</td>
+                                  </tr>
+                                {% endif %}
+                              {% endfor %}
+                            {% endif %}
+
+                            
+                          </table>
+                    </div>
+                    <!-- Super Winners -->
+                    <div class="col-md-4 super">
+                        <h3>Super Tickets</h3>
+                        <table class="w3-table-all w3-hoverable">
+                            <thead>
+                              <tr class="tr-head">
+                                
+                                <th>Coupen No</th>
+                                <th>Count</th>
+                                <th>Price</th>
+                              </tr>
+                            </thead>
+                            
+                            {% if filtered_data %}
+                              {% for i in filtered_data %}
+                                {% if i.coupen_type == "SUPER" %}
+                                  <tr>
+                                    <td>{{i.coupen_number}}</td>
+                                    <td>{{i.coupen_count}}</td>
+                                    <td>{{i.coupen_rate}}</td>
+                                  </tr>
+                                {% endif %}
+                              {% endfor %}
+                            {% endif %}
+                            
+                          </table>
+                    </div>
+                </div>
+
+
+                <!-- Winning tickets -->
+                <h2 class="text-center headline">WINNING TICKETS</h2>
+                <div class="row">
+                    <div class="col-md-4 block">
+                        <h3>Block Winners</h3>
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                  <th scope="col">Lucky No.</th>
+                                  <th scope="col">Price</th>
+                                  <th scope="col">Count</th>
+
+                                </tr>
+                              </thead>
+                              <tbody>
+                                
+                              {% if filtered_data %}
+                                {% for i in filtered_data %}
+                                  {% if i.coupen_type == "BLOCK" and i.is_winner == True %}
+                                    <tr>
+                                      <td>{{i.coupen_number}}</td>
+                                      <td>{{i.prize}}</td>
+                                      <td>{{i.coupen_count}}</td>
+
+                                    </tr>
+                                  {% endif %}
+                                {% endfor %}
+                              {% endif %} 
+                               
+                              </tbody>
+                        </table>
+                    </div>
+                    <!-- Box -->
+                    <div class="col-md-4 box">
+                        <h3>Box Winners</h3>
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                  <th scope="col">Lucky No.</th>
+                                  <th scope="col">Price</th>
+                                  <th scope="col">Count</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {% if filtered_data %}
+                                {% for i in filtered_data %}
+                                  {% if i.coupen_type == "BOX" and i.is_winner == True %}
+                                    <tr>
+                                      <td>{{i.coupen_number}}</td>
+                                      <td>{{i.prize}}</td>
+                                      <td>{{i.coupen_count}}</td>
+
+                                    </tr>
+                                  {% endif %}
+                                {% endfor %}
+                                {% endif %}
+                                
+                              </tbody>
+                        </table>
+                    </div>
+                    <!-- Super Winners -->
+                    <div class="col-md-4 super">
+                        <h3>Super Winners</h3>
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                  <th scope="col">Lucky No.</th>
+                                  <th scope="col">Price</th>
+                                  <th scope="col">Count</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {% if filtered_data %}
+                                {% for i in filtered_data %}
+                                  {% if i.coupen_type == "SUPER" and i.is_winner == True %}
+                                    <tr>
+                                      <td>{{i.coupen_number}}</td>
+                                      <td>{{i.prize}}</td>
+                                      <td>{{i.coupen_count}}</td>
+
+                                    </tr>
+                                  {% endif %}
+                                {% endfor %}
+                                {% endif %}
+                                
+                              </tbody>
+                        </table>
+                    </div>
+                </div>
+
+        </section>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+        <script>
+          $("#pdf_downloader").on('click', () => {
+            // fetching data
+            var name = $("#name").val()
+            var luckydrawtype_id = $("#luckydrawtype_id").val()
+            var from_date = $("#from_date").val()
+            var to_date = $("#to_date").val()
+            
+            var data = {"name":name, "luckydrawtype_id":luckydrawtype_id, "from_date":from_date, "to_date":to_date,"csrfmiddlewaretoken":"{{ csrf_token }}"}
+            
+            $.ajax({
+              url: "{% url "user_report_pdf" %}",
+                method: "POST",
+                data: data,
+
+                success: function(data) {
+
+                  if (data.status == 401) {
+                    return
+                  }
+
+                  // Create a blob from the response data
+                  var blob = new Blob([data], { type: 'application/pdf' });
+
+                  // Create a URL for the blob
+                  var url = window.URL.createObjectURL(blob);
+
+                  // Create an anchor element to initiate the download
+                  var a = document.createElement('a');
+                  a.href = url;
+                  a.download = 'report.pdf'; // Set the desired filename
+
+                  // Trigger a click event to download the file
+                  a.click();
+
+                  // Clean up by revoking the URL
+                  window.URL.revokeObjectURL(url);
+                    
+                },
+
+            })
+            console.log(data)
+          
+          })
+        </script>
+
+
+
+    </body>
+    </html>
