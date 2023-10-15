@@ -310,7 +310,7 @@
                           
                           <input type="text" class="form-control me-4" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg " placeholder="Username" name="name" id="name" value={% if name %}{{name}}{% endif %}>
 
-                            <select class="form-select form-select-lg" id="luckydrawtype_id" name="luckydrawtype_id">
+                            <select class="form-select form-select-lg" id="luckydrawtype_id" name="luckydrawtype_id">   
                               {% if lucydraw %}
                                 {% for i in lucydraw %}
                                   <option value={{i.luckydrawtype_id}}> {{i.luckydraw_name}} </option>
