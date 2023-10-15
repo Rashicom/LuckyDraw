@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.views import View
-from .forms import AddParticipantForm, GetorSetLuckyDrawForm, AnnounceWinnerForm, ResultsForm, UserReportForm, WinnerAnnouncementPdfForm, AdditionalBillingReportForm
+from .forms import AddParticipantForm, GetorSetLuckyDrawForm, AnnounceWinnerForm, ResultsForm, UserReportForm, WinnerAnnouncementPdfForm, AdditionalBillingReportForm, AdditionalBillingReportPdfForm
 from .models import LuckyDraw, LuckyDrawContext, Participants
 from django.contrib.auth.decorators import login_required
 from datetime import timedelta, datetime, time
@@ -660,7 +660,7 @@ class AdditionalBillingReport(View):
 
         return render(request,self.templet,{"filtered_data":filtered_data, "lucydraw":lucydraw,"luckydrawtype_id":luckydrawtype_id,"lucky_obj":lucky_obj,"name":name})
 
-    
+
     def get(self, request):
         """
         this is returning the additional billing page
@@ -876,4 +876,74 @@ class ResultFilterPdf(View):
         response = FileResponse(buffer,as_attachment=True, filename="resultandreport.pdf")
         response['Content-Disposition'] = 'attachment; filename="report.pdf"'
         return response
+    
+
+# additional billing pdf
+class AdditionalBillingPdf(View):
+
+    form_class = AdditionalBillingReportPdfForm
+
+    def post(self, request):
+        """
+        this method fetch additional billing info such as for which port and date
+        then filter participants by name and creates pdf and returns
+        """
+
+        # fetching data and validating
+        form = self.form_class(request.POST)
+        if not form.is_valid():
+            print("invalied forrm")
+            print(form.errors)
+            return JsonResponse({"status":401})
         
+        # fetching elements from form
+        luckydrawtype_id = form.cleaned_data.get("luckydrawtype_id")
+        name = form.cleaned_data.get("name")
+        billing_date = form.cleaned_data.get("billing_date")
+        
+        # filter data from participant table by name matching, and from extra billing port only
+        # this is filtering data from only extra billing ports, which id is 5 is hard corder
+        # WARNING: filtering from extra billing ports is HARD CODED, problom may occure when extra billing pots id is chnged
+
+        # get today date, we need only data from todays contest
+        time_zone = pytz.timezone('Asia/Kolkata')
+        date_now = datetime.now(time_zone).date()
+        
+        # filter
+        filtered_data = Participants.objects.filter(participant_name__iexact=name,context_id__luckydrawtype_id=5, context_id__context_date=date_now, is_winner=True)
+        
+        # fetch luckydraw_instance and fetch data such as lucky drow name and time to show in pdf
+        luckydraw_instance = LuckyDraw.objects.get(luckydrawtype_id=luckydrawtype_id)
+        luckydraw_data = [luckydraw_instance.luckydraw_name,luckydraw_instance.draw_time.strftime("%I:%M %p")]
+        print(filtered_data)
+        
+        pdf_data = [[i.coupen_number,i.coupen_count,i.prize_rate * i.coupen_count] for i in filtered_data]
+        
+        # calculating total winnign prizes
+        # got through the pdf_data and last value of the sublist is the total prize of each coupen
+        total_winning_prize = 0
+        for i in pdf_data:
+            total_winning_prize += i[2]
+
+        # this fuctin returns a dict of coupen_type as key and sum as value of passes query set
+        coupen_type_wise_rate_sum = coupen_type_rate(query_set=filtered_data)
+        
+        # create a account dict using generated data and pass to generate_pdf func to show in pdf
+        accounts_dict = {}
+        accounts_dict.update(coupen_type_wise_rate_sum)
+        accounts_dict["total_winning_prize"] = total_winning_prize
+        accounts_dict["account_balance"] = total_winning_prize - coupen_type_wise_rate_sum["total_sum"]
+
+        # creating pdf
+        date_range = [billing_date,billing_date]
+        buffer = generate_pdf(
+            name,
+            pdf_data,
+            accounts_dict,
+            date_range,
+            luckydraw_data
+        )
+
+        response = FileResponse(buffer, as_attachment=True, filename="report.pdf")
+        response['Content-Disposition'] = 'attachment; filename="report.pdf"'
+        return response

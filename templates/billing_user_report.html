@@ -312,7 +312,7 @@
                               
                             </select>
                             <p class="date-input">Billing date</p>
-                            <input type="date" class="form-select form-select-lg" id="from_date" name="billing_date">
+                            <input type="date" class="form-select form-select-lg" id="billing_date" name="billing_date">
                                                    
                         </div>
 
@@ -547,13 +547,13 @@
             // fetching data
             var name = $("#name").val()
             var luckydrawtype_id = $("#luckydrawtype_id").val()
-            var from_date = $("#from_date").val()
-            var to_date = $("#to_date").val()
+            var billing_date = $("#billing_date").val()
             
-            var data = {"name":name, "luckydrawtype_id":luckydrawtype_id, "from_date":from_date, "to_date":to_date,"csrfmiddlewaretoken":"{{ csrf_token }}"}
+            
+            var data = {"name":name, "luckydrawtype_id":luckydrawtype_id,"billing_date":billing_date,"csrfmiddlewaretoken":"{{ csrf_token }}"}
             
             $.ajax({
-              url: "{% url "user_report_pdf" %}",
+              url: "{% url "additional_billing_pdf" %}",
                 method: "POST",
                 data: data,
 
