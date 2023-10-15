@@ -627,6 +627,7 @@ class AdditionalBillingReport(View):
     templet = "billing_user_report.html"
     form_class = AdditionalBillingReportForm
     
+    @method_decorator(login_required(login_url="login"))
     def post(self,request):
         """
         this method filter from addition billing port only of a perticular user
@@ -660,7 +661,7 @@ class AdditionalBillingReport(View):
 
         return render(request,self.templet,{"filtered_data":filtered_data, "lucydraw":lucydraw,"luckydrawtype_id":luckydrawtype_id,"lucky_obj":lucky_obj,"name":name})
 
-
+    @method_decorator(login_required(login_url="login"))
     def get(self, request):
         """
         this is returning the additional billing page
@@ -883,6 +884,7 @@ class AdditionalBillingPdf(View):
 
     form_class = AdditionalBillingReportPdfForm
 
+    @method_decorator(login_required(login_url="login"))
     def post(self, request):
         """
         this method fetch additional billing info such as for which port and date
