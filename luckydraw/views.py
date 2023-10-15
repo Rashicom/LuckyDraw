@@ -893,7 +893,6 @@ class AdditionalBillingPdf(View):
         form = self.form_class(request.POST)
         if not form.is_valid():
             print("invalied forrm")
-            print(form.errors)
             return JsonResponse({"status":401})
         
         # fetching elements from form
@@ -943,6 +942,19 @@ class AdditionalBillingPdf(View):
             date_range,
             luckydraw_data
         )
+
+        # after prepared the pdf, we have to delete all of the records in the perticular naem
+        # WARNING : this is not a effective solution, the feature is developed only for a short time period, until developing main feature
+        # WANRING : all the records in the extrabilling port of the perticular user is permanantly removed from data base
+        # get today date, we need only data from todays contest
+        time_zone = pytz.timezone('Asia/Kolkata')
+        date_now = datetime.now(time_zone).date()
+        
+        # filter
+        filtered_data = Participants.objects.filter(participant_name__iexact=name,context_id__luckydrawtype_id=5, context_id__context_date=date_now)
+        
+        # WARNING: deleting permanantly
+        filtered_data.delete()
 
         response = FileResponse(buffer, as_attachment=True, filename="report.pdf")
         response['Content-Disposition'] = 'attachment; filename="report.pdf"'

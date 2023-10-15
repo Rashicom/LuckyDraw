@@ -340,6 +340,7 @@
                         {% if error %}
                           <p>{{error}}</p>
                         {% endif %}
+                        <p id="error"></p>
                       </form>
                     </div>
                 </div>
@@ -549,7 +550,7 @@
             var luckydrawtype_id = $("#luckydrawtype_id").val()
             var billing_date = $("#billing_date").val()
             
-            
+            $("#error").text("")
             var data = {"name":name, "luckydrawtype_id":luckydrawtype_id,"billing_date":billing_date,"csrfmiddlewaretoken":"{{ csrf_token }}"}
             
             $.ajax({
@@ -560,6 +561,7 @@
                 success: function(data) {
 
                   if (data.status == 401) {
+                    $("#error").text("Invalid data")
                     return
                   }
 
