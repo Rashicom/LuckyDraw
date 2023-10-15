@@ -40,3 +40,18 @@ class UserReportForm(forms.Form):
 class WinnerAnnouncementPdfForm(forms.Form):
     luckydrawtype_id = forms.IntegerField(required=True)
     context_date = forms.DateField(required=True)
+
+
+
+# additional billign form
+class AdditionalBillingReportForm(forms.Form):
+    name = forms.CharField(required=True)
+    luckydrawtype_id = forms.CharField(required=False)
+    billing_date = forms.DateField(required=False)
+
+
+# inherit the AdditionalBillingReportForm and set lucky id and date requered status to true
+# here we need all informations to generate pdf
+class AdditionalBillingReportPdfForm(AdditionalBillingReportForm):
+    luckydrawtype_id = forms.CharField(required=True)
+    billing_date = forms.DateField(required=True)

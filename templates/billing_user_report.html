@@ -255,14 +255,7 @@
             <span class="navbar-toggler-icon"></span>
             </button>
 
-            <ul class="navbar-nav mx-auto">
-              <li class="nav-item">
-                <a class="nav-link under_line"  href="{% url "user_report" %}">USER REPORT</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link ms-4 text-light" href="{% url "results" %}">RESULTS & REPORTS</a>
-              </li>
-            </ul>
+            
             <div class="d-flex" role="search">
                 <a class="btn btn-outline-danger" href="{% url "logout" %}">LOGOUT</a>
             </div>
@@ -275,7 +268,7 @@
             <div class="container">
                 <div class="row mt-5">
                     <div class="col-md-12 text-center">
-                        <h2 class="text-primary fw-semibold">USER REPORT</h2>
+                        <h2 class="text-primary fw-semibold">ADDITIONAL USER BILLING</h2>
                     </div>
                     <!-- <div class="col-md-6 text-center">
                         <div class="">
@@ -310,7 +303,7 @@
                           
                           <input type="text" class="form-control me-4" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg " placeholder="Username" name="name" id="name" value={% if name %}{{name}}{% endif %}>
 
-                            <select class="form-select form-select-lg" id="luckydrawtype_id" name="luckydrawtype_id">   
+                            <select class="form-select form-select-lg" id="luckydrawtype_id" name="luckydrawtype_id">
                               {% if lucydraw %}
                                 {% for i in lucydraw %}
                                   <option value={{i.luckydrawtype_id}}> {{i.luckydraw_name}} </option>
@@ -318,11 +311,9 @@
                               {% endif %}
                               
                             </select>
-                            <p class="date-input">From</p>
-                            <input type="date" class="form-select form-select-lg" id="from_date" name="from_date">
-                            
-                            <p class="date-input">To</p>
-                            <input type="date" class="form-select form-select-lg" id="to_date" name="to_date">                            
+                            <p class="date-input">Billing date</p>
+                            <input type="date" class="form-select form-select-lg" id="billing_date" name="billing_date">
+                                                   
                         </div>
 
                         <div class="input-group">
@@ -349,6 +340,7 @@
                         {% if error %}
                           <p>{{error}}</p>
                         {% endif %}
+                        <p id="error"></p>
                       </form>
                     </div>
                 </div>
@@ -556,19 +548,20 @@
             // fetching data
             var name = $("#name").val()
             var luckydrawtype_id = $("#luckydrawtype_id").val()
-            var from_date = $("#from_date").val()
-            var to_date = $("#to_date").val()
+            var billing_date = $("#billing_date").val()
             
-            var data = {"name":name, "luckydrawtype_id":luckydrawtype_id, "from_date":from_date, "to_date":to_date,"csrfmiddlewaretoken":"{{ csrf_token }}"}
+            $("#error").text("")
+            var data = {"name":name, "luckydrawtype_id":luckydrawtype_id,"billing_date":billing_date,"csrfmiddlewaretoken":"{{ csrf_token }}"}
             
             $.ajax({
-              url: "{% url "user_report_pdf" %}",
+              url: "{% url "additional_billing_pdf" %}",
                 method: "POST",
                 data: data,
 
                 success: function(data) {
 
                   if (data.status == 401) {
+                    $("#error").text("Invalid data")
                     return
                   }
 
