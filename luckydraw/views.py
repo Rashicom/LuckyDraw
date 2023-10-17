@@ -245,21 +245,31 @@ class Context(View):
         # to know the current time we have to make a time zone object
         time_zone = pytz.timezone('Asia/Kolkata')
 
+
+        """------------THIS AUTO DATE SETTING IS TURNING OFFED FOR TEST USE ------------"""
         # if we are entering data before drow time, data goes to todays context
         if datetime.now(time_zone).time() < draw_time_obj:
             print("context : today")
             """
             todays context not annouced, so we can get or create todays context instance
             """
-            context_instance,_ = LuckyDrawContext.objects.get_or_create(context_date=datetime.now(time_zone).date(), luckydrawtype_id = luckydraw_instance)
-        
+            # TURN OFFED
+            # context_instance,_ = LuckyDrawContext.objects.get_or_create(context_date=datetime.now(time_zone).date(), luckydrawtype_id = luckydraw_instance)
+            
+
         else:
             # else todays context is finished and data can will be added to the tommorrows context
             # get or create tommorrows context instance
             print("context: tommorow")
             tomorow_date = datetime.now(time_zone).date()+timedelta(1)
             print(tomorow_date)
-            context_instance,_ = LuckyDrawContext.objects.get_or_create(luckydrawtype_id = luckydraw_instance,context_date=tomorow_date)
+
+            # TURN OFFED
+            # context_instance,_ = LuckyDrawContext.objects.get_or_create(luckydrawtype_id = luckydraw_instance,context_date=tomorow_date)
+        
+        # in all cases the coupen is added todays contest
+        context_instance,_ = LuckyDrawContext.objects.get_or_create(context_date=datetime.now(time_zone).date(), luckydrawtype_id = luckydraw_instance)
+        """-------------------------------------------------------------------------------"""
 
         # crossmatch with provided countimit, if user set new count limit update it
         count_limit = form.cleaned_data.get("count_limit")
@@ -417,7 +427,10 @@ class Context(View):
             time_diff = abs(86400 - (time1 - time2))
 
         try:
-            contest = LuckyDrawContext.objects.get(luckydrawtype_id=luckydrow.luckydrawtype_id, context_date=context_date)
+            # auto fetching using time feature is TURNED OFF
+            # contest = LuckyDrawContext.objects.get(luckydrawtype_id=luckydrow.luckydrawtype_id, context_date=context_date)
+            # FOR TEST PORPOSE returns todays contes, we dont want to return tommorrows contest if drow time not passed
+            contest = LuckyDrawContext.objects.get(luckydrawtype_id=luckydrow.luckydrawtype_id, context_date=datetime.now(time_zone).date())
         except Exception as e:
             return render(request,templet,{"luckydraw":luckydrow,"time_diff":time_diff})
         
@@ -700,19 +713,20 @@ class UserReportPdf(View):
         
         # filter
         if form.cleaned_data.get("luckydrawtype_id") == "ALL":
-            filtered_data = Participants.objects.filter(context_id__context_date__range=[from_date,to_date], participant_name__iexact=name, is_winner=True)
+            filtered_data = Participants.objects.filter(context_id__context_date__range=[from_date,to_date], participant_name__iexact=name)
 
             # if user need all data set lucky_draw data to all lucky draw and all time to show in pdf
             luckydraw_data = ["ALL","ALL TIME"]
 
         else:
-            filtered_data = Participants.objects.filter(context_id__context_date__range=[from_date,to_date], participant_name__iexact=name, context_id__luckydrawtype_id = luckydrawtype_id, is_winner=True)
+            filtered_data = Participants.objects.filter(context_id__context_date__range=[from_date,to_date], participant_name__iexact=name, context_id__luckydrawtype_id = luckydrawtype_id)
             
             # fetch luckydraw_instance and fetch data such as lucky drow name and time to show in pdf
             luckydraw_instance = LuckyDraw.objects.get(luckydrawtype_id=luckydrawtype_id)
             luckydraw_data = [luckydraw_instance.luckydraw_name,luckydraw_instance.draw_time.strftime("%I:%M %p")]
 
-        pdf_data = [[i.coupen_number,i.coupen_count,i.prize_rate * i.coupen_count] for i in filtered_data]
+        # createa array of coupem number, count and prize of of winners
+        pdf_data = [[i.coupen_number,i.coupen_count,i.prize_rate * i.coupen_count] for i in filtered_data if i.is_winner]
         
         # calculating total winnign prizes
         # got through the pdf_data and last value of the sublist is the total prize of each coupen
@@ -786,7 +800,6 @@ class WinnerAnnouncementPdf(View):
         pdf_buffer = generate_winner_pdf(reduced_winners, context_instance)
         
         return FileResponse(pdf_buffer,as_attachment=True, filename="winner_report.pdf")
-
 
 
 
@@ -911,14 +924,13 @@ class AdditionalBillingPdf(View):
         date_now = datetime.now(time_zone).date()
         
         # filter
-        filtered_data = Participants.objects.filter(participant_name__iexact=name,context_id__luckydrawtype_id=5, context_id__context_date=date_now, is_winner=True)
+        filtered_data = Participants.objects.filter(participant_name__iexact=name,context_id__luckydrawtype_id=5, context_id__context_date=date_now)
         
         # fetch luckydraw_instance and fetch data such as lucky drow name and time to show in pdf
         luckydraw_instance = LuckyDraw.objects.get(luckydrawtype_id=luckydrawtype_id)
         luckydraw_data = [luckydraw_instance.luckydraw_name,luckydraw_instance.draw_time.strftime("%I:%M %p")]
-        print(filtered_data)
         
-        pdf_data = [[i.coupen_number,i.coupen_count,i.prize_rate * i.coupen_count] for i in filtered_data]
+        pdf_data = [[i.coupen_number,i.coupen_count,i.prize_rate * i.coupen_count] for i in filtered_data if i.is_winner]
         
         # calculating total winnign prizes
         # got through the pdf_data and last value of the sublist is the total prize of each coupen

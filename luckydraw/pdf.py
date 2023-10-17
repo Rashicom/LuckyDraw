@@ -67,7 +67,7 @@ def generate_pdf(name,pdf_data, accounts_dict,date_range,luckydraw_data):
         ["Coupen type","Type_total"],
         ["BLOCK total",accounts_dict.get("BLOCK")],
         ["BOX total",accounts_dict.get("BOX")],
-        ["Block total",accounts_dict.get("SUPER")]
+        ["SUPER total",accounts_dict.get("SUPER")]
     ]
 
     table2 = Table(data2, colWidths=100, rowHeights=30)
