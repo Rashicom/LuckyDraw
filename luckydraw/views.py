@@ -753,8 +753,10 @@ class UserReportPdf(View):
             luckydraw_data
         )
 
-        response = FileResponse(buffer, as_attachment=True, filename="report.pdf")
-        response['Content-Disposition'] = 'attachment; filename="report.pdf"'
+        # generating pdf in the users name
+        pdf_name = f"{name}.pdf"
+        response = FileResponse(buffer, as_attachment=True, filename=pdf_name)
+        response['Content-Disposition'] = f'attachment; filename="{pdf_name}"'
         return response
         
 
@@ -970,6 +972,8 @@ class AdditionalBillingPdf(View):
         # WARNING: deleting permanantly
         filtered_data.delete()
 
-        response = FileResponse(buffer, as_attachment=True, filename="report.pdf")
-        response['Content-Disposition'] = 'attachment; filename="report.pdf"'
+        # generating pdf in the users name
+        pdf_name = f"{name}.pdf"
+        response = FileResponse(buffer, as_attachment=True, filename=pdf_name)
+        response['Content-Disposition'] = f'attachment; filename="{pdf_name}"'
         return response
