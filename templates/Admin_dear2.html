@@ -1,0 +1,80 @@
+{% extends "Admin_base.html" %}
+
+
+
+{% block admin_content %}
+
+      <!-- Right side column. Contains the navbar and content of the page -->
+      <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+          <h1>
+            Dear2
+          </h1>
+
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+
+          <div class="row">
+            <div class="col-md-8">
+              <!-- TABLE: LATEST ORDERS -->
+              <div class="box box-info">
+                <div class="box-header with-border">
+                  <h3 class="box-title">KERALA</h3>
+                  <div class="box-tools pull-right">
+                    <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                  </div>
+                </div><!-- /.box-header -->
+                <div class="box-body">
+
+                  <div class="table-responsive">
+                    <table class="table no-margin">
+                      <thead>
+                        <tr>
+                          <th>DATE</th>
+                          <th>STATUS</th>
+                          <!-- <th>Popularity</th> -->
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td><a href="pages/examples/invoice.html">12/03/2024</a></td>
+                          <td><span class=" label label-warning">Process</span></td>
+                          <td> <button class="btn btn-danger"><i class="fa fa-trash-o"></i></button></td>                          
+                        </tr>
+                        <tr>
+                          <td><a href="pages/examples/invoice.html">12/03/2024</a></td>
+                          <td><span class=" label label-warning">Process</span></td>
+                          <td> <button class="btn btn-danger"><i class="fa fa-trash-o"></i></button></td>                          
+                        </tr>
+                        <tr>
+                          <td><a href="pages/examples/invoice.html">12/03/2024</a></td>
+                          <td><span class=" label label-warning">Process</span></td>
+                          <td> <button class="btn btn-danger"><i class="fa fa-trash-o"></i></button></td>                          
+                        </tr>
+                        <tr>
+                          <td><a href="pages/examples/invoice.html">12/03/2024</a></td>
+                          <td><span class=" label label-warning">Process</span></td>
+                          <td> <button class="btn btn-danger"><i class="fa fa-trash-o"></i></button></td>                          
+                        </tr>
+                  
+                        
+                        
+                      </tbody>
+                    </table>
+                  </div><!-- /.table-responsive -->
+                </div><!-- /.box-body -->
+                
+              </div><!-- /.box -->
+            </div><!-- /.col -->
+            <div class="col-md-4">
+              <!-- PRODUCT LIST -->
+            </div><!-- /.col -->
+          </div><!-- /.row -->
+
+        </section><!-- /.content -->
+      </div><!-- /.content-wrapper -->
+
+{% endblock admin_content %}

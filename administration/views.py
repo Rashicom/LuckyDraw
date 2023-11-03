@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from . import forms
 from user.models import CustomUser
+from luckydraw.models import LuckyDrawContext
 
 # Create your views here.
 
@@ -85,6 +86,7 @@ class ManageUser(View):
         return render(request,self.templet,{"user_list":user_list})
 
 
+
 class AdminLogout(View):
 
     def get(self, request):
@@ -95,3 +97,53 @@ class AdminLogout(View):
         # logout and redirect to login page
         logout(request)
         return redirect('admin_login')
+
+
+
+
+
+class KeralaDear(View):
+
+    templet = "Admin_kerala.html"
+
+    def get(self, request):
+        contest_list = LuckyDrawContext.objects.filter(luckydrawtype_id=1)
+        return render(request, self.templet, {'contest_list': contest_list})
+
+
+class Dear1(View):
+
+    templet = "Admin_dear1.html"
+
+    def get(self, request):
+        contest_list = LuckyDrawContext.objects.filter(luckydrawtype_id=2)
+        return render(request, self.templet, {'contest_list': contest_list})
+
+
+class Dear2(View):
+
+    templet = "Admin_dear2.html"
+
+    def get(self, request):
+        contest_list = LuckyDrawContext.objects.filter(luckydrawtype_id=3)
+        return render(request, self.templet, {'contest_list': contest_list})
+
+
+
+class Dear3(View):
+
+    templet = "Admin_dear3.html"
+
+    def get(self, request):
+        contest_list = LuckyDrawContext.objects.filter(luckydrawtype_id=4)
+        return render(request, self.templet, {'contest_list': contest_list})
+
+
+
+class Extra(View):
+
+    templet = "Admin_dear3.html"
+
+    def get(self, request):
+        contest_list = LuckyDrawContext.objects.filter(luckydrawtype_id=5)
+        return render(request, self.templet, {'contest_list': contest_list})
