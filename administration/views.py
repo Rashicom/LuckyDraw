@@ -209,7 +209,7 @@ class KeralaDear(View):
         if not request.user.is_superuser:
             return JsonResponse({"status":403, "error":"You have to permission to perform this operation", "success":False})
 
-        contest_list = LuckyDrawContext.objects.filter(luckydrawtype_id=1)
+        contest_list = LuckyDrawContext.objects.filter(luckydrawtype_id=1).order_by("context_id")
         return render(request, self.templet, {'contest_list': contest_list})
 
 
@@ -224,7 +224,7 @@ class Dear1(View):
         if not request.user.is_superuser:
             return JsonResponse({"status":403, "error":"You have to permission to perform this operation", "success":False})
 
-        contest_list = LuckyDrawContext.objects.filter(luckydrawtype_id=2)
+        contest_list = LuckyDrawContext.objects.filter(luckydrawtype_id=2).order_by("context_id")
         return render(request, self.templet, {'contest_list': contest_list})
 
 
@@ -239,7 +239,7 @@ class Dear2(View):
         if not request.user.is_superuser:
             return JsonResponse({"status":403, "error":"You have to permission to perform this operation", "success":False})
 
-        contest_list = LuckyDrawContext.objects.filter(luckydrawtype_id=3)
+        contest_list = LuckyDrawContext.objects.filter(luckydrawtype_id=3).order_by("context_id")
         return render(request, self.templet, {'contest_list': contest_list})
 
 
@@ -255,7 +255,7 @@ class Dear3(View):
         if not request.user.is_superuser:
             return JsonResponse({"status":403, "error":"You have to permission to perform this operation", "success":False})
 
-        contest_list = LuckyDrawContext.objects.filter(luckydrawtype_id=4)
+        contest_list = LuckyDrawContext.objects.filter(luckydrawtype_id=4).order_by("context_id")
         return render(request, self.templet, {'contest_list': contest_list})
 
 
@@ -271,5 +271,5 @@ class Extra(View):
         if not request.user.is_superuser:
             return JsonResponse({"status":403, "error":"You have to permission to perform this operation", "success":False})
         
-        contest_list = LuckyDrawContext.objects.filter(luckydrawtype_id=5)
+        contest_list = LuckyDrawContext.objects.filter(luckydrawtype_id=5).order_by("context_id")
         return render(request, self.templet, {'contest_list': contest_list})
