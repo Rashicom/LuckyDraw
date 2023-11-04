@@ -142,7 +142,7 @@ class Dear3(View):
 
 class Extra(View):
 
-    templet = "Admin_dear3.html"
+    templet = "Admin_extra.html"
 
     def get(self, request):
         contest_list = LuckyDrawContext.objects.filter(luckydrawtype_id=5)

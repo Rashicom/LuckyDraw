@@ -70,42 +70,42 @@
           <ul class="sidebar-menu">
             <li class="header">MAIN NAVIGATION</li>
 
-            <li class="active treeview">
+            <li class="{% block manageuser_selected_status %}{% endblock manageuser_selected_status %} treeview">
               <a href="{% url "manage_user" %}">
                 <i class="fa fa-pie-chart"></i>
                 <span>Manage user</span>
               </a>
             </li>
 
-            <li class="treeview">
+            <li class="{% block kerala_selected_status %}{% endblock kerala_selected_status %}  treeview">
               <a href="{% url "kerala" %}">
                 <i class="fa fa-pie-chart"></i>
                 <span>KERALA</span>
               </a>
             </li>
 
-            <li class="treeview">
+            <li class="{% block dear1_selected_status %}{% endblock dear1_selected_status %} treeview">
               <a href="{% url "dear1" %}">
                 <i class="fa fa-pie-chart"></i>
                 <span>DEAR 1</span>
               </a>
             </li>
 
-            <li class="treeview">
+            <li class="{% block dear2_selected_status %}{% endblock dear2_selected_status %} treeview">
               <a href="{% url "dear2" %}">
                 <i class="fa fa-pie-chart"></i>
                 <span>DEAR 2</span>
               </a>
             </li>
 
-            <li class="treeview">
+            <li class="{% block dear3_selected_status %}{% endblock dear3_selected_status %} treeview">
               <a href="{% url "dear3" %}">
                 <i class="fa fa-pie-chart"></i>
                 <span>DEAR 3</span>
               </a>
             </li>
 
-            <li class="treeview">
+            <li class="{% block extra_selected_status %}{% endblock extra_selected_status %} treeview">
               <a href="{% url "extra" %}">
                 <i class="fa fa-pie-chart"></i>
                 <span>EXTRA BILL</span>

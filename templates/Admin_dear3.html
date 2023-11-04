@@ -1,6 +1,6 @@
 {% extends "Admin_base.html" %}
 
-
+{% block dear3_selected_status %}active{% endblock dear3_selected_status %}
 
 {% block admin_content %}
 
@@ -9,7 +9,7 @@
         <!-- Content Header (Page header) -->
         <section class="content-header">
           <h1>
-            Dear3
+            Dear 3
           </h1>
 
         </section>
@@ -22,7 +22,7 @@
               <!-- TABLE: LATEST ORDERS -->
               <div class="box box-info">
                 <div class="box-header with-border">
-                  <h3 class="box-title">KERALA</h3>
+                  <h3 class="box-title">DEAR 3</h3>
                   <div class="box-tools pull-right">
                     <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
                   </div>
@@ -33,34 +33,31 @@
                     <table class="table no-margin">
                       <thead>
                         <tr>
-                          <th>DATE</th>
-                          <th>STATUS</th>
+                          <th>ID</th>
+                          <th>CONTEXT DATE</th>
+                          <th>IS WINNER ANNOUNCED</th>
+                          <th></th>
                           <!-- <th>Popularity</th> -->
                         </tr>
                       </thead>
                       <tbody>
-                        <tr>
-                          <td><a href="pages/examples/invoice.html">12/03/2024</a></td>
-                          <td><span class=" label label-warning">Process</span></td>
-                          <td> <button class="btn btn-danger"><i class="fa fa-trash-o"></i></button></td>                          
-                        </tr>
-                        <tr>
-                          <td><a href="pages/examples/invoice.html">12/03/2024</a></td>
-                          <td><span class=" label label-warning">Process</span></td>
-                          <td> <button class="btn btn-danger"><i class="fa fa-trash-o"></i></button></td>                          
-                        </tr>
-                        <tr>
-                          <td><a href="pages/examples/invoice.html">12/03/2024</a></td>
-                          <td><span class=" label label-warning">Process</span></td>
-                          <td> <button class="btn btn-danger"><i class="fa fa-trash-o"></i></button></td>                          
-                        </tr>
-                        <tr>
-                          <td><a href="pages/examples/invoice.html">12/03/2024</a></td>
-                          <td><span class=" label label-warning">Process</span></td>
-                          <td> <button class="btn btn-danger"><i class="fa fa-trash-o"></i></button></td>                          
-                        </tr>
-                  
                         
+                        {% for contest in contest_list %}
+                        
+                          <tr>
+                            <td>{{contest.context_id}}</td>
+                            <td>{{contest.context_date}}</td>
+                            <td>
+                              {% if contest.is_winner_announced %}
+                                Announced
+                              {% else %}
+                                Pending
+                              {% endif %}
+                            </td>
+                            <td> <button class="btn btn-danger"><i class="fa fa-trash-o"></i>Delete History</button></td>                          
+                          </tr>
+                        
+                        {% endfor %} 
                         
                       </tbody>
                     </table>

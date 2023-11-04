@@ -1,6 +1,6 @@
 {% extends "Admin_base.html" %}
 
-
+{% block kerala_selected_status %}active{% endblock kerala_selected_status %}
 
 {% block admin_content %}
 
@@ -35,17 +35,29 @@
                         <tr>
                           <th>ID</th>
                           <th>CONTEXT DATE</th>
+                          <th>IS WINNER ANNOUNCED</th>
+                          <th></th>
                           <!-- <th>Popularity</th> -->
                         </tr>
                       </thead>
                       <tbody>
-
+                        
+                      {% for contest in contest_list %}
                       
                         <tr>
-                          <td><a href="pages/examples/invoice.html">12/03/2024</a></td>
-                          <td> <button class="btn btn-danger"><i class="fa fa-trash-o"></i></button></td>                          
-                        </tr>    
-                        
+                          <td>{{contest.context_id}}</td>
+                          <td>{{contest.context_date}}</td>
+                          <td>
+                            {% if contest.is_winner_announced %}
+                              Announced
+                            {% else %}
+                              Pending
+                            {% endif %}
+                          </td>
+                          <td> <button class="btn btn-danger"><i class="fa fa-trash-o"></i>Delete History</button></td>                          
+                        </tr>
+                      
+                      {% endfor %} 
                         
                       </tbody>
                     </table>
