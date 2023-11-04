@@ -41,6 +41,7 @@ class LuckyDrawContext(models.Model):
     is_winner_announced = models.BooleanField(default=False)
     count_limit = models.IntegerField(default=20)
 
+
 # particants with lucky number
 class Participants(models.Model):
     """

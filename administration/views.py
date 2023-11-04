@@ -166,6 +166,35 @@ class DeleteUser(View):
         return JsonResponse({"status":200,"success":True})       
 
 
+# delete context
+class DeleteContext(View):
+
+    @method_decorator(login_required(login_url="admin_login"))
+    def post(self, request):
+        """
+        accept : context id
+        delete context from table matching with given context id
+        return a json response
+        """
+        # return error if the user is not a super user
+        if not request.user.is_superuser:
+            return JsonResponse({"status":403, "error":"You have to permission to perform this operation", "success":False})
+        
+        # fetch context id
+        context_id = request.POST.get('context_id')
+        if context_id is None:
+            return JsonResponse({"status":401,"success":False, "error":"Invalied data"})
+        
+
+        try:
+            target_context = LuckyDrawContext.objects.get(context_id=context_id)
+            target_context.delete()
+        except Exception as e:
+            print(e)
+            return JsonResponse({"status":401,"success":False, "error":"User not found"})
+
+        return JsonResponse({"status":200,"success":True})       
+
 
 
 

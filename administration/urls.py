@@ -13,7 +13,8 @@ urlpatterns = [
     path('extra/', views.Extra.as_view(), name="extra"),
     
     path('create_user/', views.CreateUser.as_view(), name="create_user"),
-    path('delete_user/', views.DeleteUser.as_view(), name="delete_user")
+    path('delete_user/', views.DeleteUser.as_view(), name="delete_user"),
+    path('delete_context/', views.DeleteContext.as_view(), name="delete_context"),
     
     
 ]
