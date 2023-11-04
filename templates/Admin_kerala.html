@@ -1,0 +1,77 @@
+{% extends "Admin_base.html" %}
+
+{% block kerala_selected_status %}active{% endblock kerala_selected_status %}
+
+{% block admin_content %}
+
+      <!-- Right side column. Contains the navbar and content of the page -->
+      <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+          <h1>
+            Kerala
+          </h1>
+
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+
+          <div class="row">
+            <div class="col-md-8">
+              <!-- TABLE: LATEST ORDERS -->
+              <div class="box box-info">
+                <div class="box-header with-border">
+                  <h3 class="box-title">KERALA</h3>
+                  <div class="box-tools pull-right">
+                    <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                  </div>
+                </div><!-- /.box-header -->
+                <div class="box-body">
+
+                  <div class="table-responsive">
+                    <table class="table no-margin">
+                      <thead>
+                        <tr>
+                          <th>ID</th>
+                          <th>CONTEXT DATE</th>
+                          <th>IS WINNER ANNOUNCED</th>
+                          <th></th>
+                          <!-- <th>Popularity</th> -->
+                        </tr>
+                      </thead>
+                      <tbody>
+                        
+                      {% for contest in contest_list %}
+                      
+                        <tr>
+                          <td>{{contest.context_id}}</td>
+                          <td>{{contest.context_date}}</td>
+                          <td>
+                            {% if contest.is_winner_announced %}
+                              Announced
+                            {% else %}
+                              Pending
+                            {% endif %}
+                          </td>
+                          <td> <a role="button" data-id="{{contest.context_id}}" class="btn btn-danger delete_context_btn"><i class="fa fa-trash-o"></i>Delete History</a></td>                          
+                        </tr>
+                      
+                      {% endfor %} 
+                        
+                      </tbody>
+                    </table>
+                  </div><!-- /.table-responsive -->
+                </div><!-- /.box-body -->
+                
+              </div><!-- /.box -->
+            </div><!-- /.col -->
+            <div class="col-md-4">
+              <!-- PRODUCT LIST -->
+            </div><!-- /.col -->
+          </div><!-- /.row -->
+
+        </section><!-- /.content -->
+      </div><!-- /.content-wrapper -->
+
+{% endblock admin_content %}
