@@ -12,5 +12,8 @@ urlpatterns = [
     path('dear3/', views.Dear3.as_view(), name="dear3"),
     path('extra/', views.Extra.as_view(), name="extra"),
     
+    path('create_user/', views.CreateUser.as_view(), name="create_user"),
+    path('delete_user/', views.DeleteUser.as_view(), name="delete_user")
+    
     
 ]

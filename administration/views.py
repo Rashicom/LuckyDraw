@@ -6,6 +6,7 @@ from django.utils.decorators import method_decorator
 from . import forms
 from user.models import CustomUser
 from luckydraw.models import LuckyDrawContext
+from django.http import JsonResponse
 
 # Create your views here.
 
@@ -97,6 +98,72 @@ class AdminLogout(View):
         # logout and redirect to login page
         logout(request)
         return redirect('admin_login')
+
+
+class CreateUser(View):
+
+    templet = "Admin_createuser.html"
+    form_class = forms.CreateUserForm
+
+    @method_decorator(login_required(login_url="admin_login"))
+    def post(self, request):
+
+        # return error if the user is not a super user
+        if not request.user.is_superuser:
+            return JsonResponse({"status":403, "error":"You have to permission to perform this operation", "success":False})
+
+        creation_form = self.form_class(request.POST)
+        if not creation_form.is_valid():
+            return JsonResponse({"status":401, "error":"invalied data", "success":False})
+            
+
+        email = creation_form.cleaned_data.get('email')
+        password = creation_form.cleaned_data.get('password')
+
+        try:
+            CustomUser.objects.create_user(email=email, password=password)
+        except Exception as e:
+            print(e)
+            return JsonResponse({"status":401,"success":False, "error":"This user already exist"})
+        return JsonResponse({"status":201,"success":True})
+        
+
+
+    @method_decorator(login_required(login_url="admin_login"))
+    def get(self, request):
+        
+        # redirecting to the admin login page if the user is not a super user
+        if not request.user.is_superuser:
+            return redirect("admin_login")
+        
+        return render(request, self.templet)
+        
+
+# delte user jason request
+class DeleteUser(View):
+
+    @method_decorator(login_required(login_url="admin_login"))
+    def post(self, request):
+
+        # return error if the user is not a super user
+        if not request.user.is_superuser:
+            return JsonResponse({"status":403, "error":"You have to permission to perform this operation", "success":False})
+
+        # fetch data
+        user_id = request.POST.get("user_id")
+        if user_id is None:
+            return JsonResponse({"status":401,"success":False, "error":"Invalied data"})
+    
+        # delete user
+        try:
+            target_user = CustomUser.objects.get(id = user_id)
+            target_user.delete()
+
+        except Exception as e:
+            print(e)
+            return JsonResponse({"status":401,"success":False, "error":"User not found"})
+        
+        return JsonResponse({"status":200,"success":True})       
 
 
 

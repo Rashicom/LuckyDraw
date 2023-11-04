@@ -34,7 +34,7 @@
               </div>
             </div><!-- /.box-header -->
             <div class="box-body">
-              <button class="btn btn-success createbtn">CREATE NEW USER</button>
+              <a class="btn btn-success createbtn" href="{% url "create_user" %}" role="button" >CREATE NEW USER</a>
 
               <div class="table-responsive">
                 <table class="table no-margin">
@@ -48,12 +48,13 @@
                   </thead>
                   <tbody>
                     
+
                     {% for user in user_list %}
                       <tr>
                         <td><a href="#">{{user.id}}</a></td>
                         <td>{{user.email}}</td>
                         <td><span class="">{{user.is_active}}</span></td>
-                        <td><button class="btn btn-warning">Edit</button> <button class="btn btn-secondary">Delete</button></td>                          
+                        <td><a role="button" data-id="{{user.id}}" class="btn btn-danger delete_user_id">Delete</a></td>                          
                       </tr>
                     {% endfor %}
                     
@@ -75,6 +76,20 @@
 
 {% endblock admin_content %}
 
+
+{% comment %} $.ajax({
+          url: "{% url "delete_user" %}",
+          method: "POST",
+          data:data,
+          success: (data)=>{
+            if (data.success) {
+              window.location.href = "{% url "manage_user" %}"
+            }
+            else{
+              console.log("somthing went wrong")
+            }
+          }
+        }) {% endcomment %}
 
 
       
