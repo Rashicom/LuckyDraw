@@ -202,7 +202,13 @@ class KeralaDear(View):
 
     templet = "Admin_kerala.html"
 
+    @method_decorator(login_required(login_url="admin_login"))
     def get(self, request):
+
+        # return error if the user is not a super user
+        if not request.user.is_superuser:
+            return JsonResponse({"status":403, "error":"You have to permission to perform this operation", "success":False})
+
         contest_list = LuckyDrawContext.objects.filter(luckydrawtype_id=1)
         return render(request, self.templet, {'contest_list': contest_list})
 
@@ -211,7 +217,13 @@ class Dear1(View):
 
     templet = "Admin_dear1.html"
 
+    @method_decorator(login_required(login_url="admin_login"))
     def get(self, request):
+
+        # return error if the user is not a super user
+        if not request.user.is_superuser:
+            return JsonResponse({"status":403, "error":"You have to permission to perform this operation", "success":False})
+
         contest_list = LuckyDrawContext.objects.filter(luckydrawtype_id=2)
         return render(request, self.templet, {'contest_list': contest_list})
 
@@ -220,7 +232,13 @@ class Dear2(View):
 
     templet = "Admin_dear2.html"
 
+    @method_decorator(login_required(login_url="admin_login"))
     def get(self, request):
+
+        # return error if the user is not a super user
+        if not request.user.is_superuser:
+            return JsonResponse({"status":403, "error":"You have to permission to perform this operation", "success":False})
+
         contest_list = LuckyDrawContext.objects.filter(luckydrawtype_id=3)
         return render(request, self.templet, {'contest_list': contest_list})
 
@@ -230,7 +248,13 @@ class Dear3(View):
 
     templet = "Admin_dear3.html"
 
+    @method_decorator(login_required(login_url="admin_login"))
     def get(self, request):
+
+        # return error if the user is not a super user
+        if not request.user.is_superuser:
+            return JsonResponse({"status":403, "error":"You have to permission to perform this operation", "success":False})
+
         contest_list = LuckyDrawContext.objects.filter(luckydrawtype_id=4)
         return render(request, self.templet, {'contest_list': contest_list})
 
@@ -240,6 +264,12 @@ class Extra(View):
 
     templet = "Admin_extra.html"
 
+    @method_decorator(login_required(login_url="admin_login"))
     def get(self, request):
+
+        # return error if the user is not a super user
+        if not request.user.is_superuser:
+            return JsonResponse({"status":403, "error":"You have to permission to perform this operation", "success":False})
+        
         contest_list = LuckyDrawContext.objects.filter(luckydrawtype_id=5)
         return render(request, self.templet, {'contest_list': contest_list})
