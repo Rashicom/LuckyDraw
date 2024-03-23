@@ -552,7 +552,7 @@
             
             $("#error").text("")
             var data = {"name":name, "luckydrawtype_id":luckydrawtype_id,"billing_date":billing_date,"csrfmiddlewaretoken":"{{ csrf_token }}"}
-            
+              
             $.ajax({
               url: "{% url "additional_billing_pdf" %}",
                 method: "POST",

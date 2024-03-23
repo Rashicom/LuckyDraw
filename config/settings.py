@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-o4=uai0@f@#1km)7k3+y@#ky6z-o6^ubu2c%*zefrn)#32)k=h'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
@@ -145,6 +145,9 @@ USE_TZ = True
 
 STATIC_ROOT = "static-cdn/"
 STATIC_URL = 'static/'
+
+MEDIA_URL = "media/"
+MEDIA_ROOT = BASE_DIR/'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

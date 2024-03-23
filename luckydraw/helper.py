@@ -1,7 +1,7 @@
 from itertools import permutations 
 from .models import Participants
 from django.db.models import Count, Sum
-
+import pdfkit
 
 def time_to_seconds(t):
     return t.hour * 3600 + t.minute * 60 + t.second
@@ -51,3 +51,4 @@ def coupen_type_rate(query_set=None):
     reduced_dict["total_sum"] = total_sum
     
     return reduced_dict
+

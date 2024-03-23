@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views import View
 from .forms import AddParticipantForm, GetorSetLuckyDrawForm, AnnounceWinnerForm, ResultsForm, UserReportForm, WinnerAnnouncementPdfForm, AdditionalBillingReportForm, AdditionalBillingReportPdfForm
 from .models import LuckyDraw, LuckyDrawContext, Participants
@@ -12,8 +12,12 @@ from .helper import time_to_seconds, box_permutation_count, coupen_type_counts,c
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from .pdf import generate_pdf, generate_winner_pdf, generate_resultreport_pdf
+from .pdf import generate_pdf, generate_winner_pdf, generate_resultreport_pdf, generate_pdf_from_html
 from django.http import FileResponse
+import os
+from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+
 
 
 class GetorSetLuckyDraw(View):
@@ -809,7 +813,7 @@ class ResultFilterPdf(View):
 
     form_class = ResultsForm
 
-    @method_decorator(login_required(login_url="login"))
+    # @method_decorator(login_required(login_url="login"))
     def post(self, request):
 
         form = self.form_class(request.POST)
@@ -857,8 +861,7 @@ class ResultFilterPdf(View):
 
         # get account detains in the selected time period
         accounts = date_filter.get_accounts()
-        print(reduced_winners_list)
-        print(accounts)
+
         # prepare table content
         # TABLE 1  coupen type, count, amount and sum it
         # this table shows in the top of the pdf, this format is directly inject to the pdf
@@ -888,8 +891,11 @@ class ResultFilterPdf(View):
             date_range = [from_date,to_date],
             lucky_draw_data = lucky_draw_data
         )
+        html_location = os.path.join(settings.BASE_DIR,"templates","report.html")
+        test_pdf = generate_pdf_from_html(html_location)
         
         response = FileResponse(buffer,as_attachment=True, filename="resultandreport.pdf")
+        response['Content-Type'] = 'application/pdf'
         response['Content-Disposition'] = 'attachment; filename="report.pdf"'
         return response
     
