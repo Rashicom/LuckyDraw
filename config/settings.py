@@ -158,5 +158,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = "user.CustomUser"
 
 
+BASE_URL = "http://localhost/"
+
+
 
 

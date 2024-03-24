@@ -230,15 +230,15 @@
                                 <div class="row contacts">
                                     <div class="col invoice-to">
                                         <div class="text-gray-light">INVOICE TO:</div>
-                                        <h2 class="to">John Doe</h2>
-                                        <div class="address">796 Silver Harbour, TX 79273, US</div>
-                                        <div class="email"><a href="mailto:john@example.com">john@example.com</a>
+                                        <h2 class="to">{{name}}</h2>
+                                        <div class="address">address not found</div>
+                                        <div class="email"><a href="mailto:john@example.com">notfound@example.com</a>
                                         </div>
                                     </div>
                                     <div class="col invoice-details">
-                                        <h1 class="invoice-id">DEAR 1</h1>
-                                        <div class="date">Date of Invoice: 01/10/2018 - 01/10/2018</div>
-                                        <div class="date">Drow time: 3:00 PM</div>
+                                        <h1 class="invoice-id">{{luckydraw_data.0}}</h1>
+                                        <div class="date">Date of Invoice: {{date_range.0}} - {{date_range.1}}</div>
+                                        <div class="date">Drow time: {{luckydraw_data.1}}</div>
                                     </div>
                                 </div>
 
@@ -255,72 +255,22 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td class="unit">123</td>
-                                            <td class="qty">100</td>
-                                            <td class="total">₹12300</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="unit">324</td>
-                                            <td class="qty">30</td>
-                                            <td class="total">₹2100</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="unit">535</td>
-                                            <td class="qty">80</td>
-                                            <td class="total">₹34200</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="unit">123</td>
-                                            <td class="qty">100</td>
-                                            <td class="total">₹12300</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="unit">324</td>
-                                            <td class="qty">30</td>
-                                            <td class="total">₹2100</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="unit">535</td>
-                                            <td class="qty">80</td>
-                                            <td class="total">₹34200</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="unit">123</td>
-                                            <td class="qty">100</td>
-                                            <td class="total">₹12300</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="unit">324</td>
-                                            <td class="qty">30</td>
-                                            <td class="total">₹2100</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="unit">535</td>
-                                            <td class="qty">80</td>
-                                            <td class="total">₹34200</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="unit">123</td>
-                                            <td class="qty">100</td>
-                                            <td class="total">₹12300</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="unit">324</td>
-                                            <td class="qty">30</td>
-                                            <td class="total">₹2100</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="unit">535</td>
-                                            <td class="qty">80</td>
-                                            <td class="total">₹34200</td>
-                                        </tr>
+
+                                        {% for data in pdf_data %}
+
+                                            <tr>
+                                                <td class="unit">{{data.0}}</td>
+                                                <td class="qty">{{data.1}}</td>
+                                                <td class="total">₹{{data.2}}</td>
+                                            </tr>
+                                        
+                                        {% endfor %}
 
                                     </tbody>
                                     <tfoot>
                                         <tr>
                                             <td colspan="2">TOTAL WIINING AMOUNT</td>
-                                            <td>₹5,200.00</td>
+                                            <td>₹{{accounts_dict.total_winning_prize}}</td>
                                         </tr>
                                     </tfoot>
                                 </table>
@@ -341,30 +291,30 @@
                                     <tbody>
                                         <tr>
                                             <td class="unit">BLOCK TOTAL</td>
-                                            <td class="total">₹4,300</td>
+                                            <td class="total">₹{{accounts_dict.BLOCK}}</td>
                                         </tr>
                                         <tr>
                                             <td class="unit">BOX TOTAL</td>
-                                            <td class="total">₹1,200.00</td>
+                                            <td class="total">₹{{accounts_dict.BOX}}</td>
                                         </tr>
                                         <tr>
                                             <td class="unit">SUPER TOTAL</td>
-                                            <td class="total">₹3,200.00</td>
+                                            <td class="total">₹{{accounts_dict.SUPER}}</td>
                                         </tr>
 
                                     </tbody>
                                     <tfoot>
                                         <tr>
                                             <td colspan="1">TOTAL COUPEN AMOUNT</td>
-                                            <td>₹10,200.00</td>
+                                            <td>₹{{accounts_dict.total_sum}}</td>
                                         </tr>
                                         <tr>
                                             <td colspan="1">TOTAL WIINING AMOUNT</td>
-                                            <td>₹5,200.00</td>
+                                            <td>₹{{accounts_dict.total_winning_prize}}</td>
                                         </tr>
                                         <tr>
                                             <td colspan="1">ACCOUNT BALANCE</td>
-                                            <td>₹5000</td>
+                                            <td>₹{{accounts_dict.account_balance}}</td>
                                         </tr>
                                     </tfoot>
                                 </table>

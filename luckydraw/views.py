@@ -749,19 +749,25 @@ class UserReportPdf(View):
 
         # creating pdf
         date_range = [from_date,to_date]
-        buffer = generate_pdf(
-            name,
-            pdf_data,
-            accounts_dict,
-            date_range,
-            luckydraw_data
-        )
+        data = {
+            "name":name,
+            "pdf_data":pdf_data,
+            "accounts_dict":accounts_dict,
+            "date_range":date_range,
+            "luckydraw_data":luckydraw_data
+        }
 
-        # generating pdf in the users name
-        pdf_name = f"{name}.pdf"
-        response = FileResponse(buffer, as_attachment=True, filename=pdf_name)
-        response['Content-Disposition'] = f'attachment; filename="{pdf_name}"'
-        return response
+        html_location = os.path.join(settings.BASE_DIR,"templates",f"invoice_user.html")
+        pdf_save_location = os.path.join(settings.BASE_DIR,"media","user_reports",f"user_report_{name}.pdf")
+        
+        try:
+            generate_pdf_from_html(html_location, pdf_save_location, data)
+        except Exception as e:
+            print(e)
+        
+        return JsonResponse({"pdf_url": f'{settings.MEDIA_URL}user_reports/user_report_{name}.pdf'})
+        
+        
         
 
 
@@ -882,22 +888,24 @@ class ResultFilterPdf(View):
             ["Total Prize amount",accounts.get("total_prize")]
         ]
 
-        # callign pdf generator
-        buffer = generate_resultreport_pdf(
-            count_table = count_table,
-            prize_table = prize_table,
-            reduced_winners_list = reduced_winners_list,
-            profit = accounts["profit"],
-            date_range = [from_date,to_date],
-            lucky_draw_data = lucky_draw_data
-        )
+        # generate and save pdf to media files
+        data = {
+            "count_table" : count_table,
+            "prize_table" : prize_table,
+            "reduced_winners_list" : reduced_winners_list,
+            "profit" : accounts["profit"],
+            "date_range" : [from_date,to_date],
+            "lucky_draw_data" : lucky_draw_data
+        }
+
         html_location = os.path.join(settings.BASE_DIR,"templates","report.html")
-        test_pdf = generate_pdf_from_html(html_location)
-        
-        response = FileResponse(buffer,as_attachment=True, filename="resultandreport.pdf")
-        response['Content-Type'] = 'application/pdf'
-        response['Content-Disposition'] = 'attachment; filename="report.pdf"'
-        return response
+        pdf_save_location = os.path.join(settings.BASE_DIR,"media","price_report","result_report.pdf")
+        try:
+            generate_pdf_from_html(html_location, pdf_save_location, data)
+        except Exception as e:
+            print(e)
+
+        return JsonResponse({"pdf_url": f'{settings.MEDIA_URL}price_report/user_report.pdf'})
     
 
 # additional billing pdf

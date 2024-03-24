@@ -8,7 +8,7 @@ from reportlab.lib.units import inch
 from datetime import datetime
 import io
 import pdfkit
-
+from django.template.loader import render_to_string
 
 # pdf generator with user filter
 def generate_pdf(name,pdf_data, accounts_dict,date_range,luckydraw_data):
@@ -256,10 +256,13 @@ def generate_resultreport_pdf(count_table=None,prize_table=None,reduced_winners_
 """------------------- PDF usign pdfkit --------------------"""
 
 # generate pdf from html location
-def generate_pdf_from_html(location):
+def generate_pdf_from_html(location, target_location, data):
     """"
     this accepts a html location and returns pdf bytestream of the html
     """
+    html = render_to_string(location, data)
+    print("html >> ",html)
+    print("data >> ",data)
     config = pdfkit.configuration(wkhtmltopdf="/usr/bin/wkhtmltopdf")
-    pdf_byte_resp =  pdfkit.from_url(location, False, configuration=config)
-    return pdf_byte_resp
+    pdfkit.from_string(html, target_location, configuration=config)
+   

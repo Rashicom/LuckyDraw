@@ -238,9 +238,9 @@
                             <main>
                                 <div class="row contacts">
                                     <div class="col invoice-details">
-                                        <h1 class="invoice-id">KERALA</h1>
-                                        <div class="date">Date of Invoice: 01/10/2018 - 01/10/2018</div>
-                                        <div class="date">Drow time: 3:00 PM</div>
+                                        <h1 class="invoice-id">{{lucky_draw_data.0}}</h1>
+                                        <div class="date">Date of Invoice: {{date_range.0}} - {{date_range.1}}</div>
+                                        <div class="date">Drow time: {{lucky_draw_data.1}}</div>
                                     </div>
                                 </div>
 
@@ -259,26 +259,26 @@
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td class="unit">BOX</td>
-                                            <td class="qty">100</td>
-                                            <td class="total">₹0.00</td>
+                                            <td class="unit">{{count_table.0.0}}</td>
+                                            <td class="qty">{{count_table.0.1}}</td>
+                                            <td class="total">₹{{count_table.0.2}}</td>
                                         </tr>
                                         <tr>
-                                            <td class="unit">BLOCK</td>
-                                            <td class="qty">30</td>
-                                            <td class="total">₹1,200.00</td>
+                                            <td class="unit">{{count_table.1.0}}</td>
+                                            <td class="qty">{{count_table.1.1}}</td>
+                                            <td class="total">₹{{count_table.1.2}}</td>
                                         </tr>
                                         <tr>
-                                            <td class="unit">SUPER</td>
-                                            <td class="qty">80</td>
-                                            <td class="total">₹3,200.00</td>
+                                            <td class="unit">{{count_table.2.0}}</td>
+                                            <td class="qty">{{count_table.2.1}}</td>
+                                            <td class="total">₹{{count_table.2.2}}</td>
                                         </tr>
 
                                     </tbody>
                                     <tfoot>
                                         <tr>
                                             <td colspan="2">SUBTOTAL</td>
-                                            <td>₹5,200.00</td>
+                                            <td>₹{{count_table.3.2}}</td>
                                         </tr>
                                         <tr>
                                             <td colspan="2">TAX 0%</td>
@@ -286,7 +286,7 @@
                                         </tr>
                                         <tr>
                                             <td colspan="2">GRAND TOTAL</td>
-                                            <td>₹6,500.00</td>
+                                            <td>₹{{count_table.3.2}}</td>
                                         </tr>
                                     </tfoot>
                                 </table>
@@ -304,36 +304,19 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td class="unit">FIRST PRICE</td>
-                                            <td class="total">₹0.00</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="unit">SECOND PRICE</td>
-                                            <td class="total">₹1,200.00</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="unit">THIRD PRICE</td>
-                                            <td class="total">₹3,200.00</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="unit">FORTH PRICE</td>
-                                            <td class="total">₹0.00</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="unit">FIFTH PRICE</td>
-                                            <td class="total">₹1,200.00</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="unit">COMPLIMENTARY PRICE</td>
-                                            <td class="total">₹3,200.00</td>
-                                        </tr>
+
+                                        {% for price_data in prize_table|slice:"-1" %}
+                                            <tr>
+                                                <td class="unit">{{price_data.0}}</td>
+                                                <td class="total">₹{{price_data.1}}</td>
+                                            </tr>
+                                        {% endfor %}
 
                                     </tbody>
                                     <tfoot>
                                         <tr>
                                             <td colspan="1">SUBTOTAL</td>
-                                            <td>₹5,200.00</td>
+                                            <td>₹{{prize_table|last|last}}</td>
                                         </tr>
                                         <tr>
                                             <td colspan="1">TAX 0%</td>
@@ -341,7 +324,7 @@
                                         </tr>
                                         <tr>
                                             <td colspan="1">GRAND TOTAL</td>
-                                            <td>₹6,500.00</td>
+                                            <td>₹{{prize_table|last|last}}</td>
                                         </tr>
                                     </tfoot>
                                 </table>
@@ -356,18 +339,18 @@
                                     <tbody>
                                         <tr>
                                             <td class="unit">TOTAL COUPEN AMOUNT</td>
-                                            <td class="total">₹6500</td>
+                                            <td class="total">₹{{count_table|last|last}}</td>
                                         </tr>
                                         <tr>
                                             <td class="unit">TOTAL WINNING AMOUNT</td>
-                                            <td class="total">₹1,200</td>
+                                            <td class="total">₹{{prize_table|last|last}}</td>
                                         </tr>
 
                                     </tbody>
                                     <tfoot>
                                         <tr>
                                             <td colspan="1">PROFIT</td>
-                                            <td>₹6,500.00</td>
+                                            <td>₹{{profit}}</td>
                                         </tr>
                                     </tfoot>
                                 </table>
@@ -390,162 +373,17 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td class="no">123</td>
-                                            <td class="unit">₹0.00</td>
-                                            <td class="qty">100</td>
-                                            <td class="total">₹0.00</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="no">423</td>
-                                            <td class="unit">₹40.00</td>
-                                            <td class="qty">30</td>
-                                            <td class="total">₹1,200.00</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="no">234</td>
-                                            <td class="unit">₹40.00</td>
-                                            <td class="qty">80</td>
-                                            <td class="total">₹3,200.00</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="no">335</td>
-                                            <td class="unit">₹40.00</td>
-                                            <td class="qty">20</td>
-                                            <td class="total">₹800.00</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="no">123</td>
-                                            <td class="unit">₹0.00</td>
-                                            <td class="qty">100</td>
-                                            <td class="total">₹0.00</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="no">423</td>
-                                            <td class="unit">₹40.00</td>
-                                            <td class="qty">30</td>
-                                            <td class="total">₹1,200.00</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="no">234</td>
-                                            <td class="unit">₹40.00</td>
-                                            <td class="qty">80</td>
-                                            <td class="total">₹3,200.00</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="no">335</td>
-                                            <td class="unit">₹40.00</td>
-                                            <td class="qty">20</td>
-                                            <td class="total">₹800.00</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="no">123</td>
-                                            <td class="unit">₹0.00</td>
-                                            <td class="qty">100</td>
-                                            <td class="total">₹0.00</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="no">423</td>
-                                            <td class="unit">₹40.00</td>
-                                            <td class="qty">30</td>
-                                            <td class="total">₹1,200.00</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="no">234</td>
-                                            <td class="unit">₹40.00</td>
-                                            <td class="qty">80</td>
-                                            <td class="total">₹3,200.00</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="no">335</td>
-                                            <td class="unit">₹40.00</td>
-                                            <td class="qty">20</td>
-                                            <td class="total">₹800.00</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="no">123</td>
-                                            <td class="unit">₹0.00</td>
-                                            <td class="qty">100</td>
-                                            <td class="total">₹0.00</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="no">423</td>
-                                            <td class="unit">₹40.00</td>
-                                            <td class="qty">30</td>
-                                            <td class="total">₹1,200.00</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="no">234</td>
-                                            <td class="unit">₹40.00</td>
-                                            <td class="qty">80</td>
-                                            <td class="total">₹3,200.00</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="no">335</td>
-                                            <td class="unit">₹40.00</td>
-                                            <td class="qty">20</td>
-                                            <td class="total">₹800.00</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="no">234</td>
-                                            <td class="unit">₹40.00</td>
-                                            <td class="qty">80</td>
-                                            <td class="total">₹3,200.00</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="no">335</td>
-                                            <td class="unit">₹40.00</td>
-                                            <td class="qty">20</td>
-                                            <td class="total">₹800.00</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="no">123</td>
-                                            <td class="unit">₹0.00</td>
-                                            <td class="qty">100</td>
-                                            <td class="total">₹0.00</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="no">423</td>
-                                            <td class="unit">₹40.00</td>
-                                            <td class="qty">30</td>
-                                            <td class="total">₹1,200.00</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="no">234</td>
-                                            <td class="unit">₹40.00</td>
-                                            <td class="qty">80</td>
-                                            <td class="total">₹3,200.00</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="no">335</td>
-                                            <td class="unit">₹40.00</td>
-                                            <td class="qty">20</td>
-                                            <td class="total">₹800.00</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="no">123</td>
-                                            <td class="unit">₹0.00</td>
-                                            <td class="qty">100</td>
-                                            <td class="total">₹0.00</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="no">423</td>
-                                            <td class="unit">₹40.00</td>
-                                            <td class="qty">30</td>
-                                            <td class="total">₹1,200.00</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="no">234</td>
-                                            <td class="unit">₹40.00</td>
-                                            <td class="qty">80</td>
-                                            <td class="total">₹3,200.00</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="no">335</td>
-                                            <td class="unit">₹40.00</td>
-                                            <td class="qty">20</td>
-                                            <td class="total">₹800.00</td>
-                                        </tr>
+                                        {% for winner in reduced_winners_list %}
+
+                                            <tr>
+                                                <td class="no">{{winner.0}}</td>
+                                                <td class="unit">{{winner.1}}</td>
+                                                <td class="qty">{{winner.2}}</td>
+                                                <td class="total">₹{{winner.3}}</td>
+                                            </tr>
+                                        
+                                        {% endfor %}
+
                                     </tbody>
  
                                 </table>
