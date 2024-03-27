@@ -965,15 +965,22 @@ class AdditionalBillingPdf(View):
 
         # creating pdf
         date_range = [billing_date,billing_date]
-        buffer = generate_pdf(
-            name,
-            pdf_data,
-            accounts_dict,
-            date_range,
-            luckydraw_data
-        )
+        data = {
+            "name":name,
+            "pdf_data":pdf_data,
+            "accounts_dict":accounts_dict,
+            "date_range":date_range,
+            "luckydraw_data":luckydraw_data
+        }
+        html_location = os.path.join(settings.BASE_DIR,"templates",f"invoice_user.html")
+        pdf_save_location = os.path.join(settings.BASE_DIR,"media","additional_bills",f"additional_bill_{name}.pdf")
+        
+        try:
+            generate_pdf_from_html(html_location, pdf_save_location, data)
+        except Exception as e:
+            print(e)
 
-        # after prepared the pdf, we have to delete all of the records in the perticular naem
+        # after prepared the pdf, we have to delete all of the records in the perticular name
         # WARNING : this is not a effective solution, the feature is developed only for a short time period, until developing main feature
         # WANRING : all the records in the extrabilling port of the perticular user is permanantly removed from data base
         # get today date, we need only data from todays contest
@@ -986,8 +993,5 @@ class AdditionalBillingPdf(View):
         # WARNING: deleting permanantly
         filtered_data.delete()
 
-        # generating pdf in the users name
-        pdf_name = f"{name}.pdf"
-        response = FileResponse(buffer, as_attachment=True, filename=pdf_name)
-        response['Content-Disposition'] = f'attachment; filename="{pdf_name}"'
-        return response
+        return JsonResponse({"pdf_url": f'{settings.MEDIA_URL}additional_bills/additional_bill_{name}.pdf'})
+

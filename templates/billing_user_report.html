@@ -564,23 +564,8 @@
                     $("#error").text("Invalid data")
                     return
                   }
-
-                  // Create a blob from the response data
-                  var blob = new Blob([data], { type: 'application/pdf' });
-
-                  // Create a URL for the blob
-                  var url = window.URL.createObjectURL(blob);
-
-                  // Create an anchor element to initiate the download
-                  var a = document.createElement('a');
-                  a.href = url;
-                  a.download = 'report.pdf'; // Set the desired filename
-
-                  // Trigger a click event to download the file
-                  a.click();
-
-                  // Clean up by revoking the URL
-                  window.URL.revokeObjectURL(url);
+                  
+                  window.open(data.pdf_url)
                     
                 },
 
