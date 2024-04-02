@@ -335,6 +335,7 @@ class Context(View):
 
                 elif len(number)==len(char):
                     single_coupen_rate = 8
+                    coupen_type = "SUPER"  # overridding the type to super if the value is 8
             
             # calculation for limit exceeded or not
             counter = CoupenCounter(coupen_number=coupen_number,coupen_type=coupen_type,needed_count=coupen_count,context_id=context_instance.context_id)

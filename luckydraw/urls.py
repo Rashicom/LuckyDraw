@@ -18,3 +18,4 @@ urlpatterns = [
     path('result_filter_pdf/', views.ResultFilterPdf.as_view(),name="result_filter_pdf"),
     path('additional_billing_pdf/', views.AdditionalBillingPdf.as_view(),name="additional_billing_pdf"),
 ]
+    
