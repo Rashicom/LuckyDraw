@@ -906,7 +906,7 @@ class ResultFilterPdf(View):
         except Exception as e:
             print(e)
 
-        return JsonResponse({"pdf_url": f'{settings.MEDIA_URL}price_report/user_report.pdf'})
+        return JsonResponse({"pdf_url": f'{settings.MEDIA_URL}price_report/result_report.pdf'})
     
 
 # additional billing pdf

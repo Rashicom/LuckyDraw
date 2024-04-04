@@ -261,8 +261,24 @@ class AnnounceWinners:
         
         for participant in all_participants:
             print(participant.coupen_number)
+
+            # additional checking for super, bcz super contains 
             if participant.coupen_type == "SUPER":
-                 self.super_winner(participant)
+                number = ""
+                char = ""
+                for i in participant.coupen_number:
+                    if i.isnumeric():
+                        number = number+i
+                    else:
+                        char = char + i
+
+                # pure super check
+                if len(char) == 0:
+                    self.super_winner(participant)
+                # partial block: eg: AB12
+                if len(number)==len(char):
+                    self.block_winner(participant)
+
             if participant.coupen_type == "BOX":
                  self.box_winner(participant)
             if participant.coupen_type == "BLOCK":
