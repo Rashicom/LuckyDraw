@@ -301,7 +301,6 @@ class Context(View):
         # creating instace for validator class and pass credencials
         coupen = self.coupenvalidator_class(coupen_number=coupen_number, coupen_type=coupen_type)
         
-
         # if coupen is valied update data base
         if coupen.is_valied():
             print("coupen validated and READY TO SAVE DATA BASE")
@@ -332,6 +331,9 @@ class Context(View):
 
                 elif len(char) > len(number):
                     single_coupen_rate = 10.5 * len(char)
+                
+                elif len(char) == len(number) and len(char) == 3:
+                    single_coupen_rate = 10.5 * len(number)
 
                 elif len(number)==len(char):
                     single_coupen_rate = 8

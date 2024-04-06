@@ -165,11 +165,20 @@ class DateFilter(BaseCoupenFilter):
                 accounts["box_total_value"] += i.coupen_rate
             
             elif i.coupen_type == "BLOCK":
-                accounts["block_count"] += i.coupen_count
+
+                number = ""
+                char = ""
+                for j in i.coupen_number:
+                    if j.isnumeric():
+                        number = number+j
+                    else:
+                        char = char + j
+                print(i.coupen_number)
+                accounts["block_count"] += i.coupen_count * len(char)        # return number of combination count g: coupen ab1 count 2 total coutn = 4
                 accounts["block_total_value"] += i.coupen_rate
             
             elif i.coupen_type == "SUPER":
-                accounts["super_count"] += i.coupen_count
+                accounts["super_count"] += i.coupen_count 
                 accounts["super_total_value"] += i.coupen_rate
 
 
