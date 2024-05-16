@@ -95,10 +95,9 @@
                 <li class="nav-item">
                   <a class="nav-link ms-4 text-light"  href="{% url "draw" %}">DRAW PORT</a>
                 </li>
-              </ul>
+            </ul>
             <div class="d-flex" role="search">
               <a href="{% url "logout" %}" class="btn btn-outline-danger" >LOGOUT</a>
-             
             </div>
           </div>
         </div>
@@ -140,12 +139,12 @@
           <div class="row">
           <div class="col-8">
 
-          <form method="POST" class="row row-cols-lg-auto g-3 align-items-center form-section">
+          <form method="POST" class="row row-cols-lg-auto g-3 align-items-center form-section" id="context-submit" enctype="multipart/form-data">
 
             {% csrf_token %}
             <input type="text" hidden id="luckydrawtype_id" name="luckydrawtype_id" value={{luckydraw.luckydrawtype_id}}>
             
-            <div class="row col-6">
+            <div class="row">
               <div class="col-3">
                 <label class="visually-hidden" for="inlineFormInputGroupUsername">Username</label>
                 <div class="input-group">
@@ -178,19 +177,22 @@
 
             </div>
           
-            <div class="col-6">
+            <div class="row">
 
-              <div class="input-group">
+              <div class="col-3">
                 <span>
                   <input type="number" value={% if contest.count_limit %}{{contest.count_limit}}{% else %}20{% endif %} class="form-control ms-1" name="count_limit" id="inlineFormInputGroupUsername" placeholder="Count Limit" />
                 </span>
               </div>
-            
-              
+
+              <div class="col-5">
+                <div class="">
+                  <input type="file" class="form-control" id="coupen_file" name="coupen_file" placeholder="Coupen File"/>
+                </div>
+              </div>
             </div>
-            
-            
           </form>
+
           </div>
           <div class="col-4 form-section">
             <table class="table">
@@ -365,6 +367,25 @@
         updateCountdown();
 
       
+      $("#context-submit").on("submit", function(e) {
+        e.preventDefault()
+        var fileInput = $("#coupen_file")[0];
+        if (fileInput.files.length > 0) {
+            console.log("BULK submission")
+            var currentUrl = window.location.href; // Get the current URL
+            var dynamicNumber = currentUrl.slice(-2)[0]; // Extract the dynamic number from the current URL
+            var url = "/luckydraw/bulk_contest/" + dynamicNumber + "/";
+            this.action = url;
+            this.submit()
+        } else {
+          var currentUrl = window.location.href; // Get the current URL
+          var dynamicNumber = currentUrl.slice(-2)[0]; // Extract the dynamic number from the current URL
+          var url = "/luckydraw/get_contest/" + dynamicNumber + "/";
+          this.action = url;
+          this.submit();
+        }
+      })
+
       //participant save button
       $("#add_participant").on("click", function(e) {
         /*

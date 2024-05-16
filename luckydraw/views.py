@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect
 from django.views import View
-from .forms import AddParticipantForm, GetorSetLuckyDrawForm, AnnounceWinnerForm, ResultsForm, UserReportForm, WinnerAnnouncementPdfForm, AdditionalBillingReportForm, AdditionalBillingReportPdfForm
+from .forms import AddParticipantForm, GetorSetLuckyDrawForm, AnnounceWinnerForm, ResultsForm, UserReportForm, WinnerAnnouncementPdfForm, AdditionalBillingReportForm, AdditionalBillingReportPdfForm, BulkAddParticipantForm
 from .models import LuckyDraw, LuckyDrawContext, Participants
 from django.contrib.auth.decorators import login_required
 from datetime import timedelta, datetime, time
-from .coupens import CoupenCounter, CoupenValidator, AnnounceWinners, CoupenScraper
+from .coupens import CoupenCounter, CoupenValidator, AnnounceWinners, CoupenScraper, CoupenExtractor
 from .coupenfilter import WinnersFilter, DateFilter
 from django.http import JsonResponse
 import pytz
@@ -216,7 +216,7 @@ class Context(View):
             coupen_typewise_count = coupen_type_counts(context_id = contest.context_id)
         
         else:
-            # no cpontext fount means this is the first data
+            # no context fount means this is the first data
             # if there is no contest fount set participants and coupen counts to null/0
             coupen_typewise_count = {"box_count":0, "block_count":0,"super_count":0}
             all_paerticipants = ""
@@ -281,6 +281,7 @@ class Context(View):
             context_instance.count_limit = count_limit
             context_instance.save()
 
+        # >>>>>>
         # CHECK 3 : validate coupen
         coupen_number = form.cleaned_data.get("coupen_number")
         coupen_type = form.cleaned_data.get("coupen_type")
@@ -451,6 +452,293 @@ class Context(View):
 
 
 
+# bulk .txt coupen upload
+class BulkContext(View):
+
+    Addparticipant_templet = "lucky_add.html"
+    form_class = BulkAddParticipantForm
+    coupenvalidator_class = CoupenValidator
+
+    @method_decorator(login_required(login_url="login"))
+    def post(self, request, luckydrawtype_id):
+
+        # geting lucky drow instance to pass to show the details in the frond end
+        luckydrow = LuckyDraw.objects.get(luckydrawtype_id = luckydrawtype_id)
+        print("request hit")
+        print(luckydrow)
+        # get present context participant detains to list in the html
+        draw_time = datetime.strptime(str(luckydrow.draw_time), "%H:%M:%S").time()
+        time_zone = pytz.timezone('Asia/Kolkata')
+        time_now = datetime.now(time_zone).time()
+
+        # find time difference to show in the frond end in any case
+        time1 = time_to_seconds(time_now)
+        time2 = time_to_seconds(draw_time)
+
+        if time_now < draw_time:
+            context_date = datetime.now(time_zone).date()
+            time_diff = abs(time1 - time2)
+            
+        else:
+            context_date = datetime.now(time_zone).date() + timedelta(1)
+            time_diff = abs(86400 - (time1 - time2))
+
+
+        contest = LuckyDrawContext.objects.filter(luckydrawtype_id=luckydrow.luckydrawtype_id, context_date=context_date)
+        if contest.exists():
+            # fiter participants in the contst object
+            contest = contest[0]
+            all_paerticipants = Participants.objects.filter(context_id= contest.context_id)
+
+            # coupen wise count to show in html
+            coupen_typewise_count = coupen_type_counts(context_id = contest.context_id)
+        
+        else:
+            # no context fount means this is the first data
+            # if there is no contest fount set participants and coupen counts to null/0
+            coupen_typewise_count = {"box_count":0, "block_count":0,"super_count":0}
+            all_paerticipants = ""
+        
+
+        # CHECK 1 : fetching data and validatiog form
+        form = self.form_class(request.POST, request.FILES)
+        print(request.POST)
+        
+        if not form.is_valid():
+            print("form validation FAILED")
+            print(form.errors)
+            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"Invalied fields", "time_diff":time_diff, **coupen_typewise_count})
+        
+
+        # CHECK 2 : data entry time constrain check
+
+        # if the time is blow draw time get or create todays dates context instance
+        # if the time is high(todys context is finished and winner announced), get or create tomorrows date context instance
+        
+        try:
+            luckydraw_instance = LuckyDraw.objects.get(luckydrawtype_id=form.cleaned_data.get("luckydrawtype_id"))
+        except Exception as e:
+            print(e)
+            return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"Not found", "time_diff":time_diff})
+
+            
+        draw_time = luckydraw_instance.draw_time
+        
+        # drow time is a string, so we have to convert it to time object
+        draw_time_obj = datetime.strptime(str(draw_time), "%H:%M:%S").time()
+        
+        # to know the current time we have to make a time zone object
+        time_zone = pytz.timezone('Asia/Kolkata')
+
+
+        """------------THIS AUTO DATE SETTING IS TURNING OFFED FOR TEST USE ------------"""
+        # if we are entering data before drow time, data goes to todays context
+        if datetime.now(time_zone).time() < draw_time_obj:
+            print("context : today")
+            """
+            todays context not annouced, so we can get or create todays context instance
+            """
+            # TURN OFFED
+            # context_instance,_ = LuckyDrawContext.objects.get_or_create(context_date=datetime.now(time_zone).date(), luckydrawtype_id = luckydraw_instance)
+            
+
+        else:
+            # else todays context is finished and data can will be added to the tommorrows context
+            # get or create tommorrows context instance
+            print("context: tommorow")
+            tomorow_date = datetime.now(time_zone).date()+timedelta(1)
+            print(tomorow_date)
+
+            # TURN OFFED
+            # context_instance,_ = LuckyDrawContext.objects.get_or_create(luckydrawtype_id = luckydraw_instance,context_date=tomorow_date)
+        
+        # in all cases the coupen is added todays contest
+        context_instance,_ = LuckyDrawContext.objects.get_or_create(context_date=datetime.now(time_zone).date(), luckydrawtype_id = luckydraw_instance)
+        """-------------------------------------------------------------------------------"""
+
+        # crossmatch with provided countimit, if user set new count limit update it
+        count_limit = form.cleaned_data.get("count_limit")
+        if int(context_instance.count_limit) != int(count_limit):
+            context_instance.count_limit = count_limit
+            context_instance.save()
+        
+
+        # CHECK 3 : validate coupen
+        participant_name = form.cleaned_data.get("participant_name")
+        file_obj = form.cleaned_data.get("coupen_file")
+
+        # CHECK 4 : segrigate coupen
+        coupen_extractor_obj = CoupenExtractor()
+        coupen_extractor_obj.feed_file(file_obj=file_obj)
+        coupen_extractor_obj.classify_coupens()
+        all_coupen_set = coupen_extractor_obj.get_all_coupens()
+        print(all_coupen_set)
+
+        for coupen_info in all_coupen_set:
+
+            participant_name = form.cleaned_data.get("participant_name")
+
+            # fetching each coupen details
+            coupen_number = coupen_info[1]
+            coupen_type = coupen_info[0]
+            coupen_count = coupen_info[2]
+
+            if int(coupen_count) == 0:
+                # TODO:add logging
+                print("one unsuccessful coupen found")
+                continue
+                # return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"Invalied count", "time_diff":time_diff,"contest":context_instance,**coupen_typewise_count})
+
+            # creating instace for validator class and pass credencials
+            coupen = self.coupenvalidator_class(coupen_number=coupen_number, coupen_type=coupen_type)
+
+            # if coupen is valied update data base
+            if coupen.is_valied():
+                print("coupen validated and READY TO SAVE DATA BASE")
+
+                # single coupen rate calculation
+                if coupen_type=="SUPER":
+                    single_coupen_rate = 8
+                elif coupen_type=="BOX":
+                    """
+                    here may be the coupen contains 2 same digits in, this case there is no 6 compinations
+                    we have to find the coupen rate according to the compbinations
+                    """
+                    permutation_count = box_permutation_count(coupen_number=coupen_number)
+                    single_coupen_rate = int(permutation_count) * 8
+
+                else:
+                    # for block there is a seperate rate machanism
+                    number = ""
+                    char = ""
+                    for i in coupen_number:
+                        if i.isnumeric():
+                            number = number+i
+                        else:
+                            char = char + i
+
+                    if len(char)==1 and len(number) == 1:
+                        single_coupen_rate = 10.50
+
+                    elif len(char) > len(number):
+                        single_coupen_rate = 10.5 * len(char)
+
+                    elif len(char) == len(number) and len(char) == 3:
+                        single_coupen_rate = 10.5 * len(number)
+
+                    elif len(number)==len(char):
+                        single_coupen_rate = 8
+                        coupen_type = "SUPER"  # overridding the type to super if the value is 8
+
+                # calculation for limit exceeded or not
+                counter = CoupenCounter(coupen_number=coupen_number,coupen_type=coupen_type,needed_count=coupen_count,context_id=context_instance.context_id)
+
+                if counter.is_count_exceeded():
+                    """
+                    if the count limit is exceeded we have to save tocken with limited avalilable count
+                    rest of the count is added as a seperate row as is count_limit_exceeded as True
+                    """
+                    countlimit_exceeded = counter.countlimit_exceeded
+
+                    # create participant with lucky number
+                    try:
+                        new_participant = Participants(
+                            context_id=context_instance,
+                            participant_name = participant_name,
+                            coupen_number = coupen_number,
+                            coupen_type = coupen_type,
+                            coupen_count = countlimit_exceeded,
+                            coupen_rate = int(countlimit_exceeded)*float(single_coupen_rate),
+                            is_limit_exceeded = True
+
+                        )
+                        new_participant.save()
+
+                    except Exception as e:
+                        # TODO: logging
+                        print(e)
+                        print("one unsuccessful coupen update")
+                        continue
+                        # return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"coupen not updated", "time_diff":time_diff,"contest":context_instance,"last_participant_name":participant_name, **coupen_typewise_count})
+
+                if counter.available_count is not None:
+
+                    # create participant with lucky number
+                    try:
+                        new_participant = Participants(
+                            context_id=context_instance,
+                            participant_name = participant_name,
+                            coupen_number = coupen_number,
+                            coupen_type = coupen_type,
+                            coupen_count = counter.available_count,
+                            coupen_rate = int(counter.available_count)*float(single_coupen_rate),
+                            is_limit_exceeded = False
+
+                        )
+                        new_participant.save()
+
+                    except Exception as e:
+                        # TODO: logging
+                        print(e)
+                        print("one unsuccessful coupen update")
+                        continue
+                        # return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"coupen not updated", "time_diff":time_diff,"contest":context_instance,"last_participant_name":participant_name, **coupen_typewise_count})
+            else:
+                # TODO: logging
+                print("one unsuccessful coupen update, Coupen: ", coupen_info)
+                continue
+                # return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"error":"Invalied coupan", "time_diff":time_diff,"contest":context_instance,"last_participant_name":participant_name, **coupen_typewise_count})
+        
+        all_paerticipants = Participants.objects.filter(context_id= context_instance.context_id)
+        # coupen wise count to show in html
+        coupen_typewise_count = coupen_type_counts(context_id = context_instance.context_id)
+        return render(request,self.Addparticipant_templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"time_diff":time_diff,"contest":context_instance,"last_participant_name":participant_name, **coupen_typewise_count})
+
+    @method_decorator(login_required(login_url="login"))
+    def get(self, request, luckydrawtype_id):
+        """
+        this method returns Add participant page
+
+        accept: luckydrawtype_id as parmas
+        """
+
+        templet = self.Addparticipant_templet
+
+        # geting lucky drow instance to pass to show the details in the frond end
+        luckydrow = LuckyDraw.objects.get(luckydrawtype_id = luckydrawtype_id)
+
+        # get present context participant detains to list in the html
+        draw_time = datetime.strptime(str(luckydrow.draw_time), "%H:%M:%S").time()
+        time_zone = pytz.timezone('Asia/Kolkata')
+        time_now = datetime.now(time_zone).time()
+
+        # calculate time diff to show
+        time1 = time_to_seconds(time_now)
+        time2 = time_to_seconds(draw_time)
+
+        if time_now < draw_time:
+            context_date = datetime.now(time_zone).date()
+            time_diff = abs(time1 - time2)
+            
+        else:
+            context_date = datetime.now(time_zone).date() + timedelta(1)
+            time_diff = abs(86400 - (time1 - time2))
+
+        try:
+            # auto fetching using time feature is TURNED OFF
+            # contest = LuckyDrawContext.objects.get(luckydrawtype_id=luckydrow.luckydrawtype_id, context_date=context_date)
+            # FOR TEST PORPOSE returns todays contes, we dont want to return tommorrows contest if drow time not passed
+            contest = LuckyDrawContext.objects.get(luckydrawtype_id=luckydrow.luckydrawtype_id, context_date=datetime.now(time_zone).date())
+        except Exception as e:
+            return render(request,templet,{"luckydraw":luckydrow,"time_diff":time_diff})
+        
+        # fiter participants in the contst object
+        all_paerticipants = Participants.objects.filter(context_id= contest.context_id)
+        
+        #coupen count
+        coupen_typewise_count = coupen_type_counts(context_id = contest.context_id)
+         
+        return render(request,templet,{"luckydraw":luckydrow, "all_paerticipants":all_paerticipants,"time_diff":time_diff,"contest":contest, **coupen_typewise_count})
 
 # Annouce winner
 class AnnounceWinner(View):

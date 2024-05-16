@@ -2,7 +2,7 @@ from .models import LuckyDraw
 import re
 from .models import Participants,LuckyDraw,LuckyDrawContext
 from itertools import permutations
-
+from datetime import datetime
 
 class CoupenScraper:
     """
@@ -580,13 +580,83 @@ class CoupenCounter:
             return False
         
 
+
+# bulk coupen generator
+class CoupenExtractor:
+    def __init__(self):
+
+        # all message lines except data time fields
+        self.message_lines = []
+
+        # coupen and count extracted and filtered and saved in format [[coupen,count],[]..]
+        self.super_coupen = []
+        self.block_coupen = []
+        self.box_coupens = []
+        self.unmatched_message_lines = []
+        self.block_pattern = r'([a-cA-C]+[0-9]+)(?:[^a-cA-C0-9]+(\d+))?'
+        self.super_pattern = r'(?<!abc)(?<!ab)(?<!ac)(?<!bc)(?<!ABC)(?<!AB)(?<!AC)(?<!BC)(?<!a)(?<!b)(?<!c)(?<!A)(?<!B)(?<!C)(\d{3})(?:[^0-9]*(\d+))?'
+        
+
+
+    def feed_file(self, file_obj=None, date_from=None, date_to=None):
+        """
+            Read the file and fetch the message and save in in message_lines list
+            only messages which is in between date_from and date_to are saved   NEED TO IMPLIMNT
+        """
+        
+        # regex for fetching list of messages
+        pattern = r"(\d{2}/\d{2}/\d{4}), (\d{2}:\d{2}) - ([^:]+): (.*)"
         
         
+        with file_obj.open() as file:
+            data = file.readlines()
 
+        # fetching messages only
+        for message in data:
+            message = message.decode("utf-8")
+            match = re.match(pattern, message)
 
+            if match:
+                date = match.group(1)
+                time = match.group(2)
+                date_time_obj = datetime.strptime(f"{date} {time}","%d/%m/%Y %H:%M")
+                
+                message_from = match.group(3)
+                message_content = match.group(4)
+                self.message_lines.append(message_content)
+            else:
+                message_content = message
+                self.message_lines.append(message_content)
 
-
-
-
+    def get_all_coupens(self):
+        return self.super_coupen + self.box_coupens + self.block_coupen
+    
+    def classify_coupens(self):
+        """
+        Iterate through the self.message_lines and extract coupens and count then classify it
+        """
         
+        # go through all lines and extract coupen and count
+        for line in self.message_lines:
+
+            """----------------BLOCK SEARCH-------------------"""
+            # pattern
+            matches = re.findall(self.block_pattern, line)
+
+            # go through all matches
+            for match in matches:
+                self.block_coupen.append(("BLOCK",match[0],1 if match[1]=="" else match[1]))
+
+            """----------------SUPER AND BOX SEARCH-------------------"""
+            # pattern
+            matches = re.findall(self.super_pattern, line)
+
+            # go through all matches
+            if "BOX" in line.upper():
+                for match in matches:
+                    self.box_coupens.append(("BOX",match[0],1 if match[1]=="" else match[1]))
+            else:
+                for match in matches:
+                    self.super_coupen.append(("SUPER",match[0],1 if match[1]=="" else match[1]))
+
 
