@@ -645,7 +645,22 @@ class CoupenExtractor:
 
             # go through all matches
             for match in matches:
-                self.block_coupen.append(("BLOCK",match[0],1 if match[1]=="" else match[1]))
+                # split coupen into sigle if coupen is grouped
+                # eg: b124 4 >> b1 4,b2 4,b4 4
+                coupen = match[0]
+                groupe_pattern = r'\b[a-cA-C]\d{2,}\b'
+                groupe_matches = re.findall(groupe_pattern, coupen)
+                if groupe_matches:
+                    grouped_coupen = groupe_matches[0]
+                    pairs = re.findall(r'([a-zA-Z])(\d+)', grouped_coupen)
+                    letter = pairs[0][0]
+                    grouped_digits = pairs[0][1]
+                    # iterate throuhg digit and create coupen and update it
+                    for digit in grouped_digits:
+                        self.block_coupen.append(("BLOCK",letter+digit,1 if match[1]=="" else match[1]))
+                else:
+                    self.block_coupen.append(("BLOCK",match[0],1 if match[1]=="" else match[1]))
+                    
 
             """----------------SUPER AND BOX SEARCH-------------------"""
             # pattern
